@@ -8,7 +8,7 @@ Skills work out of the box with no platform dependencies. Each skill is a self-c
 
 ### Claude Code
 ```bash
-l10x skill install <skill-name>
+lets skill install <skill-name>
 ```
 
 ### Manual
@@ -20,7 +20,7 @@ Copy the skill directory into your IDE's skills folder:
 ## Sync updates
 
 ```bash
-l10x skill sync
+lets skill sync
 ```
 
 ## Skills

@@ -100,7 +100,7 @@ It is designed for product/growth/UX teams who need:
 ## Commands
 
 ```bash
-l10x persona simulate --repo-root . \
+lets persona simulate --repo-root . \
   --kind url --uri "https://example.com/signup" \
   --persona-id skeptical_buyer --scenario-id trust_and_click \
   --packs-root "$PACKS_ROOT" \

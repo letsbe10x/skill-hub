@@ -89,7 +89,7 @@ Minimum fields:
 3. Run the CLI:
 
 ```bash
-l10x research prd groom \
+lets research prd groom \
   --repo-root . \
   --artifact ./docs/prd.md \
   --evidence ./research/interview-notes.md \
@@ -99,7 +99,7 @@ l10x research prd groom \
 For market intelligence:
 
 ```bash
-l10x research prd groom \
+lets research prd groom \
   --repo-root . \
   --artifact ./docs/prd.md \
   --evidence ./research/interview-notes.md \
@@ -109,7 +109,7 @@ l10x research prd groom \
 For opportunity discovery:
 
 ```bash
-l10x research prd groom \
+lets research prd groom \
   --repo-root . \
   --artifact ./docs/prd.md \
   --evidence ./research/interview-notes.md \
