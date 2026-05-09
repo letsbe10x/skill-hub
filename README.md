@@ -56,6 +56,24 @@ l10x skill sync
 | `lets-audit-repo` | Audit a repo for quality and standards |
 | `lets-author-skill` | Author a new skill |
 
+## Contributing
+
+1. Create a directory named `lets-<your-skill>/` with a `SKILL.md` file.
+2. The skill must be **platform-neutral** — no `l10x` CLI references, no runtime
+   dependencies. Platform-specific hooks belong in
+   [skill-overlay](https://github.com/letsbe10x/skill-overlay).
+3. Include YAML frontmatter with at minimum: `name`, `description`, `metadata.author`,
+   `metadata.version`, `lifecycle`, `compatibility.agents`.
+4. Validate with `forge check lets-<name>/SKILL.md` (from a skill-forge checkout).
+5. Open a PR. CI runs `forge check` on all changed skills.
+
+### Overlay composition
+
+skill-hub provides clean base skills. Runtime augmentation (context pre-flight,
+governance checks, pack enrichment) is injected via
+[skill-overlay](https://github.com/letsbe10x/skill-overlay) at sync time using
+anchor-based composition. See the overlay repo for details.
+
 ## letsbe10x augmentation
 
 For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), see [skill-overlay](https://github.com/letsbe10x/skill-overlay).
