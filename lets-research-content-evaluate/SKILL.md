@@ -88,7 +88,7 @@ It produces a structured critique focused on:
 ## Steps
 
 1. Fill out the brief template: [`references/content_evaluate_brief.yml`](references/content_evaluate_brief.yml).
-2. Ingest the artifact (`raw_copy` for email/ad copy; `url` for landing pages) using `l10x persona ingest`.
+2. Ingest the artifact (`raw_copy` for email/ad copy; `url` for landing pages) using `lets persona ingest`.
 3. Optionally run persona simulation on the same artifact to get segment friction and trust signals.
 4. Produce a report with:
    - issues grouped by taxonomy (clarity, trust, pricing, CTA, cognitive load)
@@ -98,7 +98,7 @@ It produces a structured critique focused on:
 ## Commands
 
 ```bash
-l10x persona ingest --repo-root . \
+lets persona ingest --repo-root . \
   --kind raw_copy --text "Headline: ... CTA: ... Proof: ..." \
   --title "Content evaluation artifact"
 ```

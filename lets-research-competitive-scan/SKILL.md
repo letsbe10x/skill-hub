@@ -85,8 +85,8 @@ This skill is intentionally **artifact-first**: it captures competitor pages as 
 ## Steps
 
 1. Fill out the brief template: [`references/competitive_scan_brief.yml`](references/competitive_scan_brief.yml).
-2. Ingest competitor artifacts (URLs) using `l10x persona ingest` (one run per competitor).
-3. For each competitor, optionally run the same cohort scenario via `l10x persona simulate` to get segment-aware friction and trust signals.
+2. Ingest competitor artifacts (URLs) using `lets persona ingest` (one run per competitor).
+3. For each competitor, optionally run the same cohort scenario via `lets persona simulate` to get segment-aware friction and trust signals.
 4. Synthesize a report:
    - positioning claims, proof/trust signals, CTAs, pricing model, differentiators
    - "what they do well" vs "where they're weak"
@@ -95,7 +95,7 @@ This skill is intentionally **artifact-first**: it captures competitor pages as 
 ## Commands
 
 ```bash
-l10x persona ingest --repo-root . \
+lets persona ingest --repo-root . \
   --kind url --uri "https://example.com" \
   --title "Competitor landing page"
 ```

@@ -56,7 +56,7 @@ Use it when the user is not only grooming an existing PRD, but asking:
 
 > Given this capability or thesis, what valuable problems could it solve if we adapt it intelligently?
 
-The workflow uses `l10x research prd groom --modes opportunity_discovery` and keeps creative ideas governed by capability links, assumptions, market signals, validation gates, and audit artifacts.
+The workflow uses `lets research prd groom --modes opportunity_discovery` and keeps creative ideas governed by capability links, assumptions, market signals, validation gates, and audit artifacts.
 
 ## When To Use
 
@@ -88,7 +88,7 @@ Use [`scripts/validate-intake.py`](scripts/validate-intake.py) before running wh
 ## Command
 
 ```bash
-l10x research prd groom \
+lets research prd groom \
   --repo-root . \
   --artifact ./docs/prd-or-hypothesis.md \
   --evidence ./research/evidence.md \
@@ -106,7 +106,7 @@ For hypothesis-only discovery, omit `--solution-root`.
 1. Confirm the user has at least one valid intake: solution or hypothesis.
 2. Confirm raw evidence and market context are safe to process. Do not paste sensitive source, customer data, or private hypotheses into inline `--hypothesis`.
 3. Validate intake with the script when paths or templates are involved.
-4. Run `l10x research prd groom --modes opportunity_discovery`.
+4. Run `lets research prd groom --modes opportunity_discovery`.
 5. Inspect `role_execution_packets.json`. If it contains open packets, run or dispatch those bounded roles using the packet's doctrine refs, role playbook, persona lenses, thinking archetypes, question banks, and rubrics. Pass results back as `role_outputs` for a follow-up run. See [`references/role-execution-handoff.md`](references/role-execution-handoff.md).
 6. Check artifact completeness with [`scripts/check-artifact-completeness.py`](scripts/check-artifact-completeness.py).
 7. Summarize the ranked portfolio with [`scripts/summarize-opportunity-portfolio.py`](scripts/summarize-opportunity-portfolio.py).

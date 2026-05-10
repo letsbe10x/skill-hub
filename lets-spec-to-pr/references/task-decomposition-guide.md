@@ -22,8 +22,8 @@ Each task passed to `change_code` should include:
 ## Example
 
 ```
-Goal: Add `l10x context authoring verify` command to CLI.
-Acceptance criteria: `uv run l10x context authoring verify` exits 0 when context is fresh.
+Goal: Add `lets context authoring verify` command to CLI.
+Acceptance criteria: `uv run lets context authoring verify` exits 0 when context is fresh.
 Files in scope: src/letsbe10x_run/cli.py, tests/test_cli.py
 Spec reference: Section 3.2 — Context Freshness Check
 ```

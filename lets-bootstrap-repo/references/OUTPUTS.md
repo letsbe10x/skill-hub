@@ -22,7 +22,7 @@ A pack is `trusted: true` when its `trust_level` field equals `"verified"` in th
 
 ## What "enriched" means
 
-The engineering pack is `enriched: true` when `workflow_context.engineering.repo_summary` is non-empty. This happens only after `lets-bootstrap-agents-md` has run Phase 8 (`l10x context enrich --pack engineering`).
+The engineering pack is `enriched: true` when `workflow_context.engineering.repo_summary` is non-empty. This happens only after `lets-bootstrap-agents-md` has run Phase 8 (`lets context enrich --pack engineering`).
 
 ## Readiness levels
 

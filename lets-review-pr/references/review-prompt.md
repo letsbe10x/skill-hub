@@ -1,6 +1,6 @@
 # PR Review Prompt
 
-System prompt context for `l10x run exec --goal review_change` in the `lets-review-pr` skill.
+System prompt context for `lets run exec --goal review_change` in the `lets-review-pr` skill.
 
 ## Prompt Template
 
@@ -28,4 +28,4 @@ Diff:
 
 ## Usage
 
-Pass the rendered prompt as the `--context` argument to `l10x run exec --goal review_change`.
+Pass the rendered prompt as the `--context` argument to `lets run exec --goal review_change`.

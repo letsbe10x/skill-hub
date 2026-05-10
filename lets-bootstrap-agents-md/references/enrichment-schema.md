@@ -1,6 +1,6 @@
 # Enrichment JSON Schema — lets-bootstrap-agents-md
 
-The enrichment file is written to `/tmp/<repo-name>/.agents-bootstrap/enrichment.json` in Phase 8 and passed to `l10x context enrich`. It carries the three fields that populate the engineering context pack: `repo_summary`, `key_flows`, and `architecture_invariants`.
+The enrichment file is written to `/tmp/<repo-name>/.agents-bootstrap/enrichment.json` in Phase 8 and passed to `lets context enrich`. It carries the three fields that populate the engineering context pack: `repo_summary`, `key_flows`, and `architecture_invariants`.
 
 ## Schema
 
@@ -21,7 +21,7 @@ The enrichment file is written to `/tmp/<repo-name>/.agents-bootstrap/enrichment
 
 ### pack_id
 
-Must be exactly `"engineering"`. No other value is accepted by `l10x context enrich`.
+Must be exactly `"engineering"`. No other value is accepted by `lets context enrich`.
 
 ### repo_summary
 
@@ -53,9 +53,9 @@ Must be exactly `"engineering"`. No other value is accepted by `l10x context enr
   - `"events are append-only — never mutate a written event"`
   - `"memory writes are atomic via exclusive-create + os.replace"`
 
-## Validation before running l10x context enrich
+## Validation before running lets context enrich
 
-Before invoking `l10x context enrich`, verify:
+Before invoking `lets context enrich`, verify:
 
 1. `pack_id` is exactly `"engineering"`.
 2. `repo_summary` is non-empty and ≤ 300 characters.
@@ -63,4 +63,4 @@ Before invoking `l10x context enrich`, verify:
 4. `architecture_invariants` has between 3 and 10 items, each non-empty.
 5. Every invariant in `architecture_invariants` appears in at least one AGENTS.md file written in Phase 5 or Phase 6.
 
-If any check fails, fix the enrichment file before running the command. Do not pass a malformed enrichment file to `l10x context enrich`.
+If any check fails, fix the enrichment file before running the command. Do not pass a malformed enrichment file to `lets context enrich`.
