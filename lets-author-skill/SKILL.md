@@ -1,10 +1,10 @@
 ---
 name: lets-author-skill
-description: "Use when creating, improving, or evaluating a skill — runs a structured intake, finds the right shape, drafts a thin orchestrator, wires repo surfaces, and runs forge quality gates."
+description: "Use when creating, improving, or evaluating a skill — runs a structured intake, finds the right shape, drafts a thin orchestrator, wires repo surfaces, runs forge quality gates, calibrates judges, and produces multi-runtime evidence."
 metadata:
   author: cogsmith-ai
-  version: "2.0.0"
-  tags: [skills, authoring, quality]
+  version: "2.1.0"
+  tags: [skills, authoring, quality, calibration, assessment]
 lifecycle: published
 source: https://github.com/letsbe10x/skill-hub/blob/main/lets-author-skill/SKILL.md
 compatibility:
@@ -17,8 +17,11 @@ triggers:
   - enhance a skill
   - evaluate a skill
   - forge a skill
+  - calibrate a skill
+  - compare skill benchmarks
+  - review benchmark results
 discovery_signals:
-  keywords: [skill, authoring, scaffold, enhance, forge, bundle, benchmark, eval, shapes, blueprint]
+  keywords: [skill, authoring, scaffold, enhance, forge, bundle, benchmark, eval, shapes, blueprint, calibrate, compare, review, assessment, multi-runtime, graders]
   languages: [markdown, yaml]
   frameworks: []
   adapters: []
@@ -46,6 +49,10 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
 - You want to evaluate whether a skill is ready to ship (structural gate + bench evidence)
 - You want to pick the right shape before drafting to avoid structural rework later
 - You need to decide whether to research first or draft directly
+- You want to calibrate the LLM judge against real benchmark pass rates
+- You want to compare A/B benchmark artifacts side-by-side
+- You want multi-runtime benchmarks (claude, codex, cursor) for portability evidence
+- You want to export benchmark tasks for human review and import annotations back
 
 ## Read These References First
 
@@ -94,6 +101,9 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
 
    # non-interactive mode
    uv run forge skill enhance lets-{name} --non-interactive
+
+   # scaffold capability declarations from skill content
+   uv run forge scaffold-capabilities ../skill-hub/lets-{name}/SKILL.md
    ```
 
 6. Draft `SKILL.md` as a thin orchestrator. See `references/authoring-guide.md` §4 for the drafting rules. Key points:
@@ -123,6 +133,31 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
 
    Generated datasets are scaffolding. Replace generic prompts with skill-specific trigger, capability, and regression cases before accepting a benchmark as quality evidence.
 
+   Use the dataset library to seed from curated reusable families:
+
+   ```bash
+   # list available dataset families
+   uv run forge dataset library list
+
+   # inspect a specific family to see its slices and task templates
+   uv run forge dataset library inspect skill_authoring.trigger_precision
+
+   # scaffold a dataset from a library family
+   uv run forge dataset scaffold ../skill-hub/lets-{name}/SKILL.md --suite trigger --family skill_authoring.trigger_precision
+   ```
+
+   **Deterministic grader selection guide** (prefer these over `prompt_judge`):
+
+   | Grader | Use When |
+   |--------|----------|
+   | `text` | Expected substrings or forbidden strings in output |
+   | `regex` | Pattern matching (e.g., version strings, IDs) |
+   | `json_schema` | Required JSON structure/fields in output |
+   | `file` | Workspace file existence or content verification |
+   | `diff` | Expected vs actual text comparison |
+   | `program` | Custom executable verifier (JSON stdin/stdout protocol) |
+   | `prompt_judge` | Quality dimensions that resist deterministic checks (last resort) |
+
 9. Wire repo surfaces. Update in the same change when they exist:
 
    - `Makefile` — add install target
@@ -133,26 +168,60 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
 
 10. Run quality gates. See `references/quality-checklist.md` for the full gate list.
 
+    **Hard gates checked (HG1-HG8):**
+
+    | Gate | What It Checks |
+    |------|----------------|
+    | HG1 | Resource integrity — all referenced paths exist |
+    | HG2 | No placeholders — no unfinished or angle-bracket placeholder tokens |
+    | HG3 | Published version — lifecycle "published" requires metadata.version |
+    | HG4 | Portable manifest — sidecar matches provenance/integrity |
+    | HG5 | Metadata fidelity — declared hard_limits/validation_gates appear in content |
+    | HG6 | Discovery honesty — governance-impact metadata matches runtime posture |
+    | HG7 | Capability honesty — declared capabilities match observable content |
+    | HG8 | Signed distribution — published skills carry signed, hash-stable metadata |
+
     ```bash
-    # structural gate — required before PR
+    # structural gate — required before PR (checks HG1-HG8 + S1-S9 + ratchet)
     uv run forge check ../skill-hub/lets-{name} --baselines-dir ../skill-hub/.forge/baselines
 
     # smoke bench
-    uv run forge bench ../skill-hub/lets-{name} --suite smoke
+    uv run forge bench ../skill-hub/lets-{name} --suite smoke --runtime claude
+    ```
+
+    **Choose the right assessment profile:**
+
+    | Profile | Use Case | Key Thresholds |
+    |---------|----------|----------------|
+    | `letsbe10x-smoke` | First-run, quick confidence | pass rate >= 0.50, delta >= -0.05, 1+ trial |
+    | `letsbe10x-pr` | PR-level gate | pass rate >= 0.60, delta >= 0.0, 2+ trials |
+    | `letsbe10x-release` | Release promotion | pass rate >= 0.75, delta >= 0.05, 3+ trials, oracle evidence required |
+    | `letsbe10x-nightly` | Nightly regression CI | Same as release but 5+ trials |
+
+    ```bash
+    # run assessment with multi-runtime coverage for portability evidence
+    uv run forge assess ../skill-hub/lets-{name} --profile letsbe10x-pr --suite trigger --runtime claude --runtime cursor --trials 3
     ```
 
 11. Run the full capability bench when measured quality evidence is needed.
 
     ```bash
-    uv run forge bench ../skill-hub/lets-{name} --suite capability
+    # multi-runtime benchmark (with/without-skill A/B comparison)
+    uv run forge bench ../skill-hub/lets-{name} --suite capability --runtime claude --runtime cursor
 
     # analyze before accepting
     uv run forge result analyze .forge/benchmarks/lets-{name}.json
 
+    # compare two benchmark artifacts side-by-side (A/B)
+    uv run forge compare .forge/benchmarks/lets-{name}__baseline.json .forge/benchmarks/lets-{name}__candidate.json
+
+    # accept a candidate directly from compare
+    uv run forge compare baseline.json candidate.json --accept-candidate-to ../skill-hub/lets-{name} --reason "candidate improves delta"
+
     # browse locally
     uv run forge serve --skills-dir ../skill-hub
 
-    # improve against the capability suite when the result says improve
+    # improve against the capability suite (uses dev/eval split discipline)
     uv run forge improve ../skill-hub/lets-{name} --suite capability --no-confirm
 
     # accept only reviewed results
@@ -163,9 +232,32 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
     uv run forge bundle report ../skill-hub/lets-{name}
     ```
 
-12. Run the simplicity check. See `references/simplicity-check.md`. Cut before you add.
+    The improve loop uses **dev/eval split discipline**: the dev-split drives iteration while the eval-split validates held-out. If the eval-split regresses, the round is reverted via git ratchet. A size guard prevents unbounded skill growth.
 
-13. Present the result:
+12. Calibrate the LLM judge and run the human review workflow.
+
+    ```bash
+    # recalculate trust factor from accumulated benchmark pass rates
+    uv run forge calibrate
+
+    # calibrate a specific effectiveness dimension
+    uv run forge calibrate --dimension E1
+
+    # incorporate human annotations for stronger calibration
+    uv run forge calibrate --human annotations.json
+
+    # export suspicious tasks for human review
+    uv run forge review-export .forge/benchmarks/lets-{name}.json --output review.json
+
+    # import review annotations back into benchmarks
+    uv run forge review-import review.json --artifact .forge/benchmarks/lets-{name}.json
+    ```
+
+    Calibration computes the Pearson correlation between LLM judge E1-E4 scores and real benchmark pass rates, producing a trust factor. Without calibration, judge scores may drift from reality.
+
+13. Run the simplicity check. See `references/simplicity-check.md`. Cut before you add.
+
+14. Present the result:
     - what was added or changed
     - whether discovery mode ran and what it concluded
     - why this shape was chosen
@@ -192,12 +284,26 @@ This skill wraps the forge CLI workflow with the authoring judgment layer that f
 - **Using prompt judges for deterministic facts** — prefer text, regex, file, or event assertions before `prompt_judge`
 - **Publishing without version** — published skills must set `metadata.version`
 - **Overbuilding** — run `references/simplicity-check.md` before adding phases, scripts, or references
+- **Single-runtime benchmarks for release** — use `--runtime claude --runtime cursor` (or all three) for release/nightly profiles to prove portability
+- **Trusting uncalibrated judge scores** — run `forge calibrate` before relying on E1-E4 for promotion decisions
+- **Skipping dev/eval split in improve** — hill-climbing on the full dataset risks overfitting; always let the improve loop use its dev/eval split discipline
+- **Ignoring HG4-HG8 for publishable skills** — HG4 (portable manifest), HG6 (discovery honesty), HG7 (capability honesty), and HG8 (signed distribution) are required for release readiness
+- **Comparing artifacts without context** — use `forge compare` to get structured delta analysis rather than eyeballing JSON
 
 ## Error Handling
 
 - If `forge` is not available, install skill-forge in your workspace and retry using `uv`
 - If `forge check` fails HG1 (missing paths), remove invalid links or add the referenced files before continuing
-- If `forge check` fails HG2 (placeholders), replace all `{PLACEHOLDER}` tokens with concrete content
+- If `forge check` fails HG2 (placeholders), replace all placeholder tokens with concrete content
+- If `forge check` fails HG3 (published version), add `metadata.version` to skill frontmatter
+- If `forge check` fails HG4 (portable manifest), generate or regenerate the sidecar manifest beside the skill
+- If `forge check` fails HG5 (metadata fidelity), ensure declared hard_limits/validation_gates in frontmatter match content sections
+- If `forge check` fails HG6 (discovery honesty), align `governance_impact` discovery signals with the skill's actual runtime posture
+- If `forge check` fails HG7 (capability honesty), run `forge scaffold-capabilities` and reconcile declared vs observable capabilities
+- If `forge check` fails HG8 (signed distribution), ensure the skill has been signed properly — this gate is fail-closed
 - If `forge bench --suite` cannot resolve a suite, run `forge bundle validate` and confirm the manifest points at the expected dataset
 - If benchmark results are flaky, inspect `flakiness_rate` and failure tags before improving or accepting the run
 - If `prompt_judge` fails because `ANTHROPIC_API_KEY` is unavailable, mark the verifier advisory-only or provide the key
+- If `forge calibrate` reports low Pearson r, accumulate more benchmark runs before trusting LLM judge scores for promotion decisions
+- If `forge improve` reverts a round, the eval-split regressed — do not force the change; iterate on a different angle
+- If multi-runtime assessment shows inconsistent pass rates across runtimes, check adapter-specific behavior and ensure datasets do not assume runtime-specific features
