@@ -3,7 +3,7 @@ name: lets-create-plan
 description: "Use when you have an approved spec and need a step-by-step implementation plan. Translates spec requirements into bite-sized tasks with exact file paths, complete code, and run commands."
 metadata:
   author: cogsmith-ai
-  version: "1.0.0"
+  version: "1.2.0"
   tags: [planning, implementation, workflow]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-create-plan/SKILL.md
@@ -28,6 +28,7 @@ outcome_runtime:
   hard_limits:
     - do_not_skip_verification_planning
     - do_not_hide_open_questions
+    - do_not_plan_without_context_discovery
   required_decision_frames:
     - implementation_plan_strategy
   validation_gates:
@@ -37,8 +38,6 @@ outcome_runtime:
     - missing_truth
     - strategic_pivot
 ---
-
-> **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-create-plan
 
@@ -75,12 +74,27 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
 
 2. **Scope check** — If the spec covers multiple independent subsystems that were not broken up during brainstorming, propose separate plans (one per subsystem) before proceeding. Each plan must produce working, testable software independently.
 
-3. **Map the file structure** — Before writing tasks, list every file that will be created or modified and what it is responsible for. Lock in decomposition decisions here.
+3. **Context sufficiency check** — Before asking clarifying questions, assess whether you already have enough context to produce a correct plan. You need:
+   - Project layout (file structure, package organization)
+   - Tech stack (language, framework, database, task queue)
+   - Testing approach (framework, patterns, where tests live)
+   - Any existing CI/deployment pipeline that changes might affect
+
+   If the spec or conversation already provides this context, skip clarification and proceed directly to file mapping. Only ask questions when answering them would materially change the plan's file paths, architecture, or test commands.
+
+4. **Discover existing patterns** — Before mapping files, silently inspect:
+   - Test framework: check `pyproject.toml`, `package.json`, `go.mod`, or existing test files for the runner and assertion style
+   - CI pipeline: check `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile` — note which checks run and what the plan might break
+   - Existing conventions: directory structure, naming patterns, import style in adjacent modules
+
+   Use what you find. Do not invent conventions when the codebase already has them.
+
+5. **Map the file structure** — List every file that will be created or modified and what it is responsible for. Lock in decomposition decisions here.
    - One responsibility per file; prefer smaller focused files over large ones.
    - Files that change together live together; split by responsibility, not by layer.
    - In existing codebases, follow established patterns.
 
-4. **Write the plan header** — Every plan starts with:
+6. **Write the plan header** — Every plan starts with:
    ```markdown
    # [Feature Name] Implementation Plan
 
@@ -95,7 +109,7 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
    ---
    ```
 
-5. **Write bite-sized tasks** — Each step is one action (2–5 minutes):
+7. **Write bite-sized tasks** — Each step is one action (2–5 minutes):
    - "Write the failing test" — step
    - "Run it to confirm it fails" — step
    - "Write minimal code to pass" — step
@@ -108,18 +122,27 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
    - Commands to run with expected output
    - A commit step
 
-6. **No placeholders** — Never write placeholder markers (for example: "to be determined", "to do later", "fix later"), vague statements like "add appropriate error handling", or "write tests for the above" without actual test code.
+8. **Flag and resolve ambiguity** — If a spec requirement can be interpreted multiple ways and the interpretation materially affects the implementation, do not silently pick one. Instead:
+   - State the ambiguity explicitly in the plan (e.g., "Spec says 'backoff' — this could mean fixed delay or exponential. Choosing exponential because…")
+   - Pick the safer/more robust interpretation with a one-line rationale
+   - Mark it with `⚠️ Interpretation:` so the reviewer can challenge it
 
-7. **Self-review** — After writing the full plan, check:
-   - Every requirement in the spec is covered
-   - No placeholder text remains
-   - Types and variable names are consistent across tasks
+   This applies to algorithmic choices (fixed vs exponential retry), boundary conditions (inclusive vs exclusive ranges), and architectural trade-offs (polling vs push) where the spec doesn't specify.
 
-8. **Save the plan** — Write to the repo's plans folder (commonly `docs` → `plans`) as `YYYY-MM-DD-feature-name.md` (override with project convention if one exists).
+9. **No placeholders** — Never write placeholder markers (for example: "to be determined", "to do later", "fix later"), vague statements like "add appropriate error handling", or "write tests for the above" without actual test code.
 
-9. **Execution handoff** — Offer two options:
-   - **Subagent-Driven** (recommended): use `superpowers:subagent-driven-development`
-   - **Inline Execution**: use `superpowers:executing-plans`
+10. **Self-review** — After writing the full plan, verify:
+    - **Requirements coverage** — produce a table mapping every spec requirement to the task(s) that satisfy it. Any unmapped requirement is a gap — add a task.
+    - **No placeholders** — scan for TBD, TODO, "add appropriate", or any vague language.
+    - **Consistency** — types, variable names, and file paths are consistent across all tasks.
+    - **CI impact** — if the project has CI, note which pipeline steps the plan's changes will trigger and whether any new steps are needed (e.g., adding Redis to test fixtures).
+    - **Rollback coverage** — if the plan includes a feature flag, migration, or phased rollout, verify there is at least one test that exercises the rollback/off path and one that tests the switchover (flag toggled mid-operation or migration reverted). If missing, add a task.
+
+11. **Save the plan** — Write to the repo's plans folder (commonly `docs` → `plans`) as `YYYY-MM-DD-feature-name.md` (override with project convention if one exists).
+
+12. **Execution handoff** — Offer two options:
+    - **Subagent-Driven** (recommended): use `superpowers:subagent-driven-development`
+    - **Inline Execution**: use `superpowers:executing-plans`
 
 ## Checkpoints
 
@@ -138,6 +161,8 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
 - **Writing steps that depend on context not stated in any prior step** — every step must be self-contained.
 - **Using placeholder text or deferred items in any plan step** — plans must be complete before handoff; every step must have a concrete action and expected result.
 - **Skipping verification planning** — every plan must include at least one verification step that confirms the implementation is correct; skip no verification step.
+- **Silently resolving spec ambiguity** — if a requirement has multiple valid interpretations, do not pick one without flagging it. The reviewer needs to see your interpretation to catch misalignment early.
+- **Feature-flagged plans without rollback tests** — if you add a feature flag or migration, the plan must include tests for: flag off (old path works), flag on (new path works), and switchover (toggling doesn't corrupt state).
 
 ## Outputs
 
