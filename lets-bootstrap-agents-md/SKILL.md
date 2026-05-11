@@ -240,7 +240,12 @@ Read each reference only when its phase activates — not upfront.
 |-------|---------|---------|
 | [assets/templates/agents-md-frontmatter.template.md](assets/templates/agents-md-frontmatter.template.md) | Required YAML frontmatter for every generated file | Phase 5/6 |
 | [assets/templates/verification-report.template.md](assets/templates/verification-report.template.md) | Verification gate report structure | Phase 7 |
-| [assets/templates/evidence-entry.schema.json](assets/templates/evidence-entry.schema.json) | Evidence index entry schema | Phase 2 |
+| [assets/templates/evidence-index.schema.json](assets/templates/evidence-index.schema.json) | Evidence index artifact schema | Phase 2 |
+| [assets/templates/directory-tree.schema.json](assets/templates/directory-tree.schema.json) | Directory tree artifact schema | Phase 2 |
+| [assets/templates/modules.schema.json](assets/templates/modules.schema.json) | Module tiering artifact schema | Phase 3 |
+| [assets/templates/command-catalog.schema.json](assets/templates/command-catalog.schema.json) | Command catalog artifact schema | Phase 4 |
+| [assets/templates/staleness-report.schema.json](assets/templates/staleness-report.schema.json) | Staleness report artifact schema | Phase 2 (update mode) |
+| [assets/templates/section-scorecard.schema.json](assets/templates/section-scorecard.schema.json) | Section quality scorecard schema | Phase 6 |
 | [scripts/detect_modules.sh](scripts/detect_modules.sh) | Discover candidate modules with metadata | Phase 2/3 |
 | [scripts/check_staleness.sh](scripts/check_staleness.sh) | Check existing AGENTS.md files for staleness signals | Phase 1 |
 

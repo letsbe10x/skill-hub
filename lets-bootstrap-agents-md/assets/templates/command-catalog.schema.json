@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Command Catalog",
+  "description": "All discovered commands with classification status.",
+  "type": "object",
+  "required": ["commands"],
+  "properties": {
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "source", "status", "scope"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The command verbatim as found in source"
+          },
+          "source": {
+            "type": "string",
+            "description": "Where the command was found (e.g., Makefile:test, README.md)"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["VERIFIED", "PLAUSIBLE", "BLOCKED"],
+            "description": "Classification per command taxonomy"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["repo-wide", "module-scoped"],
+            "description": "Whether the command applies to the whole repo or a specific module"
+          },
+          "modules": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Which modules this command applies to (empty = all)"
+          },
+          "block_reason": {
+            "type": "string",
+            "description": "Why this command is BLOCKED (only for status=BLOCKED)"
+          }
+        }
+      }
+    }
+  }
+}

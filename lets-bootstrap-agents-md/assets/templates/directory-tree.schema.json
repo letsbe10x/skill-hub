@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Directory Tree",
+  "description": "Module hierarchy with discovery indicators. Keyed by relative directory path.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["depth", "file_count"],
+    "properties": {
+      "depth": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Directory depth from repo root (root = 0)"
+      },
+      "file_count": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Immediate file count (not recursive)"
+      },
+      "has_init": {
+        "type": "boolean",
+        "description": "Contains __init__.py (Python package indicator)"
+      },
+      "has_tests": {
+        "type": "boolean",
+        "description": "Contains test files or a tests/ subdir"
+      },
+      "has_agents_md": {
+        "type": "boolean",
+        "description": "Existing AGENTS.md present on disk"
+      },
+      "subdirs": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Immediate subdirectory names (trailing /)"
+      }
+    }
+  }
+}

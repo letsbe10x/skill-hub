@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Staleness Report",
+  "description": "Identifies what changed since the last AGENTS.md compilation. Update mode only.",
+  "type": "object",
+  "required": ["generated_at"],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when report was generated"
+    },
+    "stale_modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "reasons"],
+        "properties": {
+          "path": { "type": "string" },
+          "reasons": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "All staleness signals detected"
+          }
+        }
+      }
+    },
+    "new_modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      },
+      "description": "Directories qualifying for Tier 1/2 but lacking AGENTS.md"
+    },
+    "deleted_modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      },
+      "description": "Modules referenced in existing AGENTS.md that no longer exist"
+    }
+  }
+}
