@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Readiness Rubric Check",
+  "description": "Schema for a single rubric check in the AI readiness assessment.",
+  "type": "object",
+  "required": ["check_id", "pillar", "min_level", "required", "weight", "detect_type", "detect_method"],
+  "properties": {
+    "check_id": {
+      "type": "string",
+      "pattern": "^[a-z]+\\.[a-z_]+$",
+      "description": "Stable identifier: pillar.check_name"
+    },
+    "pillar": {
+      "type": "string",
+      "enum": [
+        "feedback_velocity",
+        "error_signal_clarity",
+        "determinism",
+        "change_safety",
+        "context_discoverability",
+        "pattern_consistency",
+        "recovery_cost",
+        "environment_independence"
+      ]
+    },
+    "min_level": {
+      "type": "string",
+      "enum": ["L1", "L2", "L3", "L4", "L5"],
+      "description": "Minimum maturity level this check gates"
+    },
+    "required": {
+      "type": "boolean",
+      "description": "Whether this check gates level achievement"
+    },
+    "weight": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Score contribution when passing"
+    },
+    "detect_type": {
+      "type": "string",
+      "enum": ["deterministic", "heuristic"]
+    },
+    "detect_method": {
+      "type": "string",
+      "enum": [
+        "file_exists",
+        "file_contains",
+        "config_has_key",
+        "command_discoverable",
+        "directory_structure",
+        "file_ratio",
+        "convention_consistency",
+        "content_quality",
+        "timing_estimate"
+      ]
+    },
+    "detect_config": {
+      "type": "object",
+      "description": "Method-specific configuration (paths, patterns, thresholds)"
+    },
+    "evidence_template": {
+      "type": "string",
+      "description": "Template for evidence string when check passes/fails"
+    },
+    "remediation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Concrete remediation steps"
+    },
+    "scaffold": {
+      "type": "object",
+      "properties": {
+        "possible": { "type": "boolean" },
+        "template": { "type": "string" },
+        "action": { "type": "string", "enum": ["create", "modify", "recommend"] }
+      },
+      "description": "Whether and how this check can be scaffolded"
+    }
+  }
+}

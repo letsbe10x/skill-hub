@@ -53,7 +53,7 @@ lets skill sync
 ### Meta
 | Skill | What it does |
 |---|---|
-| `lets-audit-repo` | Audit a repo for quality and standards |
+| `lets-assess-ai-readiness` | Assess a repo's AI-assisted development readiness across 8 pillars with leveled scoring and scaffold plans |
 | `lets-author-skill` | Author a new skill |
 
 ## Contributing
