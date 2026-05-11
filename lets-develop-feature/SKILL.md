@@ -1,10 +1,10 @@
 ---
 name: lets-develop-feature
-description: "Use when implementing a code change that has a spec or task description. Drives change through mandatory scope discovery, structured execution packet, governance classification, bounded implementation, and evidence-gated handoff to lets-verify-change."
+description: "Full-lifecycle feature development with staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
 metadata:
   author: cogsmith-ai
-  version: "2.0.0"
-  tags: [implementation, change-management, delivery, governance]
+  version: "4.0.0"
+  tags: [implementation, change-management, delivery, governance, architecture]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-develop-feature/SKILL.md
 compatibility:
@@ -17,263 +17,301 @@ triggers:
   - code this up
   - implement the spec
   - execute the plan
+  - build this
+  - implement the feature
+  - code this feature
 outcome_runtime:
   open_agency_zones:
     - implementation_strategy
     - risk_decomposition
     - test_strategy
+    - architecture_decision
+    - work_package_ordering
+    - methodology_selection
+    - scenario_coverage
   governed_action_zones:
     - filesystem_mutation
     - dependency_change
     - external_side_effect
+    - schema_migration
+    - public_api_change
   allowed_moves:
     - challenge_initial_framing
     - reorder_work_by_risk
     - request_missing_context
+    - propose_scope_cut
+    - escalate_architecture_concern
+    - request_design_checkpoint
+    - block_on_missing_evidence
+    - trigger_spec_revision
   hard_limits:
     - do_not_bypass_policy_gates
     - do_not_fabricate_test_results
     - do_not_commit_secrets
     - do_not_implement_before_packet_presented
+    - do_not_expand_scope_silently
+    - do_not_skip_verification
+    - do_not_weaken_error_handling
+    - do_not_ignore_service_context
+    - do_not_leave_stages_implicit
+    - do_not_proceed_past_spec_contradiction
   required_decision_frames:
     - implementation_strategy
+    - architecture_decision
+    - methodology_choice
   validation_gates:
     - execution_packet_gate
     - verification_before_completion
     - governance_checkpoint
+    - design_checkpoint
+    - evidence_gate
+    - service_context_gate
+    - spec_alignment_gate
+    - completion_quality_gate
   mutation_policy: additive_only
   human_checkpoint_triggers:
     - irreversible_mutation
     - compliance_risk
     - critical_path_modification
+    - architecture_boundary_change
+    - public_api_surface_change
+    - service_nonnegotiable_tension
+    - spec_deviation_discovered
 ---
 
 > **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-develop-feature
 
-Plan, gate, and implement a code change with structured governance and evidence-gated handoff.
+Staged feature development with service-context binding, spec-alignment checking, and evidence-gated completion. Each stage has explicit state. Operational detail lives in phase-specific references — this file is the contract.
 
-## Process Flow
+---
 
-```dot
-digraph develop_feature {
-  Announce [shape=box];
-  ScopeDiscovery [label="Scope Discovery\n(read-only)" shape=box];
-  ExecutionPacket [label="Build Execution Packet\n(present to user)" shape=box];
-  GovernanceGate [label="Governance Gate" shape=diamond];
-  UserConfirm [label="User confirms\nhigh-risk items" shape=box];
-  Implement [label="Implement\n(bounded by packet)" shape=box];
-  EvidenceGate [label="Evidence Gate" shape=diamond];
-  Handoff [label="lets-verify-change" shape=doublecircle];
+## Stages & Gates
 
-  Announce -> ScopeDiscovery;
-  ScopeDiscovery -> ExecutionPacket;
-  ExecutionPacket -> GovernanceGate;
-  GovernanceGate -> Implement [label="low risk"];
-  GovernanceGate -> UserConfirm [label="medium/high"];
-  UserConfirm -> Implement [label="approved"];
-  Implement -> EvidenceGate;
-  EvidenceGate -> Handoff [label="evidence exists"];
-  EvidenceGate -> Implement [label="run verification"];
-}
+```
+Stage 1: Ground         → Read repo context + service constraints (BINDING)
+Stage 2: Classify       → Determine rigor level (MINIMAL / STANDARD / ELEVATED / FULL)
+Stage 3: Plan           → Execution packet + scenarios + assumptions
+Stage 4: Architecture   → Design gate (required | skipped with reason)
+Stage 5: Checkpoint     → User reviews plan (STANDARD+)
+Stage 6: Implement      → Per-package, with spec re-read at each milestone
+Stage 7: Test           → Methodology-aware verification
+Stage 8: Verify         → Compare delivered work against plan + spec + service context
+Stage 9: Complete       → Quality scorecard + handoff
 ```
 
-## When to use
+**Every stage** ends in one of: `completed` | `skipped` (with reason) | `blocked` (with blocker).
 
-- AI agent is about to implement a change and needs governance before coding
-- Developer wants a structured execution packet before implementation begins
-- Part of a `pr-ship` workflow: lets-develop-feature → lets-verify-change → lets-review-code
-- A change touches multiple files, shared interfaces, or critical paths
-
-## When not to use
-
-- You only need to verify an existing change (use `lets-verify-change` directly).
-- You are reviewing a PR without implementing anything (use `lets-review-pr`).
-- The change is a single-line typo fix with zero risk (just fix it directly).
-
-## Inputs
-
-- Input: Task description, spec, or approved plan
-- Input: Repo root path
-- Input: List of changed or planned file paths (optional — discovered in Phase 1 if not provided)
+**No stage is ever left implicit.** The handoff shows all 9 stages accounted for.
 
 ---
 
-## Step 1 — Announce
+## When to Use
 
-**This step is mandatory. Do it BEFORE any file reads or exploration.**
+- Implementing a feature, bugfix, or refactor that touches production code
+- Any change that benefits from structured planning before coding
+- Delivery chain: **lets-develop-feature** → lets-verify-change → lets-review-code
 
-State: "I'm using lets-develop-feature to implement this change."
+## When Not to Use
 
-Do not skip this. Do not proceed to reading files without announcing first.
-
----
-
-## Step 2 — Scope Discovery (read-only)
-
-Before building the execution packet, gather evidence about what you're changing.
-
-1. **Identify target files** — from the task description, spec, or by exploring the codebase.
-
-2. **Read each target file** and scan for risk signals:
-
-   | Signal | How to detect | Meaning |
-   |--------|---------------|---------|
-   | Critical path marker | Docstring contains "CRITICAL", "security review", "do not modify without" | High risk — requires individual confirmation |
-   | Shared interface | File is imported by 3+ other modules (check with grep) | Medium risk — changes propagate |
-   | Configuration file | Lives in `config/`, `.env`, or is named `*.yaml`/`*.toml`/`*.json` with cross-cutting settings | Medium risk — affects multiple subsystems |
-   | Irreversible operation | Task involves DROP, DELETE, migration, or external API call | High risk — cannot be undone |
-   | Test file only | File lives in `tests/` or `test_*` | Low risk |
-   | New file (additive) | File doesn't exist yet | Low risk |
-
-3. **Check who imports each file** (for existing files):
-   ```bash
-   grep -r "from .module_name import\|import module_name" --include="*.py" .
-   ```
-
-4. **Output**: A file manifest with risk annotations. Example:
-   ```
-   Files in scope:
-   - src/permissions.py — MEDIUM (shared interface, imported by api.py, admin.py, middleware.py)
-   - src/auth.py — HIGH (docstring: "CRITICAL PATH", security-sensitive)
-   - config/roles.yaml — MEDIUM (cross-cutting config)
-   - src/api.py — LOW (additive: new endpoint)
-   - tests/test_permissions.py — LOW (test file)
-   ```
-
-**Do not proceed to the execution packet without completing scope discovery.**
+- Verifying an existing change → `lets-verify-change`
+- Reviewing a PR → `lets-review-pr`
+- Single-line zero-risk typo fix → just fix it
+- Research/discovery without implementing → `lets-brainstorm`
 
 ---
 
-## Step 3 — Build the Execution Packet
+## Graduated Rigor
 
-Present the following structured packet to the user. Every field is mandatory.
+| Level | When | Stages active | Detail |
+|-------|------|---------------|--------|
+| **MINIMAL** | Trivial + low risk + mechanical | 1,2,3(minimal),6,8(quick),9 | [CLASSIFICATION.md](references/CLASSIFICATION.md) |
+| **STANDARD** | Typical feature/bugfix | All stages, arch may be skipped | Full packet + scenarios |
+| **ELEVATED** | Cross-module, new abstractions, API | All stages, arch required | Design checkpoint + traceability |
+| **FULL** | Large, critical, irreversible | All + per-file confirmation | Stacked PRs + quality scorecard |
 
-```markdown
-## Execution Packet
-
-**Task:** [one-sentence description of what this change accomplishes]
-
-**Risk Level:** Low | Medium | High
-**Risk Evidence:**
-- [cite specific signals from scope discovery, e.g., "auth.py docstring says CRITICAL PATH"]
-- [e.g., "permissions.py imported by 4 modules — shared interface"]
-
-### Work Packages (ordered lowest-risk first)
-
-| # | Files | Intent | Verification | Risk |
-|---|-------|--------|--------------|------|
-| 1 | tests/test_new.py | Write failing tests first | `pytest tests/test_new.py` — should fail | Low |
-| 2 | src/new_module.py | Implement new additive logic | `pytest tests/test_new.py` — should pass | Low |
-| 3 | src/shared.py | Modify shared interface | `pytest tests/ -q` — all pass | Medium |
-| 4 | config/settings.yaml | Update configuration | Manual review | Medium |
-
-### Critical Path Files (require individual confirmation)
-- src/auth.py — "CRITICAL PATH" marker in docstring. Confirm before editing? (y/n)
-```
-
-**Hard rules for the execution packet:**
-- Work packages are ordered **lowest risk first** — complete safe changes before risky ones.
-- Every work package has a verification command. No package without a way to check it.
-- Critical path files are listed separately with an explicit confirmation request.
-- If you cannot identify verification commands, ask the user what tests/checks exist.
-
-**Do not proceed to implementation without presenting this packet.**
+See [references/CLASSIFICATION.md](references/CLASSIFICATION.md) for classification matrix and gate overrides.
 
 ---
 
-## Step 4 — Governance Gate
+## Stage Contracts (Summary)
 
-After presenting the execution packet, apply the governance decision:
+### Stage 1 — Ground in Repo + Service Context
 
-| Overall Risk Level | Action |
-|-------------------|--------|
-| **Low** | All files are additive or test-only. State "Low risk — proceeding with implementation." and continue. |
-| **Medium** | Shared interfaces or config touched. State the specific risks, then ask: "Acknowledge these risks and proceed? (y/n)" |
-| **High** | Critical paths, irreversible operations, or security surfaces. Present a mitigation plan (e.g., "I'll implement behind a feature flag" or "I'll add a rollback migration"). Ask: "Confirm proceed with mitigation? (y/n)" |
+Read AGENTS.md, extract non-negotiables, critical paths, boundaries. These BIND the run.
 
-**For each critical-path file**, ask individually:
-> "This file is in a critical path — proceed with editing [filename]? (y/n)"
+**Output:** Service context summary. See [references/SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md).
 
-Wait for explicit confirmation before editing critical-path files.
+### Stage 2 — Classify & Select Rigor
+
+Classify by type/scale/risk/complexity. Apply gate overrides.
+
+**Output:** Classification + rigor level. See [references/CLASSIFICATION.md](references/CLASSIFICATION.md).
+
+### Stage 3 — Plan
+
+Produce execution packet with work packages, scenario matrix, assumptions.
+
+**Output:** Execution packet, scenario matrix, assumptions log. See [references/PLANNING.md](references/PLANNING.md).
+
+### Stage 4 — Architecture Gate
+
+Opens when: new abstraction, boundary change, API change, schema change. Answer the 6 gate questions.
+
+**Output:** Architecture notes (or explicit `skipped` with reason). See [references/ARCHITECTURE-GATE.md](references/ARCHITECTURE-GATE.md).
+
+### Stage 5 — Checkpoint
+
+Present plan to user for review. Validate completeness.
+
+**Output:** User approval. See [references/PLANNING.md](references/PLANNING.md).
+
+### Stage 6 — Implement
+
+Execute work packages in order. **Mandatory spec re-read at each milestone boundary.** Stop on spec contradiction.
+
+**Output:** Code changes + living artifacts (traceability, notes). See [references/IMPLEMENTATION.md](references/IMPLEMENTATION.md).
+
+### Stage 7 — Test
+
+Methodology-aware testing per work package.
+
+**Output:** Test results + coverage evidence. See [references/METHODOLOGY.md](references/METHODOLOGY.md).
+
+### Stage 8 — Verify
+
+Compare delivered work against plan, spec, service context, scenario coverage. Not "run tests again" — a dedicated comparison.
+
+**Output:** Verification verdict (ready | blocked). See [references/VERIFICATION.md](references/VERIFICATION.md).
+
+### Stage 9 — Complete
+
+Quality scorecard. Handoff packet with full stage status.
+
+**Output:** Scorecard + handoff. See [references/COMPLETION.md](references/COMPLETION.md).
 
 ---
 
-## Step 5 — Implement (bounded by packet)
+## Spec-Alignment Protocol
 
-After governance is cleared, implement each work package in order:
+When a spec/task description exists, implementation must align to it continuously:
 
-1. Read target files before editing
-2. Make the change as specified in the work package
-3. Run the verification command listed for that package
-4. If verification fails, fix before moving to the next package
-5. Move to the next work package
+1. **Before each work package:** Re-read the relevant section of the spec
+2. **During implementation:** If code reveals spec contradiction → STOP
+3. **On contradiction:** Surface it, update spec understanding or revise approach
+4. **At verification:** Check each spec requirement against implemented code
 
-**Scope enforcement:**
-- Do NOT implement changes to files not listed in the execution packet.
-- If you discover additional files need changes, STOP and say: "I need to update the execution packet — [file] also needs modification because [reason]. Proceed?"
-- Only continue after user confirms the expanded scope.
+**Spec contradiction = hard stop.** Never silently proceed past a deviation.
+
+See [references/SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md) for the full protocol.
 
 ---
 
-## Step 6 — Evidence Gate and Handoff
+## Negative Guardrails (What I REFUSE To Do)
 
-Before handoff, you MUST have at least one concrete verification artifact:
+| # | Guardrail |
+|---|-----------|
+| 1 | I will NOT implement before presenting the execution packet |
+| 2 | I will NOT expand scope without stopping and asking |
+| 3 | I will NOT weaken existing error handling |
+| 4 | I will NOT ignore service context constraints |
+| 5 | I will NOT fabricate test results or claim untested confidence |
+| 6 | I will NOT leave stages implicit — every stage is completed or explicitly skipped |
+| 7 | I will NOT commit secrets |
+| 8 | I will NOT re-plan inside implementation (stop and update the plan) |
+| 9 | I will NOT skip reading files before editing them |
+| 10 | I will NOT proceed past a spec contradiction without surfacing it |
+| 11 | I will NOT claim completion without running the quality scorecard |
+| 12 | I will NOT soften findings or imply confidence I don't have |
 
-- A passing test run output (preferred)
-- A lint/type-check result
-- A build artifact or successful compilation
+---
 
-**Do not say "it should pass" — that is not evidence. Run the command.**
+## Completion Quality Scorecard
 
-```bash
-# Confirm the change surface
-git diff --stat HEAD
+Before handoff, score the delivery (STANDARD+ rigor):
 
-# Run verification
-pytest tests/ -q  # or the project's test command
-```
+| Dimension | 0–5 | Criteria |
+|-----------|-----|----------|
+| **Spec adherence** | | Does implementation match the task/spec? |
+| **Test coverage** | | Are scenarios from the matrix covered? |
+| **Service constraint preservation** | | Are non-negotiables honored with evidence? |
+| **Scope discipline** | | Did we stay within the execution packet? |
 
-Present the evidence, then invoke `lets-verify-change`.
+**Pass threshold: ≥16/20.** Below threshold = `blocked`, identify gaps.
+
+See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric.
+
+---
+
+## Error Handling
+
+- If AGENTS.md is missing: proceed without service context, note `Stage 1: completed (no AGENTS.md — no service constraints bound)`
+- If spec/task description is ambiguous: extract inferred requirements, surface to user for confirmation before implementing
+- If a spec contradiction is discovered mid-implementation: HARD STOP — surface it, do not silently proceed
+- If a work package verification fails: fix within scope or mark BLOCKED — do not skip to next package
+- If quality scorecard < 16/20: mark delivery BLOCKED — identify specific gaps before attempting fix
+- If an assumption is invalidated during implementation: stop at package boundary, assess impact, re-plan if significant
+- If forge check fails on the delivered code: fix lint/type/test issues before proceeding to completion
 
 ---
 
 ## Anti-patterns
 
-- **Implementing before presenting the execution packet** — the packet gates implementation. No packet, no coding.
-- **Saying "this is low risk" without citing evidence** — risk classification must reference specific signals from scope discovery (docstring markers, import count, file type).
-- **Skipping critical-path confirmation** — every file with a critical-path signal requires individual "proceed?" confirmation. No exceptions.
-- **Modifying files not in the execution packet** — if you discover new scope, stop and update the packet. Do not silently expand.
-- **Handing off without running verification** — you must have executed at least one command and shown its output before invoking lets-verify-change.
-- **Committing secrets, tokens, or credentials** — never commit secrets. Use environment variables or secret managers.
-- **Ordering work packages highest-risk first** — do safe changes first. If a risky change breaks something, the safe changes already committed still work.
-
-## Context sufficiency check
-
-For trivial changes (single test file edit, adding a comment, fixing a typo in a non-critical file), the execution packet can be minimal:
-
-```markdown
-## Execution Packet
-**Task:** Fix typo in README
-**Risk Level:** Low
-**Risk Evidence:** Single documentation file, no importers, no runtime effect.
-
-| # | Files | Intent | Verification | Risk |
-|---|-------|--------|--------------|------|
-| 1 | README.md | Fix typo | Visual review | Low |
-```
-
-The packet is still required — it's just short. This prevents the skill from being bypassed on "simple" changes while keeping overhead proportional.
+- **Implementing before presenting the packet** — the plan exists to catch problems before they become code
+- **Skipping spec re-read** — memory drifts; re-reading at boundaries catches contradictions early
+- **Silent scope expansion** — touching files not in the packet without stopping to ask
+- **Weakening error handling** — existing catches, retries, and fallbacks exist for a reason
+- **Fabricating test results** — if you didn't run it, you don't know the result
+- **Leaving stages implicit** — every stage must be explicitly completed, skipped with reason, or blocked
+- **Ignoring service context** — non-negotiables from AGENTS.md are binding, not advisory
+- **Claiming untested confidence** — score honestly; gaps are better documented than hidden
 
 ---
 
 ## Outputs
 
-- Output: File manifest with risk annotations (from scope discovery)
-- Output: Structured execution packet with work packages
-- Output: Governance decision with cited evidence
-- Output: Implemented changes with verification evidence
-- Output: Handoff to lets-verify-change
+- Service context summary (non-negotiables, critical paths)
+- Change classification (type, scale, risk, rigor)
+- Execution packet with scenarios and assumptions
+- Architecture notes (or explicit skip)
+- Per-package verification evidence
+- Traceability record (requirement → code → test)
+- Spec alignment check results
+- Verification verdict (ready | blocked)
+- Quality scorecard (≥16/20 to pass)
+- Stage status table (all 9 accounted for)
+- Handoff to lets-verify-change
 
-Done when: execution packet is presented, governance is cleared, all work packages are implemented with verification, and handoff is ready.
+---
+
+## References (Progressive Disclosure)
+
+Read each reference only when its stage activates — not upfront.
+
+| Reference | When to read |
+|-----------|-------------|
+| [CLASSIFICATION.md](references/CLASSIFICATION.md) | Stage 2 — selecting rigor level |
+| [SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md) | Stage 1 — reading service constraints |
+| [PLANNING.md](references/PLANNING.md) | Stage 3/5 — building and reviewing the plan |
+| [ARCHITECTURE-GATE.md](references/ARCHITECTURE-GATE.md) | Stage 4 — design decisions |
+| [IMPLEMENTATION.md](references/IMPLEMENTATION.md) | Stage 6 — per-package implementation discipline |
+| [METHODOLOGY.md](references/METHODOLOGY.md) | Stage 7 — test methodology selection |
+| [SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md) | Stage 6/8 — checking against spec |
+| [VERIFICATION.md](references/VERIFICATION.md) | Stage 8 — verification protocol |
+| [COMPLETION.md](references/COMPLETION.md) | Stage 9 — quality scorecard and handoff |
+| [SCENARIO-MATRIX.md](references/SCENARIO-MATRIX.md) | Stage 3 — building scenario coverage |
+| [STACKED-PRS.md](references/STACKED-PRS.md) | Stage 6 — decomposing large changes |
+| [HANDOFF.md](references/HANDOFF.md) | Stage 9 — handoff packet format |
+
+## Templates & Scripts
+
+Use these to scaffold artifacts — do not invent formats from scratch.
+
+| Asset | Purpose | Used in |
+|-------|---------|---------|
+| [assets/templates/execution-packet.template.md](assets/templates/execution-packet.template.md) | Execution packet structure | Stage 3 |
+| [assets/templates/handoff.template.md](assets/templates/handoff.template.md) | Handoff packet structure | Stage 9 |
+| [assets/templates/traceability.template.md](assets/templates/traceability.template.md) | Implementation traceability record | Stage 6 |
+| [scripts/classify_risk.sh](scripts/classify_risk.sh) | Automated risk signal scanning | Stage 2 |
+| [scripts/check_blast_radius.sh](scripts/check_blast_radius.sh) | Importer analysis for blast radius | Stage 2/3 |
