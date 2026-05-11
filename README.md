@@ -31,9 +31,9 @@ lets skill sync
 | `lets-start-here` | Classify intent and route to the right skill |
 | `lets-bootstrap-agents-md` | Generate AGENTS.md from repo evidence |
 | `lets-bootstrap-repo` | Bootstrap a new repo with initial structure |
-| `lets-develop-feature` | End-to-end feature development |
-| `lets-review-code` | Code review with quality checks |
-| `lets-review-pr` | Pull request review end-to-end |
+| `lets-develop-feature` | Staged feature development with spec-alignment, graduated rigor, and quality scorecard |
+| `lets-review-code` | Multi-lens code review with planner-driven depth, finding verification, and confidence scoring |
+| `lets-review-pr` | PR review controlplane with context discovery, multi-lens routing, spec alignment, and GitHub posting |
 | `lets-verify-change` | Verify a change meets requirements |
 | `lets-verify-ready` | Verify a branch is ready to merge |
 | `lets-spec-to-pr` | Implement a spec as a pull request |
