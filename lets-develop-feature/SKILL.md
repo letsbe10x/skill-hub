@@ -262,6 +262,8 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 
 ## References (Progressive Disclosure)
 
+Read each reference only when its stage activates — not upfront.
+
 | Reference | When to read |
 |-----------|-------------|
 | [CLASSIFICATION.md](references/CLASSIFICATION.md) | Stage 2 — selecting rigor level |
@@ -276,3 +278,15 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 | [SCENARIO-MATRIX.md](references/SCENARIO-MATRIX.md) | Stage 3 — building scenario coverage |
 | [STACKED-PRS.md](references/STACKED-PRS.md) | Stage 6 — decomposing large changes |
 | [HANDOFF.md](references/HANDOFF.md) | Stage 9 — handoff packet format |
+
+## Templates & Scripts
+
+Use these to scaffold artifacts — do not invent formats from scratch.
+
+| Asset | Purpose | Used in |
+|-------|---------|---------|
+| [assets/templates/execution-packet.template.md](assets/templates/execution-packet.template.md) | Execution packet structure | Stage 3 |
+| [assets/templates/handoff.template.md](assets/templates/handoff.template.md) | Handoff packet structure | Stage 9 |
+| [assets/templates/traceability.template.md](assets/templates/traceability.template.md) | Implementation traceability record | Stage 6 |
+| [scripts/classify_risk.sh](scripts/classify_risk.sh) | Automated risk signal scanning | Stage 2 |
+| [scripts/check_blast_radius.sh](scripts/check_blast_radius.sh) | Importer analysis for blast radius | Stage 2/3 |
