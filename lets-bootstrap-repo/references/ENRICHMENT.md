@@ -38,23 +38,69 @@ When sources conflict: prefer explicit docs over inferred patterns. Surface conf
 
 ### Extraction Protocol
 
-1. **Scan for explicit standards docs:**
-   ```
-   CONTRIBUTING.md, docs/coding-rules.md, docs/style-guide.md,
-   .editorconfig, .eslintrc*, .prettierrc*, ruff.toml, pyproject.toml [tool.ruff]
-   ```
+Four extraction modes, use whichever sources are available:
 
-2. **Mine linter configs** for enforced rules (these are VERIFIED conventions)
+#### Mode 1 — From existing standards docs (highest priority)
 
-3. **Check for PR review patterns** (optional, requires `gh` CLI):
-   - Look for recurring review comments on recent PRs
-   - Extract patterns mentioned ≥ 3 times by reviewers
+Scan for:
+```
+CONTRIBUTING.md, docs/coding-rules.md, docs/style-guide.md,
+.editorconfig, .eslintrc*, .prettierrc*, ruff.toml, pyproject.toml [tool.ruff]
+```
 
-4. **Scan codebase patterns:**
-   - Import ordering conventions
-   - Error handling patterns (e.g., always wrap in Result, never bare except)
-   - Naming conventions (files, functions, classes)
-   - Test structure patterns
+Parse into importance tiers: non-negotiable, convention, preference.
+
+#### Mode 2 — From linter/formatter configs (VERIFIED conventions)
+
+Mine enforced rules from tooling configuration. These are the strongest evidence — the tool rejects code that violates them.
+
+```bash
+# Python: extract ruff rules
+grep -A 50 '\[tool.ruff' pyproject.toml | grep "select\|ignore"
+# JS/TS: extract eslint rules
+cat .eslintrc* | jq '.rules'
+```
+
+#### Mode 3 — From PR review comments (optional, requires `gh` CLI)
+
+Extract recurring reviewer feedback — patterns mentioned ≥ 3 times across PRs:
+
+```bash
+# Fetch recent merged PR comments
+gh pr list --state merged --limit 20 --json number | \
+  jq -r '.[].number' | while read pr; do
+    gh api repos/{owner}/{repo}/pulls/$pr/comments --jq '.[].body'
+  done
+```
+
+**Distillation rules:**
+- Include all prescriptive comments ≥15 chars (imperative tone: "use X", "don't Y", "avoid W")
+- Strip noise: "LGTM", emoji-only, bare links without context
+- Deduplicate near-identical comments; keep most specific phrasing
+- Mark frequency: how many PRs mentioned this (signals importance)
+- Tag signal words: "must", "never", "always" → non-negotiable tier
+
+#### Mode 4 — From codebase pattern analysis
+
+Sample 8-10 files across ≥3 different modules. Extract patterns with ≥3 file occurrences:
+
+```bash
+# Error handling patterns
+grep -r "raise\|except\|try:" --include="*.py" -l | head -10
+
+# Import ordering
+head -20 src/**/*.py | grep "^import\|^from"
+
+# Test fixture patterns
+grep -r "fixture\|setUp\|@pytest" --include="*.py" tests/ | head -10
+```
+
+Look for:
+- Error handling conventions (custom exceptions, Result types, retry patterns)
+- Logging patterns (structured logging, correlation IDs, log levels)
+- Config access patterns (env vars, settings objects, dependency injection)
+- Naming conventions (files, functions, classes, test methods)
+- Import ordering conventions
 
 ### Output Structure
 

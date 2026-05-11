@@ -64,10 +64,28 @@ Required structure:
 4. Verify: `<command from command-catalog>`
 ```
 
+#### How to discover recipes (analogy-driven)
+
+To write the "Adding a New X" recipe for a module:
+
+1. **Find 2-3 analogous implementations** in the module — files that follow the same pattern:
+   - Same base class or interface
+   - Same decorator or registration mechanism
+   - Same file naming convention (e.g., `*_goal.py`, `*_adapter.py`)
+
+2. **Extract the common pattern** across those analogies:
+   - What base class/interface do they extend?
+   - Where do they register (file + symbol)?
+   - What naming convention do they follow?
+   - How are they tested?
+
+3. **Write as numbered steps** with the most well-documented analogy as the reference template.
+
 Rules:
 - Registration points must reference exact file + symbol
 - Verify step must use a VERIFIED command from the catalog
 - If multiple extension patterns exist, document up to 3 (most frequent first)
+- Cite the analogous implementation: "following `existing_thing.py` as template"
 
 ### 4. Testing (Tier 1, if module is testable separately)
 
@@ -96,6 +114,27 @@ Two parts:
 - Depends on: <list of dependency modules>
 - Contract: <interface file or protocol>
 ```
+
+#### How to discover boundaries (caller-mapping)
+
+To populate integration points:
+
+1. **Map upstream callers** — who imports from this module?
+   ```bash
+   grep -r "from {module}" --include="*.py" --include="*.ts" -l
+   grep -r "import {module}" --include="*.py" --include="*.ts" -l
+   ```
+
+2. **Map downstream dependencies** — what does this module import?
+   ```bash
+   grep -r "^from\|^import" {module}/ --include="*.py" | grep -v "__pycache__"
+   ```
+
+3. **Identify contracts** — what does this module expose publicly vs. keep internal?
+   - Public: exported in `__init__.py`, used by ≥2 callers
+   - Internal: not imported by other modules
+
+4. **Derive common mistakes** from boundary violations found in git history or PR reviews.
 
 ### 6. Related
 

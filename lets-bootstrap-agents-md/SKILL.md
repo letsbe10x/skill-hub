@@ -234,10 +234,20 @@ Read each reference only when its phase activates — not upfront.
 | [VERIFICATION.md](references/VERIFICATION.md) | Phase 7 — 4-gate verification protocol |
 | [ARTIFACT-SCHEMAS.md](references/ARTIFACT-SCHEMAS.md) | Phase 2/3/4 — JSON artifact formats and schemas |
 
+## Templates & Scripts
+
+| Asset | Purpose | Used in |
+|-------|---------|---------|
+| [assets/templates/agents-md-frontmatter.template.md](assets/templates/agents-md-frontmatter.template.md) | Required YAML frontmatter for every generated file | Phase 5/6 |
+| [assets/templates/verification-report.template.md](assets/templates/verification-report.template.md) | Verification gate report structure | Phase 7 |
+| [assets/templates/evidence-entry.schema.json](assets/templates/evidence-entry.schema.json) | Evidence index entry schema | Phase 2 |
+| [scripts/detect_modules.sh](scripts/detect_modules.sh) | Discover candidate modules with metadata | Phase 2/3 |
+| [scripts/check_staleness.sh](scripts/check_staleness.sh) | Check existing AGENTS.md files for staleness signals | Phase 1 |
+
 ## Hard Rules
 
 - Never commit AGENTS.md files on behalf of the user
-- Never write working files (`/tmp/...`) into the repo
+- Never write working files into the repo (keep in temporary bootstrap directory)
 - Do not surface BLOCKED commands in any output
 - Root AGENTS.md must be synthesized from module files on disk — never from blank prompt
 - Every generated file must include YAML frontmatter with `last_compiled_date` and `version`

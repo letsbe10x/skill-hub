@@ -6,7 +6,7 @@ Run in Phase 7 after all AGENTS.md files are written to disk. Four gates, sequen
 
 - **Max fix cycles:** 2 per gate. If a gate still fails after 2 cycles, surface to user with specific remediation.
 - **Scope:** All generated AGENTS.md files (root + module tiers 1 and 2).
-- **Inputs:** `evidence-index.json`, `command-catalog.json`, `modules.json`, `directory-tree.json` from `/tmp/<repo-name>/.agents-bootstrap/`.
+- **Inputs:** `evidence-index.json`, `command-catalog.json`, `modules.json`, `directory-tree.json` from the bootstrap working directory.
 
 ## Gate 1 — Correctness
 
@@ -20,6 +20,46 @@ Every claim in every AGENTS.md must be traceable to evidence.
 | Specificity | No vague statements like "we use X for Y" without a `file:role` reference | Add file reference or remove statement |
 | De-duplication | No rule appears in both root and module AGENTS.md | Remove from module (root wins) |
 | De-duplication | No rule appears in two sibling module AGENTS.md files | Move to parent, remove from both siblings |
+
+### Correctness verification protocol
+
+For each claim in a generated AGENTS.md:
+
+1. **Non-Negotiable claims** — verify ≥1 file where the pattern is enforced:
+   ```bash
+   # Example: verify auth pattern exists
+   grep -r "auth\|permission\|session" --include="*.py" -l
+   ```
+
+2. **Convention claims** — verify ≥3 file occurrences across ≥2 directories:
+   ```bash
+   # Example: verify error handling pattern
+   grep -r "raise CustomException" --include="*.py" -l | wc -l
+   ```
+
+3. **Tech stack claims** — verify (a) manifest reference AND (b) ≥1 import in application code:
+   ```bash
+   # Check manifest
+   grep "redis" pyproject.toml requirements.txt package.json 2>/dev/null
+   # Check usage
+   grep -r "import redis\|from redis" --include="*.py" -l
+   ```
+
+4. **Command claims** — verify verbatim in build surface:
+   ```bash
+   grep -F "make test" Makefile
+   grep "scripts" package.json | grep "test"
+   ```
+
+### Specificity standard
+
+Bad (vague):
+- "We use Redis for caching"
+- "Kafka is the async pattern"
+
+Good (specific):
+- "Redis for session storage in `permissions/session_store.py`"
+- "Kafka (via Confluent) handles job intake; Procrastinate manages worker queuing (see `workers/queue.py`)"
 
 ## Gate 2 — Completeness
 
@@ -35,6 +75,34 @@ No significant patterns or signals left undocumented.
 | Orphaned tech | Manifest dependencies with ≥ 3 imports not mentioned in Technology Stack | Add to tech stack or note in Related |
 | Root synthesis | Root AGENTS.md references every Tier 1 module in its module map | Add missing module row |
 
+### Completeness scanning protocol
+
+1. **Missing tier coverage** — check if any tiers are empty when code suggests otherwise:
+   - If codebase has ≥3 security-related patterns, "Non-Negotiables" should exist
+   - If codebase has ≥5 repeated architectural patterns, "Strong Conventions" should exist
+   - If README/comments mention gotchas, anti-patterns section should exist
+
+2. **Cross-file patterns** — sample 8-10 files across modules, look for:
+   - Error handling: Do ≥3 files use the same exception pattern?
+   - Logging: Do ≥3 files use the same logger initialization?
+   - Config access: Do ≥3 files import config the same way?
+   - Testing: Do ≥3 test files use the same fixture pattern?
+
+3. **Undocumented gotchas** — search codebase:
+   ```bash
+   grep -r "HACK\|FIXME\|XXX\|WARNING\|NOTE:" --include="*.py" --include="*.ts" --include="*.js"
+   ```
+   Compare findings against generated tribal knowledge / anti-patterns sections.
+
+4. **Orphaned tech** — compare manifest deps against documented tech stack:
+   ```bash
+   # For Python
+   grep -E "^[a-zA-Z]" requirements.txt | cut -d= -f1 | while read dep; do
+     count=$(grep -r "import $dep\|from $dep" --include="*.py" -l | wc -l)
+     [ "$count" -ge 3 ] && echo "$dep: $count imports"
+   done
+   ```
+
 ## Gate 3 — Actionability
 
 Generated docs must enable agents to act, not just read.
@@ -46,6 +114,43 @@ Generated docs must enable agents to act, not just read.
 | Verify commands | At least one VERIFIED command referenced per Tier 1/2 module | Pull from command-catalog.json |
 | Path existence | Every path referenced in any AGENTS.md exists on disk | Remove dead path references |
 | Boundary actionability | "Boundaries and Safety Gates" has at least one item per column (Allowed/Ask-first/Never-do) | Fill from evidence or mark `(none identified)` |
+
+### Extension recipe protocol (analogy-driven)
+
+For each Tier 1 module that needs "Adding a New X" recipes:
+
+1. **Find analogous implementations** — search the module for 2-3 existing implementations of the same pattern:
+   - Same base class or interface
+   - Same decorator or registration mechanism
+   - Same file naming convention
+
+2. **Extract the pattern** from those analogies:
+   - What base class/interface to extend?
+   - What registration step is required?
+   - What naming convention to follow?
+   - What test pattern to replicate?
+
+3. **Write the recipe** with:
+   - Numbered steps
+   - At least one registration point (where to register the new thing)
+   - At least one verify step (how to confirm it works)
+
+### Boundary protocol (caller-aware)
+
+For each module's boundaries:
+
+1. **Map callers** — who imports from this module?
+   ```bash
+   grep -r "from {module}" --include="*.py" -l
+   grep -r "import {module}" --include="*.py" -l
+   ```
+
+2. **Identify contracts** — what does this module expose vs. keep internal?
+
+3. **Classify actions:**
+   - **Allowed:** read-only operations, adding new implementations following pattern
+   - **Ask-first:** changing public interfaces, modifying shared state
+   - **Never-do:** breaking contracts, bypassing safety checks, modifying internals of upstream modules
 
 ## Gate 4 — Freshness (update mode only)
 
@@ -74,7 +179,7 @@ After all gates complete, emit a summary:
 | Freshness | PASS/FAIL/SKIP | N | N | N |
 
 ### Unresolved (requires user input)
-- <file>: <specific issue and remediation instruction>
+- {file}: {specific issue and remediation instruction}
 ```
 
 Overall status: PASS only if all applicable gates show 0 remaining issues.

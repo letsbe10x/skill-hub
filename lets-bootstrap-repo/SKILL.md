@@ -229,6 +229,14 @@ Read each reference only when its phase activates — not upfront.
 | [ENRICHMENT.md](references/ENRICHMENT.md) | Phase 5 — coding standards extraction, AGENTS.md handoff, architecture scaffold |
 | [OUTPUTS.md](references/OUTPUTS.md) | Phase 6 — artifact layout, readiness levels, scoring weights |
 
+## Templates & Scripts
+
+| Asset | Purpose | Used in |
+|-------|---------|---------|
+| [assets/templates/readiness-report.template.md](assets/templates/readiness-report.template.md) | Readiness report structure | Phase 6 |
+| [assets/templates/service-yaml.template.yaml](assets/templates/service-yaml.template.yaml) | Service context artifact template | Phase 3 |
+| [scripts/check_repo_status.sh](scripts/check_repo_status.sh) | Detect existing artifacts and their staleness | Phase 1 |
+
 ## Hard Rules
 
 - Never overwrite existing artifacts without explicit confirmation and diff
