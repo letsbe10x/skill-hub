@@ -3,7 +3,7 @@ name: lets-create-plan
 description: "Use when you have an approved spec and need a step-by-step implementation plan. Translates spec requirements into bite-sized tasks with exact file paths, complete code, and run commands."
 metadata:
   author: cogsmith-ai
-  version: "1.1.0"
+  version: "1.2.0"
   tags: [planning, implementation, workflow]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-create-plan/SKILL.md
@@ -122,17 +122,25 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
    - Commands to run with expected output
    - A commit step
 
-8. **No placeholders** — Never write placeholder markers (for example: "to be determined", "to do later", "fix later"), vague statements like "add appropriate error handling", or "write tests for the above" without actual test code.
+8. **Flag and resolve ambiguity** — If a spec requirement can be interpreted multiple ways and the interpretation materially affects the implementation, do not silently pick one. Instead:
+   - State the ambiguity explicitly in the plan (e.g., "Spec says 'backoff' — this could mean fixed delay or exponential. Choosing exponential because…")
+   - Pick the safer/more robust interpretation with a one-line rationale
+   - Mark it with `⚠️ Interpretation:` so the reviewer can challenge it
 
-9. **Self-review** — After writing the full plan, verify:
-   - **Requirements coverage** — produce a table mapping every spec requirement to the task(s) that satisfy it. Any unmapped requirement is a gap — add a task.
-   - **No placeholders** — scan for TBD, TODO, "add appropriate", or any vague language.
-   - **Consistency** — types, variable names, and file paths are consistent across all tasks.
-   - **CI impact** — if the project has CI, note which pipeline steps the plan's changes will trigger and whether any new steps are needed (e.g., adding Redis to test fixtures).
+   This applies to algorithmic choices (fixed vs exponential retry), boundary conditions (inclusive vs exclusive ranges), and architectural trade-offs (polling vs push) where the spec doesn't specify.
 
-10. **Save the plan** — Write to the repo's plans folder (commonly `docs` → `plans`) as `YYYY-MM-DD-feature-name.md` (override with project convention if one exists).
+9. **No placeholders** — Never write placeholder markers (for example: "to be determined", "to do later", "fix later"), vague statements like "add appropriate error handling", or "write tests for the above" without actual test code.
 
-11. **Execution handoff** — Offer two options:
+10. **Self-review** — After writing the full plan, verify:
+    - **Requirements coverage** — produce a table mapping every spec requirement to the task(s) that satisfy it. Any unmapped requirement is a gap — add a task.
+    - **No placeholders** — scan for TBD, TODO, "add appropriate", or any vague language.
+    - **Consistency** — types, variable names, and file paths are consistent across all tasks.
+    - **CI impact** — if the project has CI, note which pipeline steps the plan's changes will trigger and whether any new steps are needed (e.g., adding Redis to test fixtures).
+    - **Rollback coverage** — if the plan includes a feature flag, migration, or phased rollout, verify there is at least one test that exercises the rollback/off path and one that tests the switchover (flag toggled mid-operation or migration reverted). If missing, add a task.
+
+11. **Save the plan** — Write to the repo's plans folder (commonly `docs` → `plans`) as `YYYY-MM-DD-feature-name.md` (override with project convention if one exists).
+
+12. **Execution handoff** — Offer two options:
     - **Subagent-Driven** (recommended): use `superpowers:subagent-driven-development`
     - **Inline Execution**: use `superpowers:executing-plans`
 
@@ -153,6 +161,8 @@ Follow DRY, YAGNI, and TDD throughout. Each task must produce working, testable 
 - **Writing steps that depend on context not stated in any prior step** — every step must be self-contained.
 - **Using placeholder text or deferred items in any plan step** — plans must be complete before handoff; every step must have a concrete action and expected result.
 - **Skipping verification planning** — every plan must include at least one verification step that confirms the implementation is correct; skip no verification step.
+- **Silently resolving spec ambiguity** — if a requirement has multiple valid interpretations, do not pick one without flagging it. The reviewer needs to see your interpretation to catch misalignment early.
+- **Feature-flagged plans without rollback tests** — if you add a feature flag or migration, the plan must include tests for: flag off (old path works), flag on (new path works), and switchover (toggling doesn't corrupt state).
 
 ## Outputs
 
