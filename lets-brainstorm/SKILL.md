@@ -1,9 +1,9 @@
 ---
 name: lets-brainstorm
-description: "Use BEFORE any creative work — creating features, building components, adding functionality, modifying behavior, or resolving any open design question. Canonical brainstorming skill for letsbe10x. Supports Full Mode (governance-gated spec) and Light Mode (express brainstorm for low-risk, self-contained ideation). Produces a user-approved spec and routes to the correct downstream skill."
+description: "Use BEFORE any creative work — creating features, building components, adding functionality, modifying behavior, or resolving any open design question. Turns an unresolved question into a validated spec artifact and routes to the correct downstream skill."
 metadata:
   author: cogsmith-ai
-  version: "0.2.0"
+  version: "0.4.0"
   tags: [exploration, design, spec, architecture, decisions, ideation, creative-work]
 lifecycle: draft
 source: https://github.com/letsbe10x/skills/blob/main/lets-brainstorm/SKILL.md
@@ -51,10 +51,10 @@ outcome_runtime:
     - propose_alternative_approaches
     - withhold_routing_until_spec_approved
   hard_limits:
-    - do_not_write_spec_before_approach_confirmed
+    - do_not_implement_before_design_approved
     - do_not_route_before_spec_passes_validation
+    - do_not_skip_context_gathering
   required_decision_frames:
-    - exploration_type_classification
     - approach_selection
     - downstream_routing
   validation_gates:
@@ -68,49 +68,72 @@ outcome_runtime:
     - routing_confirmation
 ---
 
-> **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
-
 # lets-brainstorm
 
-Drive the `explore` goal: turn an unresolved question into a validated spec artifact, then route
-to the right downstream skill based on what the exploration reveals.
+Turn an unresolved question into a validated spec, then route to the right downstream skill.
 
-**This is the canonical brainstorming skill for letsbe10x.** Use it for *any* creative work —
-features, components, functionality, behavior changes, architecture, technology choices, or any
-open design question. In this workspace it supersedes `superpowers:brainstorming`; do not invoke
-that skill when `lets-brainstorm` is available.
+Do NOT implement, scaffold, write code, or invoke any implementation skill until you have
+presented a design and the user has approved it. This applies to EVERY project regardless of
+perceived simplicity.
+
+## Anti-pattern: "This Is Too Simple To Need A Design"
+
+Every project goes through this process. A task tracker, a single-function utility, a config
+change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted
+work. The design can be short (a few sentences for truly simple projects), but you MUST present
+it and get approval.
+
+## Process Flow
+
+```dot
+digraph brainstorming {
+    "Gather context\n(silent)" [shape=box];
+    "Scope too large?" [shape=diamond];
+    "Propose decomposition" [shape=box];
+    "Ask clarifying questions\n(one per message)" [shape=box];
+    "Propose 2-3 approaches\n(with trade-offs)" [shape=box];
+    "Present design sections\n(get approval per section)" [shape=box];
+    "User approves?" [shape=diamond];
+    "Write + validate spec" [shape=box];
+    "Spec self-review" [shape=box];
+    "User reviews spec" [shape=box];
+    "Route to downstream skill" [shape=doublecircle];
+
+    "Gather context\n(silent)" -> "Scope too large?";
+    "Scope too large?" -> "Propose decomposition" [label="yes"];
+    "Scope too large?" -> "Ask clarifying questions\n(one per message)" [label="no"];
+    "Propose decomposition" -> "Ask clarifying questions\n(one per message)";
+    "Ask clarifying questions\n(one per message)" -> "Propose 2-3 approaches\n(with trade-offs)";
+    "Propose 2-3 approaches\n(with trade-offs)" -> "Present design sections\n(get approval per section)";
+    "Present design sections\n(get approval per section)" -> "User approves?";
+    "User approves?" -> "Present design sections\n(get approval per section)" [label="revise"];
+    "User approves?" -> "Write + validate spec" [label="yes"];
+    "Write + validate spec" -> "Spec self-review";
+    "Spec self-review" -> "User reviews spec";
+    "User reviews spec" -> "Route to downstream skill" [label="approved"];
+    "User reviews spec" -> "Write + validate spec" [label="changes"];
+}
+```
 
 ## Modes
 
-| Mode | When | Questions | Approaches | Spec sections |
-|---|---|---|---|---|
-| **Full** (default) | Architecture, features with multi-component scope, cross-team impact, anything with production risk | 4 question areas, one per message | 2–3 alternatives with trade-offs | All required sections |
-| **Light** (express brainstorm) | Self-contained single-file idea, small utility, throwaway script, clearly low-risk change, or the user explicitly asks for a "quick" / "express" brainstorm | Up to 3 focused questions, may be batched | 1 recommendation + 1 alternative | Minimum set (see Phase 5) |
+| Mode | When | Behavior |
+|---|---|---|
+| **Full** (default) | Multi-component scope, cross-team impact, production risk | One question per message, 2-3 approaches, full spec sections |
+| **Light** | Single-file, low-risk, or user says "quick"/"express" | Up to 3 batched questions, 1 recommendation + 1 alternative, minimal spec |
 
-**Mode is declared at the end of Phase 1**, after classification. Default is **Full**.
-Switch to Light only when the exploration type is `direct` AND no cross-boundary impact is
-detected, OR the user explicitly requests express mode. **Both modes require a user-approved
-spec before routing** — Light does not mean skipping the spec; it means writing a smaller one.
-
-## Exploration Law
-
-**NO SPEC WITHOUT A CONFIRMED APPROACH.**
-**NO ROUTING WITHOUT A VALIDATED, USER-APPROVED SPEC.**
-**NO LIGHT MODE WHEN SCOPE EXPANDS.**
-
-If Phase 3 (exploration) is not complete, you cannot write the spec.
-If the spec has not passed `validate_spec.py` and user approval, you cannot route.
-If Light Mode discovers multi-component scope, cross-service data flow, or security/compliance
-implications, **stop and escalate to Full Mode** — restart from Phase 3 with the full flow.
+Determine mode internally during context gathering. Do not present the mode choice to the user.
+If Light Mode discovers multi-component scope or compliance risk mid-exploration, escalate to
+Full Mode immediately.
 
 ## Anti-patterns
 
-- **Routing to lets-develop-feature without a spec** — a confirmed approach and validated spec are required before any implementation skill is invoked.
-- **Asking multiple questions at once (Full Mode)** — one question per message in Full Mode. Light Mode may batch up to 3 focused questions.
-- **Treating exploration type as obvious** — classify it in Phase 1. A "simple feature" may reveal itself as a product question once context is loaded.
-- **Always routing to lets-create-plan** — the correct downstream skill depends on what the exploration reveals; see `references/routing-guide.md`.
-- **Staying in Light Mode when scope grows** — if you discover multi-component impact, cross-boundary data flow, or compliance risk mid-exploration, escalate to Full Mode. Do not write a light spec for a heavy problem.
-- **Using superpowers:brainstorming inside letsbe10x** — `lets-brainstorm` is the canonical skill in this workspace. Its Light Mode covers the same ground for low-risk ideation while preserving the spec + approval gates.
+- **Front-loading process before questions** — the user's first interaction should be a clarifying question, not a status report about governance checks or classification taxonomy.
+- **Asking multiple questions at once in Full Mode** — one question per message. Prefer multiple-choice when options are enumerable.
+- **Implementing without an approved design** — even for "simple" changes.
+- **Staying in Light Mode when scope grows** — if you discover cross-boundary impact, escalate.
+- **Using superpowers:brainstorming inside letsbe10x** — this skill supersedes it.
+- **Routing before spec validation and user approval** — the spec gates are non-negotiable.
 
 ## When to Use
 
@@ -123,186 +146,153 @@ implications, **stop and escalate to Full Mode** — restart from Phase 3 with t
 ## When Not to Use
 
 - A spec and approach are already approved — invoke `lets-create-plan` directly.
-- The change is a mechanical single-file edit with zero design decisions (rename a variable, bump a dependency, fix a typo).
-- The request is product opportunity discovery from an existing solution or hypothesis — use `lets-opportunity-discovery`.
-- You are in pure debugging / triage territory — use `lets-triage-issue` or `lets-triage-incident`.
+- The change is a mechanical single-file edit with zero design decisions.
+- Product opportunity discovery — use `lets-opportunity-discovery`.
+- Debugging / triage — use `lets-triage-issue` or `lets-triage-incident`.
 
 ---
 
-## Phase 1 — Classify exploration type, select mode, and load repo context
+## Step 1 — Gather context (silent)
 
-**Classify the exploration before asking any questions.** The type determines which questions matter and where the exploration routes.
+Before your first message to the user, silently:
 
-Read: existing specs, ADRs, and plans in `docs/`; recent commits; established patterns in the codebase.
+1. Check for an active governance context:
+   ```bash
+   lets run list --format json | jq '.[0].run_dir // empty'
+   ```
+   If found: read `workflow_context.json` and `classification.json`. If governance blocks, stop and explain. Otherwise note the context.
 
-Classify into one of:
+2. Read: recent commits, existing specs/ADRs, codebase structure relevant to the request.
 
-| Type | Signal | Default downstream | Default mode |
-|---|---|---|---|
-| `feature` | New behaviour or component with clear implementation scope | `lets-create-plan` | Full |
-| `architecture` | System-level decision affecting multiple components or teams | `lets-create-plan` | Full |
-| `product` | Outcome is unclear; needs problem–solution fit before a spec makes sense | `lets-opportunity-discovery` | Full |
-| `direct` | Small, well-bounded, immediately implementable after spec | `lets-spec-to-pr` | Light |
+3. Assess scope: if the request describes multiple independent subsystems, flag this for decomposition in your first message.
 
-### Mode selection rules
+4. Determine mode (Full/Light) based on scope and risk. Do not surface this to the user.
 
-- If exploration type is `direct` AND no signal of cross-boundary impact (single file or module, no schema change, no security/compliance surface) → **Light Mode**.
-- If the user explicitly asks for "quick brainstorm", "express brainstorm", "keep it light", or similar → **Light Mode** (still honor escalation rules below).
-- Otherwise → **Full Mode**.
-- If any of these is present, force **Full Mode** regardless: security/compliance surface touched, migration required, public API change, multi-team ownership.
-
-Present both the classification and the mode to the user before proceeding:
-
-> "This looks like a **[type]** exploration. I'll run it in **[Light | Full]** mode and route to **[downstream skill]** once we have an approved spec. Does that sound right?"
-
-Wait for confirmation. If the user disagrees with either the type or the mode, adjust. The user may *downgrade* Full → Light only when none of the force-Full conditions apply. They may always *upgrade* Light → Full.
+**Your first visible message to the user is a clarifying question (or decomposition proposal if scope is too large).**
 
 ---
 
-## Phase 2 — Scope check
-
-Assess whether this is a single coherent exploration or multiple independent ones.
-
-If the request spans multiple independent subsystems (e.g. "build a platform with auth, billing, and analytics"), stop and propose decomposition:
-- Name each sub-project.
-- Clarify how they relate and in what order they should be explored.
-- Confirm with the user which one to start.
-
-Each sub-project runs its own full brainstorm → spec → downstream cycle.
-
-**Light Mode note:** if Phase 2 requires decomposition, escalate to Full Mode before continuing. A request large enough to need decomposition is not a Light exploration.
-
----
-
-## Phase 3 — Exploration
+## Step 2 — Clarify and explore
 
 ### Full Mode
 
 Ask one question per message. Prefer multiple-choice when options are enumerable.
 
-Cover, in this order:
-1. **Problem** — what specific problem does this solve, and for whom? What breaks or degrades without it?
-2. **Constraints** — performance, compatibility, deployment environment, security, team bandwidth.
-3. **Success criteria** — what does done look like? How would you know it's working?
-4. **Scope boundary** — what is explicitly out of scope for this exploration?
+Focus on understanding:
+1. **Problem** — what specific problem does this solve, and for whom?
+2. **Constraints** — performance, compatibility, security, team bandwidth.
+3. **Success criteria** — what does done look like?
+4. **Scope boundary** — what is explicitly out of scope?
 
-Stop asking when you have enough to propose distinct, concrete approaches.
+Stop asking when you have enough to propose distinct approaches.
 
-**Propose 2–3 approaches** with explicit trade-offs. Lead with your recommendation and state why. Get the user to confirm a direction before moving to Phase 4.
+**Propose 2–3 approaches** with explicit trade-offs. Lead with your recommendation and explain why. Get the user to confirm a direction.
 
 ### Light Mode
 
-Ask up to 3 focused questions. They MAY be batched in a single message if each is short and independent. Cover only what is load-bearing:
+Ask up to 3 focused questions in a single message:
+1. Problem + who it serves
+2. Success signal
+3. Known constraints (skip if none)
 
-1. **Problem + who it serves** — one line each.
-2. **Success signal** — how will you know it worked?
-3. **Any constraint you already know** — skip if none.
+Propose 1 recommendation + 1 alternative with one-line trade-offs. Get confirmation.
 
-Then propose **1 recommended approach plus 1 alternative** in one message with one-line trade-offs. Get confirmation.
-
-**Escalation watch:** if answers reveal multi-component scope, schema migration, security/compliance surface, or cross-service data flow → stop, tell the user "this is larger than it looked — switching to Full Mode" and restart Phase 3 in Full Mode.
+**Escalation:** if answers reveal multi-component scope, migration, or compliance surface → tell the user and switch to Full Mode.
 
 ---
 
-## Phase 4 — Design convergence
+## Step 3 — Present design
 
 ### Full Mode
 
-With the approach confirmed, work through the design section by section. Present each section, ask whether it looks right, and wait before continuing.
+With the approach confirmed, present design section by section. Ask "does this look right?" after each section before continuing.
 
 | Section | What to cover |
 |---|---|
 | Architecture | Components, responsibilities, boundaries |
 | Data model | Entities, relationships, storage — omit if stateless |
-| Component design | Each unit's interface, dependencies, isolation invariant |
-| Data flow | Request → processing → response, including error paths |
+| Component design | Interfaces, dependencies, isolation |
+| Data flow | Request → processing → response, including errors |
 | Error handling | How failures surface and recover |
-| Testing approach | Unit, integration, and acceptance scenarios by name |
+| Testing approach | Unit, integration, acceptance scenarios by name |
+
+Scale each section to its complexity — a few sentences if straightforward, more detail if nuanced.
 
 Design for isolation: each component has one purpose, communicates through defined interfaces, and can be understood without reading its internals.
 
-In existing codebases: follow established patterns. Include targeted improvements only when they directly serve this goal.
+In existing codebases: follow established patterns. Include improvements only when they directly serve this goal.
 
 ### Light Mode
 
-Present a single condensed design block in one message covering:
-- **Approach** — one paragraph describing what we'll build and why.
-- **Touch points** — the files/modules that will change (must stay small; if the list grows, escalate).
-- **Testing** — named scenarios, unit or integration.
+Present a single condensed block:
+- **Approach** — what we'll build and why (one paragraph)
+- **Touch points** — files/modules that change (if list grows, escalate)
+- **Testing** — named scenarios
 
-Ask "Does this look right?" and wait for confirmation before Phase 5.
+Get confirmation.
 
 ---
 
-## Phase 5 — Spec production and validation
+## Step 4 — Write and validate spec
 
 ### Full Mode
 
-Use `assets/spec-template.md` as the starting structure. Fill every applicable section. Remove sections that genuinely do not apply. Leave no placeholders — TBD is a gate failure.
-
-Save to:
-```
-docs/specs/YYYY-MM-DD-<topic>.md
-```
-
-Then validate:
-```bash
-python3 skills/lets-brainstorm/scripts/validate_spec.py docs/specs/YYYY-MM-DD-<topic>.md
-```
+Use `assets/spec-template.md` as the starting structure. Fill every applicable section. Remove sections that don't apply. Every section must be concrete — no placeholders.
 
 ### Light Mode
 
-Use `assets/light-spec-template.md` as the starting structure. Required sections:
-
-```
-## Problem
-## Approach
-## Success Criteria
-## Testing Approach
-```
-
-`## Open Questions` is optional in Light Mode, but if present all items must be resolved
-(same rule as Full Mode). Fill each section concisely (a few sentences to a short paragraph).
-Leave no placeholders.
-
-Save to:
-```
-docs/specs/YYYY-MM-DD-<topic>.md
-```
-
-Validate with the `--light` flag:
-```bash
-python3 skills/lets-brainstorm/scripts/validate_spec.py --light docs/specs/YYYY-MM-DD-<topic>.md
-```
+Use `assets/light-spec-template.md`. Required sections: Problem, Approach, Success Criteria, Testing Approach.
 
 ### Both modes
 
-Fix every reported issue and re-run until the validator exits 0. Do not proceed with a failing spec.
-
-Commit:
+Save the spec, then validate:
 ```bash
-git add docs/specs/YYYY-MM-DD-<topic>.md
-git commit -m "spec: <topic>"
+python3 skills/lets-brainstorm/scripts/validate_spec.py "$SPEC_PATH"
+python3 skills/lets-brainstorm/scripts/validate_spec.py --light "$SPEC_PATH"
 ```
 
+Fix every issue and re-run until the validator exits 0. Commit:
+```bash
+git add "$SPEC_PATH" && git commit -m "spec: $(basename "$SPEC_PATH" .md)"
+```
+
+### Spec self-review
+
+After writing, check:
+1. **Placeholder scan** — any incomplete sections or vague requirements? Fix them.
+2. **Internal consistency** — do sections contradict each other?
+3. **Scope check** — focused enough for a single implementation plan?
+4. **Ambiguity check** — could any requirement be interpreted two ways? Pick one.
+
+Fix issues inline. No separate review pass needed.
+
 ---
 
-## Phase 6 — User review gate
+## Step 5 — User review gate
 
-> "Spec written and committed to `<path>`. Please review it — let me know if you want any changes before I route to the next step."
+> "Spec written and committed. Please review — let me know if you want any changes before I route to the next step."
 
-Wait for explicit approval. If changes are requested, update the spec, re-run `validate_spec.py`, and ask again.
+Wait for explicit approval. If changes requested: update, re-validate, ask again.
 
 ---
 
-## Phase 7 — Route to downstream skill
+## Step 6 — Route to downstream skill
 
-Consult `references/routing-guide.md` to confirm the correct downstream skill for the exploration type classified in Phase 1. Present the routing decision to the user, then invoke the target skill.
+Consult `references/routing-guide.md` to confirm the correct downstream skill:
+
+| Exploration type | Default downstream |
+|---|---|
+| Feature with clear scope | `lets-create-plan` |
+| Architecture decision | `lets-create-plan` |
+| Product/outcome unclear | `lets-opportunity-discovery` |
+| Small, immediately implementable | `lets-spec-to-pr` |
+
+Present the routing decision to the user, then invoke the target skill.
 
 ---
 
 ## Outputs
 
-- Output: Committed spec at `docs/specs/YYYY-MM-DD-<topic>.md` — validated and user-approved
-- Output: Routing decision logged (exploration type → downstream skill)
-- Done when: `validate_spec.py` exits 0, user has approved, and the downstream skill has been invoked
+- Committed spec — validated and user-approved
+- Routing decision (exploration type → downstream skill)
+- Done when: validator exits 0, user has approved, and downstream skill invoked
