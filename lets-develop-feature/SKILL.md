@@ -244,6 +244,31 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 
 ---
 
+## Error Handling
+
+- If AGENTS.md is missing: proceed without service context, note `Stage 1: completed (no AGENTS.md — no service constraints bound)`
+- If spec/task description is ambiguous: extract inferred requirements, surface to user for confirmation before implementing
+- If a spec contradiction is discovered mid-implementation: HARD STOP — surface it, do not silently proceed
+- If a work package verification fails: fix within scope or mark BLOCKED — do not skip to next package
+- If quality scorecard < 16/20: mark delivery BLOCKED — identify specific gaps before attempting fix
+- If an assumption is invalidated during implementation: stop at package boundary, assess impact, re-plan if significant
+- If forge check fails on the delivered code: fix lint/type/test issues before proceeding to completion
+
+---
+
+## Anti-patterns
+
+- **Implementing before presenting the packet** — the plan exists to catch problems before they become code
+- **Skipping spec re-read** — memory drifts; re-reading at boundaries catches contradictions early
+- **Silent scope expansion** — touching files not in the packet without stopping to ask
+- **Weakening error handling** — existing catches, retries, and fallbacks exist for a reason
+- **Fabricating test results** — if you didn't run it, you don't know the result
+- **Leaving stages implicit** — every stage must be explicitly completed, skipped with reason, or blocked
+- **Ignoring service context** — non-negotiables from AGENTS.md are binding, not advisory
+- **Claiming untested confidence** — score honestly; gaps are better documented than hidden
+
+---
+
 ## Outputs
 
 - Service context summary (non-negotiables, critical paths)
