@@ -1,14 +1,22 @@
 ---
 name: lets-develop-feature
-description: "Use when implementing a code change that has a spec or execution packet. Drives the change-code goal through governance classification, implementation, and evidence-gated handoff to lets-verify-change."
+description: "Use when implementing a code change that has a spec or task description. Drives change through mandatory scope discovery, structured execution packet, governance classification, bounded implementation, and evidence-gated handoff to lets-verify-change."
 metadata:
   author: cogsmith-ai
-  version: "1.0.0"
-  tags: [implementation, change-management, delivery]
+  version: "2.0.0"
+  tags: [implementation, change-management, delivery, governance]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-develop-feature/SKILL.md
 compatibility:
   agents: [claude-code, cursor, codex, copilot]
+triggers:
+  - implement this
+  - build this feature
+  - make this change
+  - develop this
+  - code this up
+  - implement the spec
+  - execute the plan
 outcome_runtime:
   open_agency_zones:
     - implementation_strategy
@@ -26,166 +34,246 @@ outcome_runtime:
     - do_not_bypass_policy_gates
     - do_not_fabricate_test_results
     - do_not_commit_secrets
+    - do_not_implement_before_packet_presented
   required_decision_frames:
     - implementation_strategy
   validation_gates:
+    - execution_packet_gate
     - verification_before_completion
     - governance_checkpoint
   mutation_policy: additive_only
   human_checkpoint_triggers:
     - irreversible_mutation
     - compliance_risk
+    - critical_path_modification
 ---
 
 > **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-develop-feature
 
-Plan and gate a code change before implementation begins, then implement it with evidence-gated handoff to verification.
+Plan, gate, and implement a code change with structured governance and evidence-gated handoff.
+
+## Process Flow
+
+```dot
+digraph develop_feature {
+  Announce [shape=box];
+  ScopeDiscovery [label="Scope Discovery\n(read-only)" shape=box];
+  ExecutionPacket [label="Build Execution Packet\n(present to user)" shape=box];
+  GovernanceGate [label="Governance Gate" shape=diamond];
+  UserConfirm [label="User confirms\nhigh-risk items" shape=box];
+  Implement [label="Implement\n(bounded by packet)" shape=box];
+  EvidenceGate [label="Evidence Gate" shape=diamond];
+  Handoff [label="lets-verify-change" shape=doublecircle];
+
+  Announce -> ScopeDiscovery;
+  ScopeDiscovery -> ExecutionPacket;
+  ExecutionPacket -> GovernanceGate;
+  GovernanceGate -> Implement [label="low risk"];
+  GovernanceGate -> UserConfirm [label="medium/high"];
+  UserConfirm -> Implement [label="approved"];
+  Implement -> EvidenceGate;
+  EvidenceGate -> Handoff [label="evidence exists"];
+  EvidenceGate -> Implement [label="run verification"];
+}
+```
 
 ## When to use
 
-- AI agent is about to implement a change and needs an execution packet and governance check
-- Developer wants a structured change plan before coding begins
+- AI agent is about to implement a change and needs governance before coding
+- Developer wants a structured execution packet before implementation begins
 - Part of a `pr-ship` workflow: lets-develop-feature → lets-verify-change → lets-review-code
+- A change touches multiple files, shared interfaces, or critical paths
 
 ## When not to use
 
 - You only need to verify an existing change (use `lets-verify-change` directly).
 - You are reviewing a PR without implementing anything (use `lets-review-pr`).
+- The change is a single-line typo fix with zero risk (just fix it directly).
 
 ## Inputs
 
-- Input: List of changed or planned file paths
+- Input: Task description, spec, or approved plan
 - Input: Repo root path
-- Input: Approved spec or task description (optional but recommended)
+- Input: List of changed or planned file paths (optional — discovered in Phase 1 if not provided)
 
 ---
 
-## Phase 1 — Identify changed paths
+## Step 1 — Announce
 
-Before beginning, determine which files are in scope for this change.
+**This step is mandatory. Do it BEFORE any file reads or exploration.**
 
-**Option A — explicit paths (preferred when known):**
-```bash
-# List the files you intend to change, e.g.:
-git diff --name-only HEAD
-# or list them explicitly: src/foo.py src/bar.py
+State: "I'm using lets-develop-feature to implement this change."
+
+Do not skip this. Do not proceed to reading files without announcing first.
+
+---
+
+## Step 2 — Scope Discovery (read-only)
+
+Before building the execution packet, gather evidence about what you're changing.
+
+1. **Identify target files** — from the task description, spec, or by exploring the codebase.
+
+2. **Read each target file** and scan for risk signals:
+
+   | Signal | How to detect | Meaning |
+   |--------|---------------|---------|
+   | Critical path marker | Docstring contains "CRITICAL", "security review", "do not modify without" | High risk — requires individual confirmation |
+   | Shared interface | File is imported by 3+ other modules (check with grep) | Medium risk — changes propagate |
+   | Configuration file | Lives in `config/`, `.env`, or is named `*.yaml`/`*.toml`/`*.json` with cross-cutting settings | Medium risk — affects multiple subsystems |
+   | Irreversible operation | Task involves DROP, DELETE, migration, or external API call | High risk — cannot be undone |
+   | Test file only | File lives in `tests/` or `test_*` | Low risk |
+   | New file (additive) | File doesn't exist yet | Low risk |
+
+3. **Check who imports each file** (for existing files):
+   ```bash
+   grep -r "from .module_name import\|import module_name" --include="*.py" .
+   ```
+
+4. **Output**: A file manifest with risk annotations. Example:
+   ```
+   Files in scope:
+   - src/permissions.py — MEDIUM (shared interface, imported by api.py, admin.py, middleware.py)
+   - src/auth.py — HIGH (docstring: "CRITICAL PATH", security-sensitive)
+   - config/roles.yaml — MEDIUM (cross-cutting config)
+   - src/api.py — LOW (additive: new endpoint)
+   - tests/test_permissions.py — LOW (test file)
+   ```
+
+**Do not proceed to the execution packet without completing scope discovery.**
+
+---
+
+## Step 3 — Build the Execution Packet
+
+Present the following structured packet to the user. Every field is mandatory.
+
+```markdown
+## Execution Packet
+
+**Task:** [one-sentence description of what this change accomplishes]
+
+**Risk Level:** Low | Medium | High
+**Risk Evidence:**
+- [cite specific signals from scope discovery, e.g., "auth.py docstring says CRITICAL PATH"]
+- [e.g., "permissions.py imported by 4 modules — shared interface"]
+
+### Work Packages (ordered lowest-risk first)
+
+| # | Files | Intent | Verification | Risk |
+|---|-------|--------|--------------|------|
+| 1 | tests/test_new.py | Write failing tests first | `pytest tests/test_new.py` — should fail | Low |
+| 2 | src/new_module.py | Implement new additive logic | `pytest tests/test_new.py` — should pass | Low |
+| 3 | src/shared.py | Modify shared interface | `pytest tests/ -q` — all pass | Medium |
+| 4 | config/settings.yaml | Update configuration | Manual review | Medium |
+
+### Critical Path Files (require individual confirmation)
+- src/auth.py — "CRITICAL PATH" marker in docstring. Confirm before editing? (y/n)
 ```
 
-**Option B — from staged changes:**
-```bash
-git diff --name-only HEAD
-```
+**Hard rules for the execution packet:**
+- Work packages are ordered **lowest risk first** — complete safe changes before risky ones.
+- Every work package has a verification command. No package without a way to check it.
+- Critical path files are listed separately with an explicit confirmation request.
+- If you cannot identify verification commands, ask the user what tests/checks exist.
 
-If no changed paths are available yet (greenfield work), proceed with an empty list and note that this is a greenfield change.
-
----
-
-## Phase 2 — Build the execution packet
-
-Read the spec or task description and produce an execution packet — a structured plan covering:
-
-- `task` — description of the change to implement
-- `work_packages` — ordered list of implementation units with file targets
-- `verification_commands` — commands to run after implementation
-
-For each work package, specify:
-- `files` — files to create or modify
-- `intent` — what the unit accomplishes
-- `verification_commands` — commands to run after this unit is complete
-
-Review the planned change against any known non-negotiables or critical paths in the repo. If the change touches a critical file or path, confirm with the user before proceeding: "This file appears to be in a critical path — proceed? (y/n)"
+**Do not proceed to implementation without presenting this packet.**
 
 ---
 
-## Phase 3 — Governance check
+## Step 4 — Governance Gate
 
-Before implementing, assess the risk of the planned change:
+After presenting the execution packet, apply the governance decision:
 
-| Risk level | Meaning | Action |
-|---------|---------|--------|
-| Low | Additive changes, no external side effects | Proceed to implementation |
-| Medium | Changes to shared interfaces or configurations | Proceed with documented acknowledgment |
-| High | Irreversible mutations, external side effects, security surface | Confirm with user before proceeding |
+| Overall Risk Level | Action |
+|-------------------|--------|
+| **Low** | All files are additive or test-only. State "Low risk — proceeding with implementation." and continue. |
+| **Medium** | Shared interfaces or config touched. State the specific risks, then ask: "Acknowledge these risks and proceed? (y/n)" |
+| **High** | Critical paths, irreversible operations, or security surfaces. Present a mitigation plan (e.g., "I'll implement behind a feature flag" or "I'll add a rollback migration"). Ask: "Confirm proceed with mitigation? (y/n)" |
 
-If the change involves irreversible mutations, dependency changes, or external side effects, present these to the user and ask for confirmation before proceeding.
+**For each critical-path file**, ask individually:
+> "This file is in a critical path — proceed with editing [filename]? (y/n)"
+
+Wait for explicit confirmation before editing critical-path files.
 
 ---
 
-## Phase 4 — Implement the change
+## Step 5 — Implement (bounded by packet)
 
-After reviewing the execution packet, implement each work package in order:
+After governance is cleared, implement each work package in order:
 
-1. Read the target files before editing (`Read` tool or equivalent)
+1. Read target files before editing
 2. Make the change as specified in the work package
-3. Run any `verification_commands` listed for that work package
-4. Move to the next work package
+3. Run the verification command listed for that package
+4. If verification fails, fix before moving to the next package
+5. Move to the next work package
 
-Do not skip work packages. Do not implement changes not listed in the execution packet without user confirmation.
+**Scope enforcement:**
+- Do NOT implement changes to files not listed in the execution packet.
+- If you discover additional files need changes, STOP and say: "I need to update the execution packet — [file] also needs modification because [reason]. Proceed?"
+- Only continue after user confirms the expanded scope.
 
 ---
 
-## Before invoking lets-verify-change
+## Step 6 — Evidence Gate and Handoff
 
-Confirm you have at least one of:
-- A passing test run output
-- A lint result
-- A build artifact
+Before handoff, you MUST have at least one concrete verification artifact:
 
-Do not invoke `lets-verify-change` and say "it should pass" — that is not evidence.
+- A passing test run output (preferred)
+- A lint/type-check result
+- A build artifact or successful compilation
 
-## Phase 5 — Handoff to lets-verify-change
-
-When implementation is complete, hand off to `lets-verify-change`:
+**Do not say "it should pass" — that is not evidence. Run the command.**
 
 ```bash
-# Run the test suite before handing off — verify first
-git diff --stat HEAD  # confirm the change surface
+# Confirm the change surface
+git diff --stat HEAD
+
+# Run verification
+pytest tests/ -q  # or the project's test command
 ```
 
-Then invoke `lets-verify-change`.
+Present the evidence, then invoke `lets-verify-change`.
+
+---
+
+## Anti-patterns
+
+- **Implementing before presenting the execution packet** — the packet gates implementation. No packet, no coding.
+- **Saying "this is low risk" without citing evidence** — risk classification must reference specific signals from scope discovery (docstring markers, import count, file type).
+- **Skipping critical-path confirmation** — every file with a critical-path signal requires individual "proceed?" confirmation. No exceptions.
+- **Modifying files not in the execution packet** — if you discover new scope, stop and update the packet. Do not silently expand.
+- **Handing off without running verification** — you must have executed at least one command and shown its output before invoking lets-verify-change.
+- **Committing secrets, tokens, or credentials** — never commit secrets. Use environment variables or secret managers.
+- **Ordering work packages highest-risk first** — do safe changes first. If a risky change breaks something, the safe changes already committed still work.
+
+## Context sufficiency check
+
+For trivial changes (single test file edit, adding a comment, fixing a typo in a non-critical file), the execution packet can be minimal:
+
+```markdown
+## Execution Packet
+**Task:** Fix typo in README
+**Risk Level:** Low
+**Risk Evidence:** Single documentation file, no importers, no runtime effect.
+
+| # | Files | Intent | Verification | Risk |
+|---|-------|--------|--------------|------|
+| 1 | README.md | Fix typo | Visual review | Low |
+```
+
+The packet is still required — it's just short. This prevents the skill from being bypassed on "simple" changes while keeping overhead proportional.
 
 ---
 
 ## Outputs
 
-- Output: Execution packet with task list
-- Output: Implemented changes ready for verification
-- Output: Handoff to lets-verify-change with at least one piece of verification evidence
+- Output: File manifest with risk annotations (from scope discovery)
+- Output: Structured execution packet with work packages
+- Output: Governance decision with cited evidence
+- Output: Implemented changes with verification evidence
+- Output: Handoff to lets-verify-change
 
-## Example
-
-```bash
-# Confirm change surface before verification handoff
-git diff --name-only HEAD
-# Then run tests
-uv run pytest tests -q
-```
-
-## Anti-patterns
-
-- **Implementing outside the execution packet without explicit confirmation** — the governance packet defines scope. Anything not in the packet is out of scope.
-- **Handing off to lets-verify-change without running any local check** — you must have at least one piece of verification evidence before handoff.
-- **Committing secrets, tokens, or credentials to the repository** — blocked. Never commit secrets; use environment variables or secret managers instead.
-
-## Process
-
-```dot
-digraph develop_feature {
-  BuildPacket -> GovernanceCheck;
-  GovernanceCheck -> Implement [label="low/medium risk"];
-  GovernanceCheck -> ConfirmWithUser [label="high risk"];
-  ConfirmWithUser -> Implement;
-  Implement -> EvidenceGate;
-  EvidenceGate -> VerifyChange [label="evidence exists"];
-  EvidenceGate -> Implement [label="no evidence yet"];
-}
-```
-
-## Hard rules
-
-- Never implement changes that are not described in the execution packet without user confirmation.
-- Before editing any file identified as critical, confirm with the user that the change is intentional. Ask: "This file is in a critical path — proceed? (y/n)"
-
-Done when: the execution packet is generated, implementation is complete with at least one verification evidence item, and handoff to lets-verify-change is ready.
+Done when: execution packet is presented, governance is cleared, all work packages are implemented with verification, and handoff is ready.
