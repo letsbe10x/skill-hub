@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeReviewFinding",
+  "description": "Schema for a single code review finding produced by lets-review-code",
+  "type": "object",
+  "required": ["finding_id", "title", "severity", "lens", "location", "description", "impact", "confidence", "classification"],
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "pattern": "^F[0-9]+$",
+      "description": "Unique finding identifier (e.g., F1, F2)"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "Brief title describing the finding"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+      "description": "Severity level determining merge-blocking behavior"
+    },
+    "lens": {
+      "type": "string",
+      "enum": ["correctness", "security", "architecture", "api", "completeness", "complexity", "ai-failure"],
+      "description": "Which review lens produced this finding"
+    },
+    "location": {
+      "type": "object",
+      "required": ["file", "line"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Relative file path from repo root"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Primary line number"
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "End line for multi-line findings"
+        },
+        "side": {
+          "type": "string",
+          "enum": ["LEFT", "RIGHT"],
+          "description": "Diff side (LEFT=removed, RIGHT=added)"
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the issue"
+    },
+    "impact": {
+      "type": "string",
+      "description": "Concrete impact for THIS system (not generic best-practice)"
+    },
+    "suggested_fix": {
+      "type": "string",
+      "description": "Actionable fix recommendation"
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "code_snippet": {
+          "type": "string",
+          "description": "Actual code from the file showing the issue"
+        },
+        "trace": {
+          "type": "string",
+          "description": "Call chain or data flow trace"
+        },
+        "related_locations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Other file:line locations related to this finding"
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Certainty score (0.0 = speculative, 1.0 = proven)"
+    },
+    "caveat": {
+      "type": "string",
+      "description": "What couldn't be fully verified"
+    },
+    "challenge": {
+      "type": "string",
+      "description": "How this finding could be wrong (intellectual honesty)"
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["REAL", "DEFER", "FALSE_POSITIVE"],
+      "description": "Post-verification classification"
+    },
+    "classification_reasoning": {
+      "type": "string",
+      "description": "Why this classification was chosen"
+    },
+    "is_umbrella": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this finding represents a root cause with multiple manifestations"
+    },
+    "umbrella_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Locations where this umbrella finding manifests"
+    },
+    "blocks_merge": {
+      "type": "boolean",
+      "description": "Whether this finding blocks merge (CRITICAL/HIGH = true)"
+    }
+  }
+}
