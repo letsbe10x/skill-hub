@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Modules (Tiering)",
+  "description": "Tiering decisions with rationale for each discovered module.",
+  "type": "object",
+  "required": ["modules"],
+  "properties": {
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "tier", "reason", "sections"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path from repo root (trailing /)"
+          },
+          "tier": {
+            "type": "integer",
+            "enum": [1, 2],
+            "description": "1 = full AGENTS.md, 2 = lightweight AGENTS.md"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Which tiering criterion was met"
+          },
+          "sections": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Sections to generate (from tier template)"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Modules this one imports from"
+          },
+          "consumed_by": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Modules that import from this one"
+          }
+        }
+      }
+    },
+    "tier_3_coverage": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Tier 3 dirs mapped to the parent that documents them"
+    }
+  }
+}

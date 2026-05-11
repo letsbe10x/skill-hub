@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evidence Index",
+  "description": "File-backed claims per module. Every claim must trace to at least one source file. Keyed by relative module path.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["source_refs", "key_files"],
+    "properties": {
+      "source_refs": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Files/dirs that provide evidence for this module's claims"
+      },
+      "key_files": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Most important files (by import count or entry-point status)"
+      },
+      "doc_refs": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Existing documentation files found in this module"
+      },
+      "invariants": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Architecture rules with file-backed evidence"
+      },
+      "patterns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "files", "confidence"],
+          "properties": {
+            "name": { "type": "string" },
+            "files": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 3
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          }
+        },
+        "description": "Recurring patterns detected across >= 3 files"
+      },
+      "gotchas": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "HACK/FIXME/WARNING comments verbatim"
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Section Scorecard",
+  "description": "Quality scores per section, used to flag low-confidence sections for user review.",
+  "type": "object",
+  "required": ["file", "sections"],
+  "properties": {
+    "file": {
+      "type": "string",
+      "description": "Which AGENTS.md file this scorecard applies to"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "line_count", "evidence_refs", "confidence"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Section heading name"
+          },
+          "line_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "evidence_refs": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of evidence citations backing this section"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Section confidence score (< 0.6 = flag for user review)"
+          },
+          "flags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Issues or notes about this section"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,59 +1,162 @@
 # Intake Guide — lets-bootstrap-repo
 
-How to present the Phase 2 intake questions and validate responses.
+How to present Phase 2 intake questions: choice menus with recommended defaults, validation rules, and staleness handling.
 
-## Question 1: Approver identity
+## Intake Card (present first)
 
-Ask: "Who is approving this bootstrap? Provide your email address or GitHub handle."
+Before asking questions, present the current state:
 
-Validation: non-empty string, no spaces. Example: `cogsmith-ai` or `rahul@example.com`.
+```
+Repo: <basename of repo root>
+Artifact          Present   Verified   Stale
+service.yaml        ✓/✗       ✓/✗       ✓/✗
+engineering.yaml    ✓/✗       ✓/✗       ✓/✗
+AGENTS.md           ✓/✗       —         —
+CLAUDE.md           ✓/✗       —         —
+CI config           ✓/✗       —         —
+```
 
-Passed to: `--approved-by <value>`
+Then ask: which bootstrap depth?
 
-## Question 2: One-sentence repo description
+| Depth | What you get |
+|-------|-------------|
+| **Baseline** (Recommended) | Capture service truth + readiness report |
+| **Operational** | + auto-discover engineering + delivery facts |
+| **Full** | + discover observability + offer enrichment |
 
-Ask: "In one sentence, what does this repo do?"
+---
 
-This is NOT passed to a CLI flag — it seeds a retained decision titled "Service purpose" after Phase 3 completes. Record it and use it in the Phase 5 readiness summary.
+## Question Set (ask one at a time)
 
-Validation: non-empty, ≤ 200 characters.
+### Question 1 — Approver identity
 
-## Question 3: Non-negotiables
+**Ask:** "Who is approving this bootstrap? Provide your email or handle."
 
-Ask: "What are 2–5 invariants that must never regress? Examples: 'No authenticated session tokens stored in plaintext', 'Public API contract stays backward-compatible'."
+**Validation:** Non-empty string, no spaces. Example: `cogsmith-ai` or `rahul@example.com`.
 
-Validation: 2–7 items. One per line from user; translate each to a `--non-negotiable` flag.
+**Maps to:** `service.approved_by`
 
-If the user gives fewer than 2: prompt once more — "Can you add at least one more? Non-negotiables are used to gate AI mutations."
+---
 
-## Question 4: Critical flows
+### Question 2 — Repo description
 
-Ask: "What are the 2–5 critical user or system flows? Examples: 'End-to-end onboarding', 'Deployment to production', 'CI green gate'."
+**Ask:** "In one sentence, what does this repo do?"
 
-Note: `l10x` already detects candidate critical paths from the repo shape (directories named `auth/`, `payments/`, `billing/` etc.). You do not have access to these candidates before bootstrap runs — ask from scratch and bootstrap will merge detected + user-provided.
+**Validation:** Non-empty, ≤ 200 characters.
 
-Validation: 2–7 items.
+**Maps to:** `service.purpose`
 
-## Question 5: Governance posture
+---
 
-Ask: "Which governance posture fits this repo best?"
+### Question 3 — Non-negotiables
 
-Present choices:
-- `guarded` — every AI mutation requires human review; strictest
-- `balanced` — AI-assisted edits with owner review *(recommended for most repos)*
-- `adaptive` — AI can make most changes; spot review
-- `experimental` — minimal gates; prototyping/research repos
+**Ask:** "What are 2–5 invariants that must never regress?"
 
-Map to `--profile <choice>`.
+**Examples to show:**
+- "No authenticated session tokens stored in plaintext"
+- "Public API contract stays backward-compatible"
+- "All database migrations must be reversible"
 
-## Question 6: Operational posture
+**Validation:** 2–7 items. If fewer than 2: prompt once more — "Can you add at least one more? Non-negotiables gate AI mutations."
 
-Ask: "Which operational posture fits?"
+**Maps to:** `service.non_negotiables[]`
 
-Present choices:
-- `intensive` — 24×7 availability; strict rollback; prod-critical
-- `managed` — business-hours availability; standard rollback *(recommended)*
-- `moderate` — best-effort; relaxed recovery
-- `lightweight` — dev/internal tooling; minimal gates
+---
 
-Map to `--operational-posture <choice>`. This is a required flag alongside `--profile`.
+### Question 4 — Critical flows
+
+**Ask:** "What are the 2–5 critical user or system flows?"
+
+**Examples to show:**
+- "End-to-end user onboarding"
+- "Payment processing pipeline"
+- "CI green gate → deploy"
+
+**Validation:** 2–7 items.
+
+**Maps to:** `service.critical_paths[]`
+
+---
+
+### Question 5 — Repo type (choice menu)
+
+**Ask:** "What type of repo is this?"
+
+| Choice | Description |
+|--------|-------------|
+| `service-or-application` (Recommended) | Web service, API, or user-facing application |
+| `library-or-package` | Shared library or published package |
+| `workflow-or-tooling-platform` | Developer tools, CI/CD tooling, internal platform |
+| `monorepo-or-multi-service` | Multiple services or packages in one repo |
+
+**Default:** Infer from repo shape. If `src/` + `Dockerfile` → `service-or-application`. If `setup.py`/`pyproject.toml` with `[project]` → `library-or-package`. If multiple top-level services → `monorepo-or-multi-service`.
+
+**Maps to:** `service.type`
+
+---
+
+### Question 6 — Governance posture (choice menu)
+
+**Ask:** "Which governance posture fits this repo best?"
+
+| Choice | Description |
+|--------|-------------|
+| `guarded` | Every AI mutation requires human review; strictest |
+| `balanced` (Recommended) | AI-assisted edits with owner review |
+| `adaptive` | AI can make most changes; spot review |
+| `experimental` | Minimal gates; prototyping/research repos |
+
+**Maps to:** `service.governance_profile`
+
+---
+
+### Question 7 — Operational posture (choice menu)
+
+**Ask:** "Which operational posture fits?"
+
+| Choice | Description |
+|--------|-------------|
+| `intensive` | 24×7 availability; strict rollback; prod-critical |
+| `managed` (Recommended) | Business-hours availability; standard rollback |
+| `moderate` | Best-effort; relaxed recovery |
+| `lightweight` | Dev/internal tooling; minimal gates |
+
+**Maps to:** `service.operational_posture`
+
+---
+
+## Staleness Handling
+
+When artifacts exist but may be stale, present:
+
+```
+service.yaml was last modified <N days ago>.
+```
+
+Then ask:
+
+| Choice | Action |
+|--------|--------|
+| **Re-verify** (Recommended) | Keep existing content, refresh verification timestamp |
+| **Re-bootstrap** | Discard and recapture from scratch (requires `--force`) |
+| **Skip** | Leave as-is, proceed to next phase |
+
+**Staleness signals:**
+- `last_compiled_date` > 90 days old
+- Referenced files no longer exist on disk
+- Referenced commands no longer in Makefile/pyproject.toml
+- Module structure has changed significantly (new top-level dirs)
+
+---
+
+## Validation Summary
+
+| Field | Rule |
+|-------|------|
+| `approved_by` | Non-empty, no spaces |
+| `purpose` | Non-empty, ≤ 200 chars |
+| `non_negotiables` | 2–7 items |
+| `critical_paths` | 2–7 items |
+| `type` | One of: service-or-application, library-or-package, workflow-or-tooling-platform, monorepo-or-multi-service |
+| `governance_profile` | One of: guarded, balanced, adaptive, experimental |
+| `operational_posture` | One of: intensive, managed, moderate, lightweight |
