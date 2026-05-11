@@ -119,6 +119,18 @@ These force rigor escalation regardless of scale:
 | **Migration gate** | Schema change, data transform, irreversible op | ELEVATED minimum |
 | **API gate** | Public interface change, breaking change | Design checkpoint |
 | **Dependency gate** | New external dependency | Security review in packet |
+| **Service context gate** | Change touches a non-negotiable or critical path from AGENTS.md | Extra verification required, explicit preservation proof in Stage 8 |
+
+## Service Context Interaction
+
+When service context identifies constraints, classification must account for them:
+
+| Constraint type | Effect on classification |
+|----------------|------------------------|
+| Non-negotiable touched | Risk = HIGH minimum (cannot be lower) |
+| Critical path touched | Extra verification obligation in packet |
+| Architecture boundary crossed | Architecture gate opens |
+| Testing expectation stated | Methodology constrained (cannot skip) |
 
 ## Output
 
