@@ -1,10 +1,10 @@
 ---
 name: lets-review-code
-description: "Use after lets-verify-change passes to review code correctness, test coverage, and functional gaps. Produces structured findings with severity and a go/no-go verdict gating PR creation."
+description: "Multi-lens code review with planner-driven depth selection, 6 review lenses, AI failure-mode detection, finding verification, and evidence-quality discipline. Produces severity-ranked findings with confidence scores and gates PR creation on zero blocking issues."
 metadata:
   author: cogsmith-ai
-  version: "2.0.0"
-  tags: [review, code-quality, delivery, security]
+  version: "3.1.0"
+  tags: [review, code-quality, delivery, security, architecture]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-review-code/SKILL.md
 compatibility:
@@ -15,11 +15,17 @@ triggers:
   - code review
   - is this ready to merge
   - check this before PR
+  - deep review
+  - review for correctness
+  - review for security
 outcome_runtime:
   open_agency_zones:
     - review_strategy
     - defect_hypothesis_generation
     - reviewer_focus_selection
+    - classification_depth_decision
+    - change_risk_analysis
+    - lens_prioritization
   governed_action_zones:
     - review_verdict
     - external_review_comment
@@ -27,249 +33,226 @@ outcome_runtime:
     - challenge_initial_framing
     - request_missing_diff_context
     - classify_false_positive
+    - escalate_security_risk
+    - escalate_architectural_violation
+    - flag_ai_failure_mode
   hard_limits:
     - do_not_fabricate_evidence
     - do_not_claim_tests_passed_without_output
     - do_not_skip_linter
+    - do_not_soften_blocking_findings
+    - do_not_approve_with_unverified_claims
   required_decision_frames:
     - review_verdict
+    - classification_verification
   validation_gates:
     - finding_evidence_gate
     - lint_gate
+    - classification_gate
   mutation_policy: read_only
   human_checkpoint_triggers:
     - unresolved_disagreement
     - compliance_risk
+    - architectural_invariant_violation
+    - security_critical_finding
 ---
 
 > **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-review-code
 
-Review a code change for correctness, security, and completeness. Produce structured findings, a go/no-go verdict, and gate PR creation on zero blocking issues.
+Multi-lens code review with intelligent depth selection. Classifies the change, selects review depth, runs specialized lenses, verifies findings against actual code, and produces a severity-ranked report. Operational detail in phase-specific references — this file is the contract.
 
-## Process Flow
+---
 
-```dot
-digraph review_code {
-  Prerequisites [label="Step 1\nPrerequisites" shape=box];
-  Lint [label="Step 2\nRun linter" shape=box];
-  Diff [label="Step 3\nReview diff" shape=box];
-  DeepCheck [label="Step 4\nDeep analysis" shape=box];
-  Findings [label="Step 5\nStructured findings" shape=box];
-  Verdict [label="Step 6\nVerdict" shape=diamond];
-  FixErrors [label="Fix errors" shape=box];
-  PR [label="Raise PR" shape=doublecircle];
+## Phases & Gates
 
-  Prerequisites -> Lint;
-  Lint -> Diff;
-  Diff -> DeepCheck;
-  DeepCheck -> Findings;
-  Findings -> Verdict;
-  Verdict -> PR [label="acceptable"];
-  Verdict -> FixErrors [label="has errors"];
-  FixErrors -> Lint [label="re-check"];
-}
+```
+Phase 1: Classify    → Determine change type, scale, risk, depth
+Phase 2: Context     → Build repo context brief (AGENTS.md, module map, hotspots)
+Phase 3: Lint        → Mandatory lint gate (never skipped)
+Phase 4: Multi-Lens  → Run activated lenses per depth decision
+Phase 5: Verify      → Verify each finding against actual code
+Phase 6: Consolidate → Deduplicate, rank by severity, umbrella findings
+Phase 7: Verdict     → PASS / PASS_WITH_NOTES / FAIL
+Phase 8: Fix         → Auto-fix or escalate blocking findings
 ```
 
-## When to use
+---
+
+## When to Use
 
 - After `lets-verify-change` completes with tests passing or skipped
-- Final step before raising a PR in the `pr-ship` workflow
-- Part of: lets-develop-feature → lets-verify-change → lets-review-code
+- Final quality gate before raising a PR
+- Part of: lets-develop-feature → lets-verify-change → **lets-review-code**
+- When you want a thorough review beyond surface-level lint
 
-## When not to use
+## When Not to Use
 
-- `lets-verify-change` has not run yet — run verification before code review.
-- You only need to check PR structure/description (use `lets-review-pr`).
-
-## Inputs
-
-- Input: Verification status — tests must have passed or been explicitly skipped
-- Input: Repo root path
-- Input: The diff or commit to review
+- `lets-verify-change` has not run yet — run verification first
+- Reviewing an existing PR from GitHub (use `lets-review-pr`)
+- Single-line config tweak with no logic impact
 
 ---
 
-## Step 1 — Prerequisites check
+## Depth Selection (Phase 1)
 
-Before reviewing, confirm:
+Classify the change, then select depth. See [references/PLANNER.md](references/PLANNER.md) for the full classification matrix.
 
-1. Tests have passed (check via `pytest` or the project's test command)
-2. No uncommitted work that should be part of this change (`git status`)
+| Depth | When | Active lenses |
+|-------|------|---------------|
+| **FULL** | >300 LOC, security-touching, new public API, migration, multi-module | All 6 + AI failure-mode |
+| **STANDARD** | 50–300 LOC, typical feature/bugfix | Correctness, Security, Completeness + AI failure-mode |
+| **LIGHT** | <50 LOC, config/docs/test-only | Correctness + quick security scan |
 
-If tests are failing, stop. Go back to `lets-verify-change` and fix failures first.
+**Gate overrides** force deeper review regardless of scale:
+- Security gate: touches auth/crypto/secrets → Security lens at FULL depth
+- Architecture gate: new abstraction, cross-boundary → Architecture lens
+- API gate: public interface change → API lens
+- AI failure gate: code appears generated → AI failure-mode scan
 
-```bash
-git status
-git log --oneline -3  # understand the commit being reviewed
-```
+State classification before proceeding:
+> **Classification: STANDARD** — 142 lines across 5 files, touches business logic.
 
 ---
 
-## Step 2 — Run linter (mandatory)
+## Lint Gate (Phase 3 — mandatory)
 
-**This step is not optional. Always run the linter before reviewing.**
-
-Detect the project's linter from config files:
-- `pyproject.toml` with `[tool.ruff]` → `ruff check src/`
-- `package.json` with eslint → `npx eslint src/`
-- `.golangci.yml` → `golangci-lint run`
-- If no linter configured → note "No linter configured" and proceed
+**Never skipped.** Detect linter from config, run against changed files only, record new issues vs. pre-existing. Only new issues count toward verdict.
 
 ```bash
-# Run against changed files only:
+# Example: Python with ruff
 ruff check $(git diff --name-only HEAD~1 -- '*.py') 2>&1 || true
-# Or project-wide if simpler:
-ruff check src/ 2>&1 || true
 ```
 
-Record:
-- Exit code (0 = clean, non-zero = issues)
-- Issue count and which are auto-fixable
-- Separate pre-existing issues (in files not touched by this commit) from new issues
+---
 
-**Only new issues (in changed files) count toward the verdict.**
+## Multi-Lens Review (Phase 4)
+
+Run each activated lens. Each answers ONE primary question. See [references/LENSES.md](references/LENSES.md) for detailed patterns and verification protocols per lens.
+
+| Lens | Primary question |
+|------|-----------------|
+| **Correctness** | Does the code do what it claims? |
+| **Security** | Can this be exploited or does it leak data? |
+| **Architecture** | Is this the right design at the right level? |
+| **API & Contracts** | Will this break callers or violate contracts? |
+| **Completeness** | Is this production-ready? |
+| **Complexity** | Is this more complex than necessary? |
+| **AI Failure-Mode** | Does this exhibit patterns common in generated code? |
 
 ---
 
-## Step 3 — Review the diff
+## Finding Verification (Phase 5)
 
-Read the full diff of the commit being reviewed:
+**Every finding must survive verification before reaching the report.** See [references/VERIFICATION.md](references/VERIFICATION.md) for the full protocol.
 
-```bash
-git diff HEAD~1..HEAD
-# or: git show HEAD
-```
+For each potential finding:
+1. Re-read the actual source file (not just the diff)
+2. Check 50+ lines of surrounding context
+3. Trace callers/callees — does a caller handle the case?
+4. Check project conventions (AGENTS.md, existing patterns)
+5. Classify: **REAL** | **DEFER** | **FALSE_POSITIVE**
 
-Also read the full content of each changed file (context beyond the diff is needed to understand impact).
-
----
-
-## Step 4 — Deep analysis checklist
-
-After reading the diff, actively check for these patterns. Do not rely on passive reading — probe each category:
-
-### Security
-- [ ] Cryptographic choices: is a weak algorithm used where a strong one is needed? (MD5, SHA1 for security purposes, ECB mode, hard-coded keys)
-- [ ] Input validation: is user/external input trusted without sanitization?
-- [ ] Secrets: any tokens, keys, or credentials in the code or config?
-- [ ] Access control: are permission checks present where needed?
-
-### Concurrency
-- [ ] Shared mutable state: is data accessed from multiple threads without synchronization?
-- [ ] Exception handling in threads: are exceptions in background threads observable? (silently swallowed = invisible failures)
-- [ ] Resource lifecycle: is start/stop idempotent? Can double-start or double-stop cause corruption?
-
-### Resource management
-- [ ] Unbounded growth: are there lists, dicts, or caches that grow without a cap or eviction policy?
-- [ ] Cleanup: are resources (files, connections, threads) properly closed/joined?
-- [ ] Error paths: do error handlers leak resources?
-
-### Correctness
-- [ ] Off-by-one: boundary conditions in loops, slices, percentile calculations
-- [ ] Dead code: functions, variables, or imports that are defined but never used
-- [ ] Inconsistent behavior: does the same concept (e.g., "expired") have different definitions in different methods?
-- [ ] Things stored but never used: parameters accepted but ignored, fields set but never read
-
-### Test adequacy
-- [ ] Does the test suite cover the feature advertised in the commit message?
-- [ ] Are error paths tested? (exceptions, edge cases, boundary conditions)
-- [ ] Are the tests actually asserting the right thing? (not just "no exception thrown")
+For REAL findings, also record:
+- **Confidence** (0.0–1.0)
+- **Evidence** (exact file:line + observed behavior)
+- **Caveat** (what couldn't be verified)
+- **Challenge** (how this finding could be wrong)
 
 ---
 
-## Step 5 — Structured findings
+## Consolidation (Phase 6)
 
-Present all findings in a structured table with severity classification:
+### Severity
 
-| # | Severity | Category | Location | Finding |
-|---|----------|----------|----------|---------|
-| 1 | **error** | Security | `file.py:27` | Description of the issue |
-| 2 | **error** | Correctness | `file.py:61` | Description |
-| 3 | warn | Concurrency | `file.py:34` | Description |
+| Severity | Meaning | Blocks? |
+|----------|---------|---------|
+| **CRITICAL** | Security vuln, data loss, crash in production path | Yes |
+| **HIGH** | Bug causing incorrect behavior under normal use | Yes |
+| **MEDIUM** | Edge case, missing validation, significant tech debt | No |
+| **LOW** | Style, minor optimization, nitpick | No |
 
-**Severity definitions:**
-
-| Severity | Meaning | Blocks merge? |
-|----------|---------|---------------|
-| **error** | Bug, security issue, or correctness defect that will cause problems in production | Yes |
-| warn | Non-ideal but functional; technical debt, missing edge case coverage, style issue | No |
-
-**Evidence requirement:** Every finding must cite a specific file and line number. Do not fabricate line references — verify them against the actual file content.
+### Rules
+- Same location flagged by multiple lenses → keep highest severity, merge evidence
+- Multiple findings sharing one root cause → report as **umbrella finding**
+- Use [assets/templates/review-report.template.md](assets/templates/review-report.template.md) for report structure
 
 ---
 
-## Step 6 — Verdict
+## Verdict (Phase 7)
 
-After all findings are documented:
+| Verdict | Criteria |
+|---------|----------|
+| **PASS** | Zero CRITICAL or HIGH findings |
+| **PASS_WITH_NOTES** | Zero blocking, some MEDIUM findings |
+| **FAIL** | One or more CRITICAL or HIGH findings |
 
-| Verdict | Criteria | Action |
-|---------|----------|--------|
-| **acceptable** | Zero error-severity findings remain | Proceed to PR |
-| **acceptable with warnings** | Zero errors, some warns | Proceed to PR, note warnings in description |
-| **insufficient** | One or more error-severity findings unresolved | Do not raise PR. Fix errors or escalate to user. |
-
-State the verdict explicitly:
-> **Verdict: acceptable** — No blocking issues. Ready to raise PR.
-
-or:
-> **Verdict: insufficient** — N error-severity finding(s) must be resolved before merging.
+State explicitly:
+> **Verdict: PASS** — No blocking issues. 2 MEDIUM findings noted for follow-up.
 
 ---
 
-## Step 7 — Fix or escalate (if insufficient)
+## Fix or Escalate (Phase 8)
 
-When errors exist:
+When blocking findings exist:
+1. Auto-fixable lint → fix (`ruff check --fix`)
+2. Code bugs with confidence ≥0.85 → fix, re-run tests, re-lint
+3. Design issues or low-confidence → surface to user with options
 
-1. **Auto-fixable lint errors** → fix them (e.g., `ruff check --fix`)
-2. **Code bugs you can fix** → offer to fix, then re-run lint and re-verify
-3. **Design issues requiring user decision** → surface to user with options
-
-After fixing, re-run linter (Step 2) and re-evaluate verdict.
+After fixing, restart from Phase 3 (lint gate) through the full pipeline.
 
 ---
 
-## Step 8 — Raise PR (if acceptable)
+## Error Handling
 
-When verdict is acceptable:
-
-```bash
-git add -p   # review each hunk
-git commit -m "feat: ${TASK_SUMMARY}"
-git push -u origin "$(git branch --show-current)"
-gh pr create \
-  --title "$TITLE" \
-  --body "## Summary
-- [description of change]
-
-## Review notes
-- [any warn-severity items noted here]
-
-## Test status
-All tests passing."
-```
-
-Confirm before posting: "Ready to raise the PR? (y/n)"
+- If linter is not configured: note "No linter configured" and proceed (Phase 3 still runs, just records absence)
+- If diff fetch fails: ask for commit range or file list
+- If file context is unavailable for verification: note in caveat, lower confidence
+- If findings conflict between lenses: note both perspectives with evidence in the report
 
 ---
 
 ## Anti-patterns
 
-- **Skipping the linter** — the linter is mandatory. It catches issues that manual review misses (unused imports, unreachable code, style violations). Never skip it.
-- **Approving without confirming test status** — verification must be confirmed before approval.
-- **Saying "LGTM" without structured findings** — every review must produce findings (even if the finding is "no issues found") with a formal verdict.
-- **Marking findings as errors without evidence** — every error-severity finding must cite a specific file:line and explain the concrete failure mode.
-- **Commenting on style while missing functional bugs** — functional correctness takes precedence. Check the deep analysis checklist before nitpicking style.
-- **Fabricating line references** — if you can't verify the exact line, read the file first. Never guess.
+- **Skipping the linter** — mandatory, always
+- **Approving without test confirmation** — verification must be confirmed
+- **Generic findings** — every finding must explain impact for THIS system, not cite general rules
+- **Findings without evidence** — must cite file:line with actual code
+- **False confidence** — if you can't verify, lower confidence and note caveat
+- **Reviewing only the diff** — always read full file context
+- **Ignoring AI failure modes** — generated code is often plausible but wrong
+- **Style over substance** — correctness and security take precedence over formatting
+- **Symptoms instead of root causes** — umbrella findings, not 5 duplicates
 
 ---
 
 ## Outputs
 
-- Output: Lint results (exit code, issue count)
-- Output: Structured findings table (severity, category, location, description)
-- Output: Formal verdict (acceptable / insufficient)
-- Output: PR raised via `gh pr create` when acceptable
+- Output: Change classification (type: feature/bugfix/refactor/config/test/docs, depth: FULL/STANDARD/LIGHT, risk signals)
+- Output: Lint results (exit code, new issue count vs pre-existing)
+- Output: Severity-ranked findings table with confidence scores (0.0–1.0) and file:line evidence
+- Output: Detailed finding reports with evidence, caveats, challenges, and fix suggestions
+- Output: Formal verdict (PASS / PASS_WITH_NOTES / FAIL) with rationale
 
-Done when: verdict is issued, and either PR is raised (acceptable) or errors are surfaced to user (insufficient).
+Done when: Verdict is issued, and either ready to ship (PASS) or blocking issues are surfaced to user (FAIL).
+
+---
+
+## References (Progressive Disclosure)
+
+Read each reference only when its phase activates — not upfront.
+
+| Reference | When to read |
+|-----------|-------------|
+| [PLANNER.md](references/PLANNER.md) | Phase 1 — classification matrix, depth decision, gate overrides |
+| [LENSES.md](references/LENSES.md) | Phase 4 — detailed patterns and checks per lens |
+| [VERIFICATION.md](references/VERIFICATION.md) | Phase 5 — finding verification protocol, confidence calibration |
+
+## Templates & Scripts
+
+| Asset | Purpose | Used in |
+|-------|---------|---------|
+| [assets/templates/review-report.template.md](assets/templates/review-report.template.md) | Report structure | Phase 6 |
+| [assets/templates/finding.schema.json](assets/templates/finding.schema.json) | Finding data schema | Phase 5/6 |
+| [scripts/classify_change.sh](scripts/classify_change.sh) | Automated change classification | Phase 1 |

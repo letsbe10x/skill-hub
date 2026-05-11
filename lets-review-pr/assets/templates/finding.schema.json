@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PRReviewFinding",
+  "description": "Schema for a single PR review finding produced by lets-review-pr",
+  "type": "object",
+  "required": ["finding_id", "title", "severity", "lens", "location", "description", "impact", "confidence", "classification"],
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "pattern": "^F[0-9]+$",
+      "description": "Unique finding identifier (e.g., F1, F2)"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "Brief title describing the finding"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+      "description": "Normalized severity level"
+    },
+    "lens": {
+      "type": "string",
+      "enum": ["general", "code", "security", "architecture", "api", "completeness", "complexity", "ai-failure", "spec-alignment"],
+      "description": "Which review lens produced this finding"
+    },
+    "location": {
+      "type": "object",
+      "required": ["file", "line"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Relative file path from repo root"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Primary line number"
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "End line for multi-line findings"
+        },
+        "side": {
+          "type": "string",
+          "enum": ["LEFT", "RIGHT", "PR"],
+          "description": "Diff side (LEFT=removed, RIGHT=added, PR=PR-wide finding)"
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the issue"
+    },
+    "impact": {
+      "type": "string",
+      "description": "Concrete impact for THIS system (not generic best-practice)"
+    },
+    "suggested_fix": {
+      "type": "string",
+      "description": "Actionable fix recommendation"
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "code_snippet": {
+          "type": "string",
+          "description": "Actual code from the file showing the issue"
+        },
+        "trace": {
+          "type": "string",
+          "description": "Call chain or data flow trace"
+        },
+        "related_locations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Other file:line locations related to this finding"
+        },
+        "spec_reference": {
+          "type": "string",
+          "description": "Reference to spec requirement if this is a spec alignment finding"
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Certainty score"
+    },
+    "caveat": {
+      "type": "string",
+      "description": "What couldn't be fully verified"
+    },
+    "challenge": {
+      "type": "string",
+      "description": "How this finding could be wrong"
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["REAL", "DEFER", "FALSE_POSITIVE"],
+      "description": "Post-verification classification"
+    },
+    "classification_reasoning": {
+      "type": "string",
+      "description": "Why this classification was chosen"
+    },
+    "blocks_merge": {
+      "type": "boolean",
+      "description": "Whether this finding blocks approval"
+    },
+    "posting_eligible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this finding should be included in GitHub comment"
+    },
+    "is_umbrella": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this represents a root cause with multiple manifestations"
+    },
+    "umbrella_evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Locations where this umbrella finding manifests"
+    }
+  }
+}

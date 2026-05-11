@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PRClassification",
+  "description": "Schema for PR classification output from the planner stage",
+  "type": "object",
+  "required": ["pr_number", "classification", "pipeline_mode", "active_lenses", "rationale"],
+  "properties": {
+    "pr_number": {
+      "type": "integer",
+      "description": "PR number"
+    },
+    "pr_url": {
+      "type": "string",
+      "description": "Full PR URL"
+    },
+    "classification": {
+      "type": "object",
+      "required": ["type", "scale", "risk", "complexity"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["feature", "bugfix", "refactor", "performance", "config", "dependency", "migration", "api-change", "docs", "test", "security"],
+          "description": "Change type"
+        },
+        "scale": {
+          "type": "string",
+          "enum": ["tiny", "small", "medium", "large", "very-large"],
+          "description": "Change scale"
+        },
+        "risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Risk level"
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["straightforward", "moderate", "complex", "gnarly"],
+          "description": "Cognitive complexity"
+        }
+      }
+    },
+    "pipeline_mode": {
+      "type": "string",
+      "enum": ["FULL", "STANDARD", "LIGHT", "TARGETED"],
+      "description": "Selected pipeline mode"
+    },
+    "active_lenses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["general", "code", "security", "architecture", "api", "completeness", "complexity", "ai-failure"]
+      },
+      "description": "Lenses activated for this review"
+    },
+    "gate_overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate", "reason", "lens_added"],
+        "properties": {
+          "gate": {
+            "type": "string",
+            "enum": ["security", "architecture", "api", "complexity", "ai-failure", "spec-deviation"]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "lens_added": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Gates that triggered additional lens activation"
+    },
+    "ai_failure_scan": {
+      "type": "boolean",
+      "description": "Whether AI failure-mode detection is active"
+    },
+    "spec_alignment": {
+      "type": "boolean",
+      "description": "Whether spec alignment review will run"
+    },
+    "spec_ref": {
+      "type": ["string", "null"],
+      "description": "Reference to the linked spec/PRD if any"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Human-readable explanation of classification decisions"
+    },
+    "focus_areas": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific areas to focus on during review"
+    },
+    "context_needed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Context that should be gathered before reviewing"
+    }
+  }
+}
