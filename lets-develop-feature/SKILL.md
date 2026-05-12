@@ -107,6 +107,37 @@ Stage 9: Complete       → Quality scorecard + handoff
 
 ---
 
+## Repo-Local Run State (`.lets/`) (Recommended)
+
+Store the run’s working artifacts *in the repo* so the workflow is resumable and auditable:
+
+```
+.lets/
+  runs/
+    develop-feature/
+      latest
+      <run_id>/
+        run-state.json
+        service-context.md
+        execution-packet.md
+        scenario-matrix.md
+        traceability.md
+        verification-record.md
+        handoff.md
+```
+
+**Optional helper (letsbe10x):** if you have the `lets` CLI available, you can scaffold these files:
+
+```bash
+lets develop-feature init <slug>
+lets develop-feature status
+lets develop-feature check
+```
+
+If you don’t have `lets`, create the directory manually and start from the templates in `assets/templates/`.
+
+---
+
 ## When to Use
 
 - Implementing a feature, bugfix, or refactor that touches production code
