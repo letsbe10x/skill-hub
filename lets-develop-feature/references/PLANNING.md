@@ -1,47 +1,38 @@
 # Planning Stage — lets-develop-feature
 
-How to validate the upstream spec against service context, produce the execution packet, build
-story/task/scenario coverage, define assumptions, and run the checkpoint.
+How to build the execution packet from an approved spec, decompose into story tasks, build
+scenario coverage, define assumptions, and run the checkpoint.
 
-## Spec Validation (Not Construction)
+## Entry Condition
 
 By the time Stage 3 activates, an approved spec MUST already exist — either:
 
-- Produced by `lets-brainstorm` (via Phase 0 delegation) → in `upstream/spec.md`
+- Produced by `lets-brainstorm` (via Phase 0 delegation)
+- Produced by inline discovery (Phase 0 fallback)
 - Pre-existing in `lets spec` workspace or referenced PRD/ticket
 - Provided directly by the user
 
 Stage 3 does NOT construct specs. If no spec exists at Stage 3 entry, something went wrong in
 Phase 0 — stop and return to Phase 0.
 
-## Spec-Readiness: Translation & Validation
+## Spec vs Service Context
 
-The spec-readiness step validates the upstream spec against the repo's service context (from
-Stage 1). It catches conflicts between design intent and repo reality.
-
-**Validation checks:**
-
-1. Does the spec's approach conflict with any service non-negotiable?
-2. Does the spec assume capabilities the repo doesn't have?
-3. Does the spec touch critical paths identified in AGENTS.md?
-4. Are there unstated dependencies the spec doesn't account for?
-5. Does the spec's scope fit within the repo's architecture boundaries?
-
-If conflicts are found: surface them to the user. Options:
-- Revise the spec (delegate back to brainstorm with the conflict as input)
-- Accept the conflict with documented risk
+If service context (Stage 1) conflicts with the spec, surface the conflict to the user:
 - Narrow scope to avoid the conflict
+- Accept with documented risk
+- Send back to discovery to revise the spec
 
-If the `lets` CLI is available, prefer:
+Don't silently proceed past a conflict. But don't over-validate — if the spec was produced by
+brainstorm with repo context, most conflicts were already caught. Only flag genuinely new
+information from AGENTS.md that brainstorm couldn't have known.
+
+If the `lets` CLI is available:
 
 ```bash
 lets spec status --format json
 lets spec export <feature_key>
 lets journey init <feature_key> --repo-root .
 ```
-
-Populate `spec-readiness.md` and `clarifications.md` from the validation results. Critical
-conflicts block planning; minor tensions are documented in the assumptions log.
 
 ### Spec Quality Checklist
 

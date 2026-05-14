@@ -2,8 +2,8 @@ schema_version: "2"
 
 workflow:
   id: "lets-develop-feature"
-  version: "3.0.0"
-  description: "Compositional feature development with intake discovery, upstream delegation, staged execution, and evidence-gated handoff."
+  version: "3.1.0"
+  description: "Feature development with intake discovery, upstream delegation, staged execution, and evidence-gated handoff."
   run_layout:
     runs_root: ".lets/runs"
 
@@ -13,16 +13,6 @@ control_levels: ["autonomous", "checkpoints", "collaborative"]
 phases:
   - id: "intake"
     title: "Phase 0: Intake & Discovery"
-    turns:
-      - id: "intent_echo"
-        title: "Turn 1: Intent echo and confirmation"
-        skippable: false
-      - id: "signals_control"
-        title: "Turn 2: Discovery signals + control recommendation"
-        skippable_when: "spec_exists AND no_signals AND resumption"
-      - id: "delegation"
-        title: "Turn 3: Delegation plan and upstream skill execution"
-        skippable_when: "no_handoffs_triggered"
 
 stages:
   - id: "ground"
@@ -30,7 +20,7 @@ stages:
   - id: "classify"
     title: "Stage 2: Classify change type/scale/risk"
   - id: "plan"
-    title: "Stage 3: Validate spec + build execution packet"
+    title: "Stage 3: Build execution packet from spec"
   - id: "architecture"
     title: "Stage 4: Architecture boundary check"
   - id: "checkpoint"
@@ -44,113 +34,40 @@ stages:
   - id: "complete"
     title: "Stage 9: Handoff to verify-change"
 
-control_stage_matrix:
-  autonomous:
-    intake_intent_echo: always
-    intake_signals_control: skip_if_clean
-    intake_delegation: skip_if_no_triggers
-    ground: silent
-    classify: silent
-    plan: silent
-    architecture: auto_resolve
-    checkpoint: skip
-    implement: hard_stops_only
-    test: failures_only
-    verify: blocked_only
-    complete: present_summary
-  checkpoints:
-    intake_intent_echo: always
-    intake_signals_control: always
-    intake_delegation: always_if_triggered
-    ground: silent
-    classify: silent
-    plan: silent
-    architecture: pause_if_opened
-    checkpoint: present_and_wait
-    implement: pause_on_blockers
-    test: report_summary
-    verify: present_verdict
-    complete: present_scorecard
-  collaborative:
-    intake_intent_echo: always
-    intake_signals_control: always
-    intake_delegation: always_if_triggered
-    ground: present_and_ask
-    classify: present_for_confirmation
-    plan: pause_on_low_confidence
-    architecture: always_present
-    checkpoint: section_by_section
-    implement: pause_at_boundaries
-    test: walk_through_coverage
-    verify: full_comparison
-    complete: review_before_handoff
-
 artifacts:
-  # Phase 0 artifacts
-  - id: "intent_echo"
-    path: "intake/intent-echo.md"
-    required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
-  - id: "discovery_signals"
-    path: "intake/discovery-signals.json"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "control_level"
-    path: "intake/control-level.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "delegation_plan"
-    path: "intake/delegation-plan.md"
-    required_for_when: "handoffs_triggered"
-  # Upstream artifacts (from delegated skills)
-  - id: "upstream_spec"
-    path: "upstream/spec.md"
-    required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
-    source: "lets-brainstorm OR pre-existing"
-  - id: "upstream_friction_log"
-    path: "upstream/friction-log.md"
-    required_for_when: "ux_surface_detected AND user_confirmed"
-    source: "lets-research-ux-walkthrough"
-  - id: "upstream_comparison"
-    path: "upstream/comparison.md"
-    required_for_when: "competitive_context_needed AND user_confirmed"
-    source: "lets-research-competitive-scan"
-  - id: "upstream_persona_report"
-    path: "upstream/persona-report.md"
-    required_for_when: "persona_validation_needed AND user_confirmed"
-    source: "lets-persona-simulate"
-  - id: "upstream_requirements"
-    path: "upstream/requirements.md"
-    required_for_when: "prd_grooming_needed AND user_confirmed"
-    source: "lets-research-prd-grooming"
-  # Stage 1-9 artifacts
-  - id: "spec_readiness"
-    path: "spec-readiness.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "clarifications"
-    path: "clarifications.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "service_context"
-    path: "service-context.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
+  # Required artifacts (all rigor levels)
   - id: "execution_packet"
     path: "execution-packet.md"
     required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
-  - id: "story_tasks"
-    path: "story-tasks.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "design_artifacts"
-    path: "design-artifacts.md"
-    required_for: ["ELEVATED", "FULL"]
-  - id: "journey_link"
-    path: "journey-link.md"
-    required_for: ["ELEVATED", "FULL"]
-  - id: "scenario_matrix"
-    path: "scenario-matrix.md"
-    required_for: ["STANDARD", "ELEVATED", "FULL"]
-  - id: "traceability"
-    path: "traceability.md"
-    required_for: ["ELEVATED", "FULL"]
   - id: "verification_record"
     path: "verification-record.md"
     required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
   - id: "handoff"
     path: "handoff.md"
     required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
+  # STANDARD+ artifacts
+  - id: "story_tasks"
+    path: "story-tasks.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+  - id: "scenario_matrix"
+    path: "scenario-matrix.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+  # ELEVATED+ artifacts
+  - id: "design_artifacts"
+    path: "design-artifacts.md"
+    required_for: ["ELEVATED", "FULL"]
+  - id: "journey_link"
+    path: "journey-link.md"
+    required_for: ["ELEVATED", "FULL"]
+  - id: "traceability"
+    path: "traceability.md"
+    required_for: ["ELEVATED", "FULL"]
+  # Optional audit trail
+  - id: "intake_audit"
+    path: "intake/"
+    required_for: []
+    description: "Phase 0 audit trail — write if you want resumability"
+  - id: "upstream_artifacts"
+    path: "upstream/"
+    required_for: []
+    description: "Artifacts from delegated skills — write if received"
