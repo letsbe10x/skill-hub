@@ -3,7 +3,7 @@ name: lets-develop-feature
 description: "Full-lifecycle feature development with intake discovery, compositional delegation, staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
 metadata:
   author: cogsmith-ai
-  version: "5.1.0"
+  version: "5.2.0"
   tags: [implementation, change-management, delivery, governance, architecture, intake, discovery]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-develop-feature/SKILL.md
@@ -106,6 +106,8 @@ outcome_runtime:
     - do_not_proceed_past_spec_contradiction
     - do_not_treat_unmapped_tasks_as_complete
     - do_not_plan_without_approved_spec_or_inline_discovery
+    - do_not_complete_package_without_updating_state
+    - do_not_resume_without_validating_state_against_code
   required_decision_frames:
     - implementation_strategy
     - architecture_decision
@@ -120,6 +122,7 @@ outcome_runtime:
     - service_context_gate
     - spec_alignment_gate
     - completion_quality_gate
+    - state_consistency_gate
   mutation_policy: additive_only
   human_checkpoint_triggers:
     - irreversible_mutation
@@ -157,6 +160,25 @@ Stage 9: Complete             → Quality scorecard + handoff
 ```
 
 **Every phase/stage** ends in one of: `completed` | `skipped` (with reason) | `blocked` (with blocker).
+
+**Checkpointing:** Every stage transition updates `run-state.md`. Every package completion
+updates both `run-state.md` and `story-tasks.md`. Status is always retrievable from
+`run-state.md` without reading any other file. See [references/CHECKPOINTING.md](references/CHECKPOINTING.md).
+
+---
+
+## Resume Protocol
+
+Before starting Phase 0, check for an existing run:
+
+1. **Detect:** Look for `run-state.md` in the run directory. If found with `status != completed`, this is a resume.
+2. **Validate:** Compare state against code reality (git log, test suite, story-tasks.md checkboxes).
+3. **Present:** Tell the user where things stand — current stage, package, last action, next action, any discrepancies.
+4. **Continue:** After acknowledgment, re-read the relevant spec section and resume from `next_action`.
+
+If no `run-state.md` exists, this is a fresh run — proceed to Phase 0.
+
+See [references/CHECKPOINTING.md](references/CHECKPOINTING.md) for the full protocol.
 
 ---
 
@@ -291,6 +313,7 @@ Read AGENTS.md, extract non-negotiables, critical paths, boundaries. These BIND 
 - Otherwise: silent.
 
 **Output:** Service context summary. See [references/SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md).
+**Checkpoint:** Update `run-state.md` → Stage 1 completed, record non-negotiable count + critical paths found.
 
 ### Stage 2 — Classify & Select Rigor
 
@@ -300,6 +323,7 @@ Classify by type/scale/risk/complexity. Apply gate overrides.
 - Otherwise: silent (shown in Stage 5).
 
 **Output:** Classification + rigor level. See [references/CLASSIFICATION.md](references/CLASSIFICATION.md).
+**Checkpoint:** Update `run-state.md` → Stage 2 completed, record classification + rigor. Initialize `run-state.md` if not yet created (STANDARD+ rigor creates it here; MINIMAL may skip).
 
 ### Stage 3 — Plan
 
@@ -310,6 +334,7 @@ send back to discovery.
 Stage 3 does NOT construct specs. It translates an approved spec into an implementable plan.
 
 **Output:** Execution packet, story tasks, scenario matrix, assumptions log. See [references/PLANNING.md](references/PLANNING.md).
+**Checkpoint:** Update `run-state.md` → Stage 3 completed, populate package table + task table + artifacts table. All artifacts now cross-referenced.
 
 ### Stage 4 — Architecture Gate
 
@@ -320,6 +345,7 @@ Opens when: new abstraction, boundary change, API change, schema change.
 - Collaborative: always present.
 
 **Output:** Architecture notes (or explicit `skipped`). See [references/ARCHITECTURE-GATE.md](references/ARCHITECTURE-GATE.md).
+**Checkpoint:** Update `run-state.md` → Stage 4 completed or skipped (with reason), record design decisions.
 
 ### Stage 5 — Checkpoint
 
@@ -330,6 +356,7 @@ Present plan to user for review.
 - Collaborative: present section-by-section.
 
 **Output:** User approval. See [references/PLANNING.md](references/PLANNING.md).
+**Checkpoint:** Update `run-state.md` → Stage 5 completed (with approval timestamp) or skipped.
 
 ### Stage 6 — Implement
 
@@ -339,7 +366,10 @@ Execute story tasks in dependency order. **Spec re-read at each milestone bounda
 - Checkpoints: pause on blockers or assumption invalidation.
 - Collaborative: pause at each package boundary.
 
+**Per-package checkpointing:** After each package completes, update BOTH `run-state.md` (package row + task rows) AND `story-tasks.md` (checkboxes). Record verification result inline. This is the critical resumability seam — a new session can pick up at the next package.
+
 **Output:** Code changes. See [references/IMPLEMENTATION.md](references/IMPLEMENTATION.md).
+**Checkpoint:** Update `run-state.md` → per-package progress, current_package counter, next_action. Stage 6 completed only when all packages done.
 
 ### Stage 7 — Test
 
@@ -350,6 +380,7 @@ Methodology-aware testing per work package.
 - Collaborative: walk through coverage vs scenario matrix.
 
 **Output:** Test results + coverage evidence. See [references/METHODOLOGY.md](references/METHODOLOGY.md).
+**Checkpoint:** Update `run-state.md` → Stage 7 completed, record test counts + pass/fail.
 
 ### Stage 8 — Verify
 
@@ -360,6 +391,7 @@ Compare delivered work against plan, spec, story tasks, service context, scenari
 - Collaborative: full per-requirement comparison.
 
 **Output:** Verification verdict (ready | blocked). See [references/VERIFICATION.md](references/VERIFICATION.md).
+**Checkpoint:** Update `run-state.md` → Stage 8 completed with verdict. Write `verification-record.md`. Cross-check all artifact consistency (see CHECKPOINTING.md).
 
 ### Stage 9 — Complete
 
@@ -370,6 +402,7 @@ Quality scorecard. Handoff packet.
 - Collaborative: scorecard review before handoff.
 
 **Output:** Scorecard + handoff. See [references/COMPLETION.md](references/COMPLETION.md).
+**Checkpoint:** Update `run-state.md` → Stage 9 completed, status → `completed`. Write `handoff.md`. Final artifact consistency check.
 
 ---
 
@@ -490,6 +523,8 @@ See [references/SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md).
 | 14 | I will NOT skip a failed checklist without explicit user acknowledgement |
 | 15 | I will NOT mark tasks complete unless mapped to a requirement, story, or scenario |
 | 16 | I will NOT begin planning without an approved spec (from delegation or inline discovery) |
+| 17 | I will NOT complete a package without updating run-state.md and story-tasks.md |
+| 18 | I will NOT resume a run without validating state against code reality |
 
 ---
 
@@ -549,6 +584,8 @@ The skill never blocks on a missing upstream skill. Required delegations have in
 - **Loading all references upfront** — read only when the stage activates
 - **Ceremony for clear requests** — if user names a spec, don't echo it back as a question
 - **Blocking on missing optional skills** — degrade gracefully, always
+- **Deferring state updates** — update run-state.md at the transition, not "later"
+- **Resuming without validation** — state file may be stale; always check against code
 
 ---
 
@@ -566,6 +603,7 @@ multiple repos — the spec is the stable anchor.
 
 ```
 <spec-workspace>/runs/develop-feature/<run_id>/
+  run-state.md      (SINGLE SOURCE OF TRUTH — always current)
   intake/           (Phase 0 audit trail — optional)
   upstream/         (artifacts from delegated skills — optional)
   execution-packet.md
@@ -575,8 +613,15 @@ multiple repos — the spec is the stable anchor.
   handoff.md
 ```
 
-The essential state is: approved spec, control level, and execution packet. If context window
-holds these, the files are for traceability and resumability, not mechanism.
+**`run-state.md` is the anchor.** It is:
+- Updated at every stage transition and package completion
+- The first file read on resume
+- The only file needed to answer "what's the current status?"
+- Cross-referenced to all other artifacts (with paths and statuses)
+
+The essential state is: approved spec, control level, and execution packet. The context window
+holds working memory; `run-state.md` holds durable memory. When context is about to be lost,
+ensure `run-state.md` is current — it's the bridge to the next session.
 
 ---
 
@@ -586,6 +631,7 @@ Read each reference only when its stage activates — not upfront.
 
 | Reference | When to read |
 |-----------|-------------|
+| [CHECKPOINTING.md](references/CHECKPOINTING.md) | Resume, and any stage transition — state management |
 | [CLASSIFICATION.md](references/CLASSIFICATION.md) | Stage 2 — selecting rigor level |
 | [SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md) | Stage 1 — reading service constraints |
 | [PLANNING.md](references/PLANNING.md) | Stage 3/5 — building the plan |

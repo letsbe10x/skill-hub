@@ -2,7 +2,7 @@ schema_version: "2"
 
 workflow:
   id: "lets-develop-feature"
-  version: "3.1.0"
+  version: "3.2.0"
   description: "Feature development with intake discovery, upstream delegation, staged execution, and evidence-gated handoff."
   run_layout:
     runs_root: "spec-colocated"
@@ -36,6 +36,11 @@ stages:
     title: "Stage 9: Handoff to verify-change"
 
 artifacts:
+  # State management (STANDARD+ — the resumability anchor)
+  - id: "run_state"
+    path: "run-state.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+    description: "Single source of truth for run progress. Updated at every stage/package transition."
   # Required artifacts (all rigor levels)
   - id: "execution_packet"
     path: "execution-packet.md"
