@@ -1,14 +1,36 @@
 # Planning Stage — lets-develop-feature
 
-How to establish spec readiness, produce the execution packet, build story/task/scenario coverage, define assumptions, and run the checkpoint.
+How to validate the upstream spec against service context, produce the execution packet, build
+story/task/scenario coverage, define assumptions, and run the checkpoint.
 
-## Spec Readiness
+## Spec Validation (Not Construction)
 
-Before writing the execution packet, identify the authoritative spec source:
+By the time Stage 3 activates, an approved spec MUST already exist — either:
 
-- `lets spec` feature workspace or exported execution brief
-- PRD, issue, ticket, or acceptance criteria
-- User request when no formal spec exists
+- Produced by `lets-brainstorm` (via Phase 0 delegation) → in `upstream/spec.md`
+- Pre-existing in `lets spec` workspace or referenced PRD/ticket
+- Provided directly by the user
+
+Stage 3 does NOT construct specs. If no spec exists at Stage 3 entry, something went wrong in
+Phase 0 — stop and return to Phase 0.
+
+## Spec-Readiness: Translation & Validation
+
+The spec-readiness step validates the upstream spec against the repo's service context (from
+Stage 1). It catches conflicts between design intent and repo reality.
+
+**Validation checks:**
+
+1. Does the spec's approach conflict with any service non-negotiable?
+2. Does the spec assume capabilities the repo doesn't have?
+3. Does the spec touch critical paths identified in AGENTS.md?
+4. Are there unstated dependencies the spec doesn't account for?
+5. Does the spec's scope fit within the repo's architecture boundaries?
+
+If conflicts are found: surface them to the user. Options:
+- Revise the spec (delegate back to brainstorm with the conflict as input)
+- Accept the conflict with documented risk
+- Narrow scope to avoid the conflict
 
 If the `lets` CLI is available, prefer:
 
@@ -18,7 +40,8 @@ lets spec export <feature_key>
 lets journey init <feature_key> --repo-root .
 ```
 
-Populate `spec-readiness.md` and `clarifications.md` before implementation planning. Critical clarifications block implementation; non-critical assumptions may proceed only when documented with confidence and validation steps.
+Populate `spec-readiness.md` and `clarifications.md` from the validation results. Critical
+conflicts block planning; minor tensions are documented in the assumptions log.
 
 ### Spec Quality Checklist
 
