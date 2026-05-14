@@ -98,20 +98,35 @@ These thoughts mean STOP — you are rationalizing:
 
 | Request family | Goal | Skill invoked |
 |---|---|---|
-| Explore / decide / design (path forward unclear) | `explore` | `lets-brainstorm` |
-| New feature / code change (spec exists) | `change_code` | `lets-develop-feature` |
+| Explore / decide / design (path forward unclear, no implementation intent) | `explore` | `lets-brainstorm` |
+| New feature / code change / implement (with or without spec) | `change_code` | `lets-develop-feature` |
 | Investigate failure / bug | `investigate_change` | `lets-triage-issue` |
 | On-call / incident | `inspect_service` + `investigate_change` | `lets-triage-incident` |
-| Plan work / spec a change (spec already written) | `create_plan` | `lets-create-plan` |
+| Plan work / spec a change (spec already written, no implementation) | `create_plan` | `lets-create-plan` |
 | Review a PR / diff | `review_change` | `lets-review-pr` |
 | Verify tests pass | `verify_change` | `lets-verify-change` |
 | Onboard / understand a repo | `onboard_repo` | `lets-onboard-repo` |
 | Audit repo governance | `audit_governance` | `lets-audit-repo` |
 | Bootstrap a new repo | `bootstrap_repo` | `lets-bootstrap-repo` |
 | Deploy a service | `deploy_service` | `lets-deploy-check` |
-| Spec a change to PR | `change_code` (spec-driven) | `lets-spec-to-pr` |
+| Spec a change to PR (small, bounded, immediate) | `change_code` (spec-driven) | `lets-spec-to-pr` |
 
-**Brainstorm disambiguation:** route to `lets-brainstorm` when the request is exploratory — the right approach is not yet agreed, a trade-off needs analysis, or the user is asking "how should we", "what's the best way", "should we use X or Y", "help me think through", or any open question about direction. Only route to `lets-develop-feature` when an approved spec already exists. Only route to `lets-create-plan` when an approved spec exists and the user needs an implementation plan from it.
+**Brainstorm vs develop-feature disambiguation:** Route to `lets-brainstorm` ONLY when the user
+is exploring without implementation intent — they want to understand trade-offs, compare
+approaches, or think through a design question. Route to `lets-develop-feature` when the user
+intends to implement something, regardless of whether a spec exists. `lets-develop-feature` has
+its own Phase 0 that detects missing specs and delegates to `lets-brainstorm` internally.
+
+| User intent signal | Route to |
+|---|---|
+| "how should we...", "what's the best way...", "help me think through" | `lets-brainstorm` |
+| "build this", "implement this", "make this change", "code this up" | `lets-develop-feature` |
+| "I want to add X" (implementation implied) | `lets-develop-feature` |
+| "should we use X or Y?" (decision, no implementation) | `lets-brainstorm` |
+
+Only route to `lets-create-plan` when an approved spec exists and the user explicitly wants a
+plan without immediately implementing (rare — usually `lets-develop-feature` handles planning
+as Stage 3 of its pipeline).
 
 **Observability disambiguation:** if the request text contains any of `["alert", "pager", "firing", "incident", "on-call", "sev1", "sev2"]`, route to `lets-triage-incident`. Otherwise route to `lets-triage-issue`.
 
@@ -122,6 +137,7 @@ These thoughts mean STOP — you are rationalizing:
 - **Routing to multiple skills simultaneously** — pick one. If the request matches two families, ask which is primary.
 - **Bypassing lets-start-here when a trigger matches** — lets-start-here exists so governance context loads first.
 - **Routing to lets-develop-feature for investigative requests** — development and investigation are separate goal paths.
+- **Routing to lets-brainstorm when implementation is intended** — if the user wants to build something, route to `lets-develop-feature` even without a spec. It handles discovery internally via Phase 0.
 - **Treating the routing table as exhaustive** — if no family matches, classify as ambiguous and ask.
 
 ## Process
@@ -175,11 +191,11 @@ Then confirm with the user before proceeding:
 
 Based on the route family and the mapping table above, invoke the selected skill.
 
-**brainstorm (idea, no spec):**
-Invoke `lets-brainstorm` skill. It explores intent, produces an approved spec, and hands off to `lets-create-plan`.
+**brainstorm (exploration, no implementation intent):**
+Invoke `lets-brainstorm` skill. It explores intent, produces an approved spec, and routes to the appropriate downstream skill.
 
-**delivery:**
-Invoke `lets-develop-feature` skill. The lets-develop-feature → lets-verify-change → lets-review-code pipeline handles sequencing.
+**delivery (implementation intent, with or without spec):**
+Invoke `lets-develop-feature` skill. Its Phase 0 detects whether a spec exists — if not, it delegates to `lets-brainstorm` internally before proceeding. The lets-develop-feature → lets-verify-change → lets-review-code pipeline handles sequencing.
 
 **verify_only:**
 Invoke `lets-verify-change` skill.

@@ -6,10 +6,20 @@ How to choose the downstream skill after a brainstorm spec is approved.
 
 | Exploration type | Condition | Route to | Usual mode |
 |---|---|---|---|
-| `feature` | Implementation scope is clear and bounded | `lets-create-plan` | Full |
+| `feature` | Implementation scope is clear and bounded | `lets-create-plan` or `lets-develop-feature` | Full |
 | `architecture` | Decision affects multiple components or teams | `lets-create-plan` | Full |
-| `direct` | Change is small, well-bounded, immediately implementable | `lets-spec-to-pr` | Light |
+| `direct` | Change is small, well-bounded, immediately implementable | `lets-develop-feature` (autonomous) or `lets-spec-to-pr` | Light |
 | `product` | Problem–solution fit is still open; more discovery needed | `lets-opportunity-discovery` | Full |
+
+### When invoked as a handoff from lets-develop-feature
+
+When `lets-brainstorm` was delegated to by `lets-develop-feature` (via its Phase 0 handoff
+declarations), do NOT route to a downstream skill at the end. Instead, produce the approved spec
+artifact and return control to `lets-develop-feature`. The calling skill handles the rest of the
+lifecycle.
+
+Detection: check if the brainstorm was invoked with `context_pass` containing `intent_echo` and
+`discovery_signals` — this indicates it was called as a delegation, not standalone.
 
 ## Mode and routing
 
@@ -44,5 +54,6 @@ Wait for confirmation. If the user disagrees, re-classify and re-route.
 ## What Not to Do
 
 - Do not always route to `lets-create-plan` regardless of exploration type.
-- Do not route to `lets-develop-feature` directly — implementation requires a plan first.
+- Do not route to `lets-develop-feature` when invoked standalone without an approved spec — `lets-develop-feature` will invoke brainstorm itself via Phase 0 when needed.
 - Do not skip presenting the routing decision — it is a required human checkpoint.
+- Do not attempt downstream routing when invoked as a delegation from `lets-develop-feature` — just return the approved artifact.

@@ -158,6 +158,30 @@ The run directory and audit directory include:
 - `opportunity_portfolio.yml`
 - `recommended_next_prds.yml`
 
+### Handoff Artifact (for downstream consumption)
+
+When invoked as a delegation from `lets-develop-feature`, produce a summary artifact named
+`requirements.md` with this frontmatter:
+
+```yaml
+---
+artifact_type: requirements
+produced_by: lets-research-prd-grooming
+produced_at: <ISO 8601 timestamp>
+status: approved
+approval_source: user
+---
+```
+
+The `requirements.md` should contain:
+- Ranked opportunities (top 3-5)
+- Acceptance criteria for the top-ranked opportunity
+- Open questions and unresolved assumptions
+- References to full audit artifacts for traceability
+
+Set `status: approved` only after the user confirms the ranked opportunities and acceptance
+criteria. If the user has not reviewed, leave as `status: draft`.
+
 Done when: opportunities are ranked with signal provenance, acceptance criteria are written for the top-ranked opportunities, and open questions are listed.
 
 ## Checkpoints

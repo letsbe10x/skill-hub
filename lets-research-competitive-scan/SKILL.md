@@ -108,13 +108,30 @@ lets persona ingest --repo-root . \
 
 ## Outputs
 
-- A competitive report (recommended name: `competitive_report.md`) containing:
+- A competitive report (recommended name: `comparison.md`) containing:
   - evidence excerpts per competitor
   - a comparison table (claims/pricing/proof/CTA/friction)
   - opportunity map and experiment ideas
 - Run IDs for each competitor snapshot and any simulations performed.
 
-Done when: comparison report is written with source references and retrieval timestamps for all claims.
+### Artifact Frontmatter (Handoff Contract)
+
+When producing the comparison report, include this YAML frontmatter so downstream skills can consume it:
+
+```yaml
+---
+artifact_type: comparison
+produced_by: lets-research-competitive-scan
+produced_at: <ISO 8601 timestamp>
+status: approved
+approval_source: self-review
+---
+```
+
+Set `status: approved` after the final `source_evidence_gate` checkpoint passes. If the user
+explicitly reviews and confirms the report, set `approval_source: user` instead of `self-review`.
+
+Done when: comparison report is written with source references, retrieval timestamps for all claims, and frontmatter status is `approved`.
 
 ## Notes
 

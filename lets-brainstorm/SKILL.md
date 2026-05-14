@@ -274,6 +274,19 @@ Fix issues inline. No separate review pass needed.
 
 Wait for explicit approval. If changes requested: update, re-validate, ask again.
 
+**On approval:** Update the spec's YAML frontmatter to mark it as approved:
+
+```yaml
+---
+status: approved
+approval_source: user
+produced_at: <current ISO timestamp>
+---
+```
+
+Commit the status update. This frontmatter is the handoff contract — downstream skills
+(e.g., `lets-develop-feature`) require `status: approved` before consuming the artifact.
+
 ---
 
 ## Step 6 — Route to downstream skill

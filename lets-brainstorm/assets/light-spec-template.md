@@ -1,3 +1,11 @@
+---
+artifact_type: spec
+produced_by: lets-brainstorm
+produced_at: YYYY-MM-DDTHH:MM:SSZ
+status: draft
+approval_source: pending
+---
+
 # <Topic> — Light Spec
 
 **Date:** YYYY-MM-DD
