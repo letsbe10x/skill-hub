@@ -115,10 +115,22 @@ lets persona simulate --repo-root . \
 
 ## Outputs
 
-- A walkthrough report (recommended name: `ux_walkthrough.md`) containing:
+- A friction log (recommended name: `friction-log.md`) containing:
   - step-by-step findings with repro notes
   - taxonomy breakdown + prioritized fixes
   - screenshots/links captured during navigation (when available)
+
+When invoked as a handoff from `lets-develop-feature`, the output must include this frontmatter:
+
+```yaml
+---
+artifact_type: friction-log
+produced_by: lets-research-ux-walkthrough
+produced_at: <ISO 8601 timestamp>
+status: approved
+approval_source: self-review
+---
+```
 
 Done when: friction log is complete with severity ratings for all items, and start/end states are confirmed.
 

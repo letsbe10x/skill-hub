@@ -274,6 +274,8 @@ Fix issues inline. No separate review pass needed.
 
 Wait for explicit approval. If changes requested: update, re-validate, ask again.
 
+**On approval:** Update the spec frontmatter to `status: approved` and `approval_source: user`. Re-commit.
+
 ---
 
 ## Step 6 — Route to downstream skill
