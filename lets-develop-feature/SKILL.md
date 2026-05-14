@@ -460,12 +460,20 @@ The skill never blocks on a missing upstream skill. Required delegations have in
 
 ---
 
-## Repo-Local Run State (`.lets/`) — Optional
+## Run State — Spec-Colocated, Not Target-Repo
 
-For resumable/auditable runs, store artifacts in the repo:
+Run artifacts live alongside the spec, NOT in the target repo being modified. Features can span
+multiple repos — the spec is the stable anchor.
+
+**Where to store:**
+- If `lets spec` workspace exists: use it (the spec workspace owns the run)
+- If a dedicated spec directory exists (e.g., `ground-truth/features/`): store there
+- If this skill is running standalone: use `/tmp/<feature-slug>/` or a workspace-level
+  `.lets/runs/` directory outside the target repo
+- Last resort only: `.lets/runs/` in the target repo (single-repo, single-feature changes)
 
 ```
-.lets/runs/develop-feature/<run_id>/
+<spec-workspace>/runs/develop-feature/<run_id>/
   intake/           (Phase 0 audit trail — optional)
   upstream/         (artifacts from delegated skills — optional)
   execution-packet.md
@@ -475,8 +483,8 @@ For resumable/auditable runs, store artifacts in the repo:
   handoff.md
 ```
 
-This is an audit trail. The essential state is: approved spec, control level, and execution
-packet. If context window holds these, the files are for traceability, not mechanism.
+The essential state is: approved spec, control level, and execution packet. If context window
+holds these, the files are for traceability and resumability, not mechanism.
 
 ---
 

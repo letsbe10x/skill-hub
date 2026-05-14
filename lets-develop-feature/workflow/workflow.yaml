@@ -5,7 +5,8 @@ workflow:
   version: "3.1.0"
   description: "Feature development with intake discovery, upstream delegation, staged execution, and evidence-gated handoff."
   run_layout:
-    runs_root: ".lets/runs"
+    runs_root: "spec-colocated"
+    note: "Store runs alongside the spec source, not in the target repo. See SKILL.md 'Run State' section."
 
 rigor_levels: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
 control_levels: ["autonomous", "checkpoints", "collaborative"]
