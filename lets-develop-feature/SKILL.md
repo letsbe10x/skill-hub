@@ -1,10 +1,10 @@
 ---
 name: lets-develop-feature
-description: "Full-lifecycle feature development with staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
+description: "Full-lifecycle feature development with intake discovery, compositional delegation, staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
 metadata:
   author: cogsmith-ai
-  version: "4.1.0"
-  tags: [implementation, change-management, delivery, governance, architecture]
+  version: "5.0.0"
+  tags: [implementation, change-management, delivery, governance, architecture, intake, discovery]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-develop-feature/SKILL.md
 compatibility:
@@ -20,6 +20,40 @@ triggers:
   - build this
   - implement the feature
   - code this feature
+handoffs:
+  - trigger: no_approved_spec
+    delegate_to: lets-brainstorm
+    artifact_expected: spec.md
+    resume_at: stage_1_ground
+    required: true
+    mode_override: null
+    context_pass: [intent_echo, discovery_signals]
+  - trigger: ux_surface_detected
+    delegate_to: lets-research-ux-walkthrough
+    artifact_expected: friction-log.md
+    resume_at: stage_4_architecture
+    required: false
+    depends_on: [no_approved_spec]
+    context_pass: [intent_echo, upstream_spec]
+  - trigger: competitive_context_needed
+    delegate_to: lets-research-competitive-scan
+    artifact_expected: comparison.md
+    resume_at: stage_3_plan
+    required: false
+    context_pass: [intent_echo, discovery_signals]
+  - trigger: persona_validation_needed
+    delegate_to: lets-persona-simulate
+    artifact_expected: persona-report.md
+    resume_at: stage_3_plan
+    required: false
+    depends_on: [no_approved_spec]
+    context_pass: [upstream_spec]
+  - trigger: prd_grooming_needed
+    delegate_to: lets-research-prd-grooming
+    artifact_expected: requirements.md
+    resume_at: stage_3_plan
+    required: false
+    context_pass: [intent_echo, discovery_signals]
 outcome_runtime:
   open_agency_zones:
     - implementation_strategy
@@ -29,12 +63,16 @@ outcome_runtime:
     - work_package_ordering
     - methodology_selection
     - scenario_coverage
+    - control_level_recommendation
+    - signal_detection
+    - delegation_ordering
   governed_action_zones:
     - filesystem_mutation
     - dependency_change
     - external_side_effect
     - schema_migration
     - public_api_change
+    - upstream_skill_invocation
   allowed_moves:
     - challenge_initial_framing
     - reorder_work_by_risk
@@ -44,6 +82,9 @@ outcome_runtime:
     - request_design_checkpoint
     - block_on_missing_evidence
     - trigger_spec_revision
+    - recommend_control_level
+    - offer_optional_delegation
+    - escalate_control_level
   hard_limits:
     - do_not_bypass_policy_gates
     - do_not_fabricate_test_results
@@ -58,11 +99,19 @@ outcome_runtime:
     - do_not_leave_stages_implicit
     - do_not_proceed_past_spec_contradiction
     - do_not_treat_unmapped_tasks_as_complete
+    - do_not_skip_intent_echo
+    - do_not_plan_without_approved_spec
+    - do_not_select_control_level_without_user_confirmation
   required_decision_frames:
     - implementation_strategy
     - architecture_decision
     - methodology_choice
+    - control_level_selection
+    - delegation_plan
   validation_gates:
+    - intent_confirmation_gate
+    - control_level_gate
+    - delegation_completion_gate
     - execution_packet_gate
     - verification_before_completion
     - governance_checkpoint
@@ -80,41 +129,102 @@ outcome_runtime:
     - public_api_surface_change
     - service_nonnegotiable_tension
     - spec_deviation_discovered
+    - control_level_override
 ---
 
 > **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-develop-feature
 
-Staged feature development with service-context binding, spec-alignment checking, and evidence-gated completion. Each stage has explicit state. Operational detail lives in phase-specific references — this file is the contract.
+Compositional feature development with intake discovery, upstream skill delegation, staged
+execution, and evidence-gated completion. Each phase/stage has explicit state. Operational
+detail lives in phase-specific references — this file is the contract.
 
 ---
 
-## Stages & Gates
+## Phases & Stages
 
 ```
-Stage 1: Ground         → Read repo context + service constraints (BINDING)
-Stage 2: Classify       → Determine rigor level (MINIMAL / STANDARD / ELEVATED / FULL)
-Stage 3: Plan           → Spec readiness + execution packet + story tasks + scenarios
-Stage 4: Architecture   → Design gate (required | skipped with reason)
-Stage 5: Checkpoint     → User reviews plan (STANDARD+)
-Stage 6: Implement      → Story tasks + packages, with spec re-read at each milestone
-Stage 7: Test           → Methodology-aware verification
-Stage 8: Verify         → Compare delivered work against plan + spec + tasks + evidence
-Stage 9: Complete       → Quality scorecard + handoff
+Phase 0: Intake & Discovery   → Understand user, detect signals, delegate to upstream skills
+  Turn 1: Intent echo         → Confirm understanding
+  Turn 2: Signals + control   → Recommend involvement level
+  Turn 3: Delegation plan     → Invoke upstream skills, collect artifacts
+
+Stage 1: Ground               → Read repo context + service constraints (BINDING)
+Stage 2: Classify             → Determine rigor level (MINIMAL / STANDARD / ELEVATED / FULL)
+Stage 3: Plan                 → Validate spec against service context, produce execution packet
+Stage 4: Architecture         → Design gate (required | skipped with reason)
+Stage 5: Checkpoint           → User reviews plan (control level determines behavior)
+Stage 6: Implement            → Story tasks + packages, with spec re-read at each milestone
+Stage 7: Test                 → Methodology-aware verification
+Stage 8: Verify               → Compare delivered work against plan + spec + tasks + evidence
+Stage 9: Complete             → Quality scorecard + handoff
 ```
 
-**Every stage** ends in one of: `completed` | `skipped` (with reason) | `blocked` (with blocker).
+**Every phase/stage** ends in one of: `completed` | `skipped` (with reason) | `blocked` (with blocker).
 
-**No stage is ever left implicit.** The handoff shows all 9 stages accounted for.
+**No stage is ever left implicit.** The handoff shows all phases and stages accounted for.
+
+---
+
+## Phase 0 — Intake & Discovery
+
+Phase 0 is conversational. Its job is to understand the user and route to the right discovery
+skills before any artifacts are produced. It replaces the old "spec-constructing" behavior with
+compositional delegation.
+
+### Turn 1 — Intent Echo
+
+Reflect the user's request back in plain language. No process jargon. Confirm understanding.
+
+```
+"You want to [plain-language echo]. Is that right?"
+```
+
+**Turn 1 is NEVER skipped.** Even when a spec exists, confirm what the user is asking for.
+
+See [references/INTAKE.md](references/INTAKE.md) for rules, anti-patterns, and error handling.
+
+### Turn 2 — Signals + Control Recommendation
+
+After intent is confirmed, present:
+1. Spec status (one line)
+2. Discovery signals (bullet list of what you detected)
+3. Control recommendation with reasoning
+4. Confirmation question
+
+Control levels:
+- **Autonomous** — "I'll plan and implement, bring you the result"
+- **Checkpoints** — "I'll bring you the design and plan for approval"
+- **Collaborative** — "We'll explore each decision together"
+
+See [references/CONTROL-LEVEL.md](references/CONTROL-LEVEL.md) for recommendation logic and stage × control matrix.
+
+### Turn 3 — Delegation Plan
+
+Match active signals against `handoffs:` declarations in frontmatter. Present delegation plan.
+Execute confirmed delegations. Collect approved artifacts.
+
+Skip Turn 3 if no delegations trigger (spec exists, signals are clean).
+
+See [references/DELEGATION.md](references/DELEGATION.md) for handoff contract, artifact format, and execution protocol.
+
+**Phase 0 output:** Confirmed intent, chosen control level, collected upstream artifacts (in `intake/` and `upstream/` directories).
 
 ---
 
 ## Spec-Driven Mode
 
-This skill is spec-driven when a spec exists and spec-constructing when it does not.
+This skill is **always spec-driven**. It does not construct specs internally.
 
-When the `lets` CLI is available, prefer Core primitives over ad hoc files:
+- When a spec exists: use it directly
+- When no spec exists: delegate to `lets-brainstorm` (via handoff declaration)
+- When requirements are raw: delegate to `lets-research-prd-grooming`
+
+The spec is the authority for WHAT and WHY. The execution packet is the authority for HOW.
+The story task list is the authority for ordered implementation.
+
+When the `lets` CLI is available, prefer Core primitives:
 
 ```bash
 lets spec status --format json
@@ -123,23 +233,11 @@ lets journey init <feature_key> --repo-root .
 lets journey status <journey_id>
 ```
 
-Use the results to populate the `.lets/runs/develop-feature/<run_id>/` artifacts. The spec workspace is the authority for WHAT and WHY, the execution packet is the authority for HOW, the story task list is the authority for ordered implementation, and the handoff/evidence records are the authority for completion.
-
-If no formal spec exists, derive a bounded spec-readiness record from the user's request before planning. Critical clarifications block implementation; non-critical assumptions may proceed only when documented in the assumptions log and traceability record.
-
-Core state model:
-
-- **`.lets/` workflow harness:** repo-local, resumable skill state and artifact checklist.
-- **`lets spec`:** ground-truth-compatible feature/spec source when available.
-- **`lets journey`:** link between spec, governed runs, receipts, and exported evidence.
-- **Coordination concepts:** task dependencies, blockers, attention items, and follow-ups represented in story tasks and handoff, not as a separate source of truth.
-- **Handoffs and evidence:** Stage 9 passes a concrete handoff to `lets-verify-change`; engine receipts and evidence bundles are referenced when available.
-
 ---
 
-## Repo-Local Run State (`.lets/`) (Recommended)
+## Repo-Local Run State (`.lets/`)
 
-Store the run’s working artifacts *in the repo* so the workflow is resumable and auditable:
+Store the run's working artifacts in the repo so the workflow is resumable and auditable:
 
 ```
 .lets/
@@ -147,6 +245,17 @@ Store the run’s working artifacts *in the repo* so the workflow is resumable a
     develop-feature/
       latest
       <run_id>/
+        intake/
+          intent-echo.md
+          discovery-signals.json
+          control-level.md
+          delegation-plan.md
+        upstream/
+          spec.md
+          friction-log.md
+          comparison.md
+          persona-report.md
+          requirements.md
         run-state.json
         spec-readiness.md
         clarifications.md
@@ -161,22 +270,13 @@ Store the run’s working artifacts *in the repo* so the workflow is resumable a
         handoff.md
 ```
 
-**Optional helper (letsbe10x):** if you have the `lets` CLI available, you can scaffold these files:
-
-```bash
-lets develop-feature init <slug>
-lets develop-feature status
-lets develop-feature check
-```
-
-If you don’t have `lets`, create the directory manually and start from the templates in `assets/templates/`.
-
 ---
 
 ## When to Use
 
 - Implementing a feature, bugfix, or refactor that touches production code
 - Any change that benefits from structured planning before coding
+- When no spec exists (Phase 0 will delegate to discovery skills)
 - Delivery chain: **lets-develop-feature** → lets-verify-change → lets-review-code
 
 ## When Not to Use
@@ -185,19 +285,32 @@ If you don’t have `lets`, create the directory manually and start from the tem
 - Reviewing a PR → `lets-review-pr`
 - Single-line zero-risk typo fix → just fix it
 - Research/discovery without implementing → `lets-brainstorm`
+- Pure exploration with no implementation intent → `lets-brainstorm`
 
 ---
 
-## Graduated Rigor
+## Graduated Rigor (Artifact Depth)
 
 | Level | When | Stages active | Detail |
 |-------|------|---------------|--------|
-| **MINIMAL** | Trivial + low risk + mechanical | 1,2,3(minimal),6,8(quick),9 | [CLASSIFICATION.md](references/CLASSIFICATION.md) |
+| **MINIMAL** | Trivial + low risk + mechanical | 0,1,2,3(minimal),6,8(quick),9 | [CLASSIFICATION.md](references/CLASSIFICATION.md) |
 | **STANDARD** | Typical feature/bugfix | All stages, arch may be skipped | Full packet + scenarios |
 | **ELEVATED** | Cross-module, new abstractions, API | All stages, arch required | Design checkpoint + traceability |
 | **FULL** | Large, critical, irreversible | All + per-file confirmation | Stacked PRs + quality scorecard |
 
 See [references/CLASSIFICATION.md](references/CLASSIFICATION.md) for classification matrix and gate overrides.
+
+## Control Level (Interaction Depth)
+
+| Level | When recommended | Effect |
+|-------|-----------------|--------|
+| **Autonomous** | Low risk, spec exists, familiar pattern | Skip pauses except hard-stops |
+| **Checkpoints** | Standard features, moderate risk | Plan gate + architecture decisions |
+| **Collaborative** | Novel/risky/ambiguous, user preference | Every boundary is a conversation |
+
+Rigor and control are orthogonal. See [references/CONTROL-LEVEL.md](references/CONTROL-LEVEL.md) for the full matrix.
+
+**Safety invariant:** FULL rigor forces minimum Checkpoints control.
 
 ---
 
@@ -207,47 +320,86 @@ See [references/CLASSIFICATION.md](references/CLASSIFICATION.md) for classificat
 
 Read AGENTS.md, extract non-negotiables, critical paths, boundaries. These BIND the run.
 
+**Control behavior:**
+- Autonomous/Checkpoints: silent
+- Collaborative: present summary, ask "anything to add?"
+
 **Output:** Service context summary. See [references/SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md).
 
 ### Stage 2 — Classify & Select Rigor
 
-Classify by type/scale/risk/complexity. Apply gate overrides.
+Classify by type/scale/risk/complexity. Apply gate overrides. Inherit control level from Phase 0.
+
+**Control behavior:**
+- Autonomous/Checkpoints: silent (shown in Stage 5)
+- Collaborative: present for confirmation
 
 **Output:** Classification + rigor level. See [references/CLASSIFICATION.md](references/CLASSIFICATION.md).
 
 ### Stage 3 — Plan
 
-Establish spec readiness, resolve critical clarifications, produce the execution packet, and decompose work into user-story task slices with scenario coverage.
+Validate the upstream spec against service context (spec-readiness). Resolve conflicts between
+spec intent and repo reality. Build the execution packet from the validated spec.
 
-**Output:** Spec-readiness record, clarifications log, execution packet, story tasks, scenario matrix, assumptions log. See [references/PLANNING.md](references/PLANNING.md).
+Stage 3 no longer constructs specs. It translates an approved spec into an implementable plan.
+
+**Inputs:** `upstream/spec.md` + `service-context.md` + optional enrichment artifacts
+**Output:** Spec-readiness record, execution packet, story tasks, scenario matrix, assumptions log.
+
+See [references/PLANNING.md](references/PLANNING.md).
 
 ### Stage 4 — Architecture Gate
 
 Opens when: new abstraction, boundary change, API change, schema change. Answer the 6 gate questions.
 
+**Control behavior:**
+- Autonomous: auto-resolve, log decisions
+- Checkpoints: pause if gate opens
+- Collaborative: always present
+
 **Output:** Architecture notes (or explicit `skipped` with reason). See [references/ARCHITECTURE-GATE.md](references/ARCHITECTURE-GATE.md).
 
 ### Stage 5 — Checkpoint
 
-Present plan to user for review. Validate completeness.
+Present plan to user for review.
+
+**Control behavior:**
+- Autonomous: **skip**
+- Checkpoints: present full packet, wait for approval
+- Collaborative: present section-by-section, each package gets confirmation
 
 **Output:** User approval. See [references/PLANNING.md](references/PLANNING.md).
 
 ### Stage 6 — Implement
 
-Execute story tasks and work packages in dependency order. **Mandatory spec re-read at each milestone boundary.** Mark completed task items, record blockers as attention items, and stop on spec contradiction.
+Execute story tasks and work packages in dependency order. **Mandatory spec re-read at each milestone boundary.** Mark completed task items, record blockers, stop on spec contradiction.
 
-**Output:** Code changes + living artifacts (traceability, notes). See [references/IMPLEMENTATION.md](references/IMPLEMENTATION.md).
+**Control behavior:**
+- Autonomous: no mid-run pauses except hard-stops
+- Checkpoints: pause on blockers or assumption invalidation
+- Collaborative: pause at each package boundary
+
+**Output:** Code changes + living artifacts. See [references/IMPLEMENTATION.md](references/IMPLEMENTATION.md).
 
 ### Stage 7 — Test
 
 Methodology-aware testing per work package.
 
+**Control behavior:**
+- Autonomous: report failures only
+- Checkpoints: report summary
+- Collaborative: walk through coverage vs scenario matrix
+
 **Output:** Test results + coverage evidence. See [references/METHODOLOGY.md](references/METHODOLOGY.md).
 
 ### Stage 8 — Verify
 
-Compare delivered work against plan, spec, story tasks, service context, scenario coverage, and available journey/evidence links. Not "run tests again" — a dedicated comparison.
+Compare delivered work against plan, spec, story tasks, service context, scenario coverage.
+
+**Control behavior:**
+- Autonomous: surface only if verdict = BLOCKED
+- Checkpoints: present verdict with evidence summary
+- Collaborative: full per-requirement comparison
 
 **Output:** Verification verdict (ready | blocked). See [references/VERIFICATION.md](references/VERIFICATION.md).
 
@@ -255,13 +407,18 @@ Compare delivered work against plan, spec, story tasks, service context, scenari
 
 Quality scorecard. Handoff packet with full stage status.
 
+**Control behavior:**
+- Autonomous: present final summary
+- Checkpoints: present scorecard + result
+- Collaborative: scorecard review before handoff confirmation
+
 **Output:** Scorecard + handoff. See [references/COMPLETION.md](references/COMPLETION.md).
 
 ---
 
 ## Spec-Alignment Protocol
 
-When a spec/task description exists, implementation must align to it continuously:
+When a spec exists (always, post-Phase-0), implementation must align to it continuously:
 
 1. **Before each work package:** Re-read the relevant section of the spec
 2. **Before each story task:** Confirm requirement/story/scenario mapping
@@ -294,6 +451,9 @@ See [references/SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md) for the full pr
 | 13 | I will NOT implement while critical clarifications remain unresolved |
 | 14 | I will NOT skip a failed checklist without explicit user acknowledgement |
 | 15 | I will NOT mark tasks complete unless each task maps to a requirement, story, scenario, or documented infrastructure need |
+| 16 | I will NOT produce artifacts before confirming I understood the user's intent (Phase 0 Turn 1) |
+| 17 | I will NOT begin planning without an approved spec — either pre-existing or produced by a delegated discovery skill |
+| 18 | I will NOT select a control level without presenting my recommendation to the user |
 
 ---
 
@@ -303,7 +463,7 @@ Before handoff, score the delivery (STANDARD+ rigor):
 
 | Dimension | 0–5 | Criteria |
 |-----------|-----|----------|
-| **Spec adherence** | | Does implementation match the task/spec? |
+| **Spec adherence** | | Does implementation match the spec? |
 | **Test coverage** | | Are scenarios from the matrix covered? |
 | **Service constraint preservation** | | Are non-negotiables honored with evidence? |
 | **Scope discipline** | | Did we stay within the execution packet? |
@@ -317,20 +477,26 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 ## Error Handling
 
 - If AGENTS.md is missing: proceed without service context, note `Stage 1: completed (no AGENTS.md — no service constraints bound)`
-- If spec/task description is ambiguous: extract inferred requirements, surface to user for confirmation before implementing
-- If critical clarifications remain after spec readiness: mark Stage 3 blocked and ask the user to resolve them
-- If a checklist has incomplete blocking items: stop and ask whether to fix the checklist or proceed with documented risk
-- If a spec contradiction is discovered mid-implementation: HARD STOP — surface it, do not silently proceed
-- If a work package verification fails: fix within scope or mark BLOCKED — do not skip to next package
-- If quality scorecard < 16/20: mark delivery BLOCKED — identify specific gaps before attempting fix
-- If an assumption is invalidated during implementation: stop at package boundary, assess impact, re-plan if significant
-- If forge check fails on the delivered code: fix lint/type/test issues before proceeding to completion
+- If user rejects intent echo: ask "What did you mean?" and re-echo
+- If user rejects control recommendation: accept their choice, log it
+- If delegated skill fails: pause, explain, ask user how to proceed
+- If delegated skill produces draft (not approved): pause, ask user to approve or re-run
+- If user says "just do it" mid-Phase-0: set autonomous, but still require spec (brainstorm in light mode)
+- If spec/task description is ambiguous: Phase 0 catches this — delegate to brainstorm
+- If critical clarifications remain: mark Stage 3 blocked (brainstorm should have resolved these)
+- If a spec contradiction is discovered mid-implementation: HARD STOP — surface it
+- If a work package verification fails: fix within scope or mark BLOCKED
+- If quality scorecard < 16/20: mark delivery BLOCKED — identify specific gaps
+- If an assumption is invalidated: stop at package boundary, assess impact, re-plan if significant
 
 ---
 
 ## Anti-patterns
 
 - **Implementing before presenting the packet** — the plan exists to catch problems before they become code
+- **Skipping Phase 0 intent echo** — never assume you understood correctly
+- **Constructing specs internally** — delegate to brainstorm; that's its job
+- **Selecting control level without asking** — always present your recommendation
 - **Skipping spec re-read** — memory drifts; re-reading at boundaries catches contradictions early
 - **Silent scope expansion** — touching files not in the packet without stopping to ask
 - **Weakening error handling** — existing catches, retries, and fallbacks exist for a reason
@@ -338,38 +504,45 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 - **Leaving stages implicit** — every stage must be explicitly completed, skipped with reason, or blocked
 - **Ignoring service context** — non-negotiables from AGENTS.md are binding, not advisory
 - **Claiming untested confidence** — score honestly; gaps are better documented than hidden
+- **Treating rigor as control** — rigor is artifact depth; control is interaction depth; they're orthogonal
 
 ---
 
 ## Outputs
 
+- Intent echo record (confirmed understanding)
+- Control level decision (with reasoning and user confirmation)
+- Delegation plan and collected upstream artifacts
 - Service context summary (non-negotiables, critical paths)
 - Change classification (type, scale, risk, rigor)
-- Spec-readiness record and clarifications log
+- Spec-readiness record (validates upstream spec against service context)
 - Execution packet with scenarios and assumptions
 - Story task list with dependency order, parallel markers, and independent test criteria
-- Design artifact inventory (research decisions, data model, contracts, quickstart, or explicit skips)
-- Journey link (feature key, journey ID, engine run IDs, evidence references when available)
+- Design artifact inventory
+- Journey link (feature key, journey ID, evidence references when available)
 - Architecture notes (or explicit skip)
 - Per-package verification evidence
 - Traceability record (requirement → code → test)
 - Spec alignment check results
 - Verification verdict (ready | blocked)
 - Quality scorecard (≥16/20 to pass)
-- Stage status table (all 9 accounted for)
+- Phase/stage status table (Phase 0 + all 9 stages accounted for)
 - Handoff to lets-verify-change
 
 ---
 
 ## References (Progressive Disclosure)
 
-Read each reference only when its stage activates — not upfront.
+Read each reference only when its phase/stage activates — not upfront.
 
 | Reference | When to read |
 |-----------|-------------|
+| [INTAKE.md](references/INTAKE.md) | Phase 0 — intent echo, signals, delegation protocol |
+| [DELEGATION.md](references/DELEGATION.md) | Phase 0 Turn 3 — handoff contract and artifact format |
+| [CONTROL-LEVEL.md](references/CONTROL-LEVEL.md) | Phase 0 Turn 2 — control level selection and stage matrix |
 | [CLASSIFICATION.md](references/CLASSIFICATION.md) | Stage 2 — selecting rigor level |
 | [SERVICE-CONTEXT.md](references/SERVICE-CONTEXT.md) | Stage 1 — reading service constraints |
-| [PLANNING.md](references/PLANNING.md) | Stage 3/5 — building and reviewing the plan |
+| [PLANNING.md](references/PLANNING.md) | Stage 3/5 — validating spec and building the plan |
 | [ARCHITECTURE-GATE.md](references/ARCHITECTURE-GATE.md) | Stage 4 — design decisions |
 | [IMPLEMENTATION.md](references/IMPLEMENTATION.md) | Stage 6 — per-package implementation discipline |
 | [METHODOLOGY.md](references/METHODOLOGY.md) | Stage 7 — test methodology selection |
@@ -382,10 +555,12 @@ Read each reference only when its stage activates — not upfront.
 
 ## Templates & Scripts
 
-Use these to scaffold artifacts — do not invent formats from scratch.
-
 | Asset | Purpose | Used in |
 |-------|---------|---------|
+| [workflow/templates/intake/intent-echo.md](workflow/templates/intake/intent-echo.md) | Intent echo record | Phase 0 Turn 1 |
+| [workflow/templates/intake/discovery-signals.json](workflow/templates/intake/discovery-signals.json) | Signal detection results | Phase 0 Turn 2 |
+| [workflow/templates/intake/control-level.md](workflow/templates/intake/control-level.md) | Control level decision | Phase 0 Turn 2 |
+| [workflow/templates/intake/delegation-plan.md](workflow/templates/intake/delegation-plan.md) | Delegation execution record | Phase 0 Turn 3 |
 | [assets/templates/execution-packet.template.md](assets/templates/execution-packet.template.md) | Execution packet structure | Stage 3 |
 | [assets/templates/handoff.template.md](assets/templates/handoff.template.md) | Handoff packet structure | Stage 9 |
 | [assets/templates/traceability.template.md](assets/templates/traceability.template.md) | Implementation traceability record | Stage 6 |

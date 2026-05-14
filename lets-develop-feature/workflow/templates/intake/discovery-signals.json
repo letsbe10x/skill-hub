@@ -1,0 +1,49 @@
+{
+  "$schema": "discovery-signals/v1",
+  "run_id": "{{run_id}}",
+  "detected_at": "{{timestamp}}",
+  "signals": {
+    "no_approved_spec": {
+      "active": false,
+      "evidence": ""
+    },
+    "ux_surface_detected": {
+      "active": false,
+      "evidence": ""
+    },
+    "competitive_context_needed": {
+      "active": false,
+      "evidence": ""
+    },
+    "persona_validation_needed": {
+      "active": false,
+      "evidence": ""
+    },
+    "prd_grooming_needed": {
+      "active": false,
+      "evidence": ""
+    },
+    "cross_module": {
+      "active": false,
+      "evidence": ""
+    },
+    "public_api_change": {
+      "active": false,
+      "evidence": ""
+    },
+    "security_surface": {
+      "active": false,
+      "evidence": ""
+    },
+    "migration": {
+      "active": false,
+      "evidence": ""
+    }
+  },
+  "summary": {
+    "total_active": 0,
+    "required_delegations": [],
+    "optional_delegations": [],
+    "risk_level_hint": "low|medium|high"
+  }
+}
