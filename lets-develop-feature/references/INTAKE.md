@@ -10,7 +10,8 @@ Run these after intent is confirmed:
 | Signal | How to detect |
 |---|---|
 | `no_approved_spec` | No spec.md in `.lets/runs/`, no `lets spec export` match, no ticket/PRD with acceptance criteria referenced |
-| `ux_surface_detected` | Request mentions UI/frontend/page/component/form; target files in UI directories |
+| `existing_ux_surface` | Request modifies an existing UI flow (not creating new); target files in UI directories |
+| `complex_new_ux_surface` | Feature introduces 3+ new screens/components, new interaction patterns, navigation changes, or has accessibility requirements |
 | `competitive_context_needed` | User mentions competitors or this is a net-new product surface |
 | `persona_validation_needed` | Request introduces a new user-facing concept or mentions target audience |
 | `prd_grooming_needed` | User pasted raw feedback or unstructured feature dump |

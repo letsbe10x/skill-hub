@@ -37,7 +37,24 @@ Examples:
 | **Extensibility** — Will it accommodate known future work? | "The interface supports multiple payment providers; we'll start with Stripe" | "This is hardcoded to Stripe with no seam for alternatives" |
 | **Alternatives** — Simpler options? | "Considered X and Y; chose Z because [concrete reason]" | "This was the first thing I thought of" |
 
-### Step 3: Document Decisions
+### Step 3: Visualize (when complexity warrants it)
+
+For ELEVATED+ rigor or when cross-module boundaries are involved, produce a diagram alongside
+the textual decisions. Pick the format that best communicates the architecture:
+
+```mermaid
+graph TD
+    A[API Gateway] --> B[Rate Limiter]
+    B --> C[Billing Service]
+    B --> D[Handler]
+    D --> E[Database]
+```
+
+- Use Mermaid, dot, or ASCII — text formats that diff and version-control
+- Show: components, boundaries, dependency direction, data flow
+- Update this diagram if Stage 6 implementation diverges from the plan
+
+### Step 4: Document Decisions
 
 ```markdown
 ### Design Decisions
@@ -47,10 +64,11 @@ Examples:
 | [what] | [approach] | [what else was considered] | [concrete reason] |
 ```
 
-### Step 4: Checkpoint
+### Step 5: Checkpoint
 
 **Interactive mode:**
 > "Design checkpoint: I'm proposing [key decisions summary]. The main tradeoff is [X]. Proceed?"
+> [Include diagram if produced]
 
 **Autonomous mode:**
 > "Design checkpoint (autonomous): Proceeding with [approach]. Rationale: [reason]. Alternative was [X], rejected because [Y]. Flagging for review."

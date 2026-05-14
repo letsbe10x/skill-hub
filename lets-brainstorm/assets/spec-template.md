@@ -67,6 +67,34 @@ approval_source: pending
 2.
 3.
 
+## UX Design (include when the feature has a user-facing surface)
+
+<!-- Remove this section entirely if the feature has no UI.
+     Include it whenever users will see, click, or interact with something. -->
+
+### UX Flow
+<!-- Screen-to-screen navigation, entry/exit points. Mermaid or text. -->
+
+### Interaction Model
+<!-- What the user does → what the system responds. Key interactions only. -->
+
+### Key Screens
+<!-- What information is shown, what actions are available. One paragraph per screen. -->
+
+### Error & Empty States
+<!-- What the user sees when things go wrong or data is missing. -->
+
+## Architecture Diagram (include when complexity warrants it)
+
+<!-- Remove this section for trivial changes.
+     Include for cross-module, new abstractions, or significant data flow changes.
+     Use Mermaid, dot, or ASCII. Update it as the design evolves. -->
+
+```mermaid
+graph TD
+    A[Component] --> B[Component]
+```
+
 ## Error Handling
 
 <!-- How failures surface to callers or users, and how they recover. -->

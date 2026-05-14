@@ -28,10 +28,17 @@ handoffs:
     required: true
     fallback: inline_discovery
     context_pass: [intent_echo, discovery_signals]
-  - trigger: ux_surface_detected
+  - trigger: existing_ux_surface
     delegate_to: lets-research-ux-walkthrough
     artifact_expected: friction-log.md
     resume_at: stage_4_architecture
+    required: false
+    depends_on: [no_approved_spec]
+    context_pass: [intent_echo, upstream_spec]
+  - trigger: complex_new_ux_surface
+    delegate_to: devx-ui-ux
+    artifact_expected: ux-design-brief.md
+    resume_at: stage_3_plan
     required: false
     depends_on: [no_approved_spec]
     context_pass: [intent_echo, upstream_spec]
@@ -212,7 +219,8 @@ From the answers, produce a brief inline spec (problem, approach, success criter
 Present it: "Here's what I'll build. Does this match?" On confirmation, proceed to Stage 1.
 
 **Optional enrichment delegations** (offer, don't impose):
-- UX surface detected → "Want me to run a UX friction analysis first?"
+- New UX surface → "This introduces new UI — want me to brainstorm the UX design first?"
+- Existing UX surface → "Want me to run a UX friction analysis on the current flow?"
 - Competitive gap → "Should I scan competitors for this surface?"
 - Persona question → "Want persona validation on this?"
 
@@ -362,6 +370,90 @@ Quality scorecard. Handoff packet.
 - Collaborative: scorecard review before handoff.
 
 **Output:** Scorecard + handoff. See [references/COMPLETION.md](references/COMPLETION.md).
+
+---
+
+## Architecture Visualization (Living Artifact)
+
+Architecture diagrams are not a one-shot artifact — they evolve as the feature moves through
+the pipeline. Produce diagrams when the feature's complexity warrants them (STANDARD+ rigor
+with cross-module scope or new abstractions).
+
+### When to produce
+
+| Stage | What to diagram | Why |
+|---|---|---|
+| Phase 0 (brainstorm) | Proposed component/flow sketch | Helps user evaluate approach before committing |
+| Stage 3 (plan) | Execution architecture — what will be built, how pieces connect | Makes the plan concrete and reviewable |
+| Stage 4 (arch gate) | Boundary diagram — what crosses what, dependency direction | Answers the gate questions visually |
+| Stage 6 (implement) | Update diagram if implementation diverges from plan | Keeps the diagram truthful |
+| Stage 9 (handoff) | Final state diagram | What was actually delivered |
+
+### Diagram types (pick what fits)
+
+| Type | Use when | Format |
+|---|---|---|
+| Component diagram | Multiple modules/services interact | Mermaid, ASCII, or dot |
+| Sequence diagram | Request flow matters (APIs, async) | Mermaid |
+| Data flow diagram | Data transformation pipeline | Mermaid or ASCII |
+| Entity relationship | New data model or schema change | Mermaid |
+| State machine | Complex state transitions | Mermaid or dot |
+
+### Rules
+
+- Use text-based formats (Mermaid, dot, ASCII) — they version-control and diff cleanly
+- Start simple. Add detail only when it clarifies, not when it decorates.
+- Update the diagram when reality diverges from it. A stale diagram is worse than none.
+- For MINIMAL rigor: skip entirely. For STANDARD: optional. For ELEVATED/FULL: at least one
+  diagram at Stage 3 and one at Stage 9.
+- Store diagrams in the spec workspace alongside other run artifacts.
+
+---
+
+## UX Design (Layered)
+
+When a feature introduces or modifies user-facing surfaces, UX design happens at two layers:
+
+### Layer 1 — In the spec (always, when UI is involved)
+
+When `lets-brainstorm` produces the spec for a feature with UI surface, it MUST include:
+
+- **UX flow** — screen-to-screen navigation, entry/exit points
+- **Interaction model** — what the user does, what the system responds
+- **Key screen descriptions** — what information is shown, what actions are available
+- **Error/empty states** — what happens when things go wrong or data is missing
+
+This is part of the spec, not a separate artifact. If brainstorm produced a spec without these
+sections for a UI feature, flag it as a gap before planning.
+
+### Layer 2 — Optional delegation for complex UI (devx-ui-ux)
+
+For complex UI surfaces (multi-screen flows, design system impact, accessibility requirements,
+responsive behavior), offer delegation to `devx-ui-ux`:
+
+```
+"This feature has significant UI complexity — want me to produce a design system
+ brief with component hierarchy, accessibility requirements, and interaction patterns
+ before I plan the implementation?"
+```
+
+What devx-ui-ux produces:
+- Design system tokens (if new surface)
+- Component hierarchy and responsibility map
+- Accessibility requirements checklist
+- Responsive behavior rules
+- Interaction patterns and state management approach
+
+This feeds into Stage 3's execution packet — the work packages reference the design brief
+for implementation guidance.
+
+### Signal: When to offer Layer 2
+
+- Feature introduces 3+ new screens or components
+- Feature changes navigation structure
+- Feature introduces a new interaction pattern (drag-drop, real-time, multi-step form)
+- Feature has accessibility compliance requirements
+- User explicitly mentions wireframes, mockups, or design system
 
 ---
 
