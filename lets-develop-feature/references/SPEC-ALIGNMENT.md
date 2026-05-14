@@ -12,14 +12,39 @@ Without deliberate re-reading, implementation drifts from the spec:
 
 ## The Protocol
 
+### Phase 0 — Spec Readiness (Stage 3)
+
+Before planning, determine whether the spec is ready for implementation:
+
+1. Identify the spec source (`lets spec`, PRD, issue, ticket, acceptance criteria, or user request)
+2. Extract actors, user stories, requirements, constraints, success criteria, and edge cases
+3. Run the spec quality checklist from `spec-readiness.md`
+4. Resolve critical clarifications before implementation
+5. Record non-critical assumptions with validation steps
+
+Critical clarifications are limited to choices that materially change scope, security/privacy posture, public contracts, or user-visible acceptance behavior. Present no more than three at once.
+
+### Requirement Quality Criteria
+
+Each requirement should be:
+
+- **Testable:** there is a clear way to verify it
+- **Unambiguous:** no important term has multiple plausible meanings
+- **User- or business-oriented:** describes the desired outcome before implementation details
+- **Bounded:** includes relevant inclusion and exclusion limits
+- **Traceable:** can map to a story, task, scenario, and verification evidence
+
+If a requirement fails these criteria and cannot be reasonably inferred, mark it as a critical clarification.
+
 ### Phase 1 — Before Each Work Package (Stage 6)
 
 At the start of every work package:
 
 1. **Identify** which spec requirements this package addresses
-2. **Re-read** the relevant section of the spec/task description (not from memory)
-3. **Confirm** your approach still aligns with what the spec says
-4. **Note** any ambiguity or tension discovered during the re-read
+2. **Identify** which user story, task IDs, and scenarios it covers
+3. **Re-read** the relevant section of the spec/task description (not from memory)
+4. **Confirm** your approach still aligns with what the spec says
+5. **Note** any ambiguity or tension discovered during the re-read
 
 This takes 30 seconds. Skipping it risks hours of rework.
 
@@ -45,12 +70,12 @@ HARD STOP.
   Location: [which spec section / which code file]
   Spec says: [exact text or requirement]
   Reality: [what the code/system actually requires]
-  
+
   Options:
   1. My understanding is wrong — re-read shows [alternative interpretation]
   2. Approach needs revision — can satisfy spec by [different approach]
   3. Spec needs revision — [why the spec appears incorrect]
-  
+
   Recommendation: [1/2/3] because [reasoning]"
 ```
 
@@ -90,10 +115,23 @@ Every requirement gets one of:
 | **Gaps exist** | Some requirements are GAP — fixable in current scope? |
 | **Blocked** | Requirements MISSING without justification — cannot complete |
 
+## Clarification Resolution Flow
+
+When `[NEEDS CLARIFICATION]` or an equivalent unresolved question exists:
+
+1. Classify it as critical or non-critical
+2. For critical items, stop before implementation and ask the user
+3. For non-critical items, choose a conservative default and record it in assumptions
+4. Update `clarifications.md` with the decision, source, and status
+5. Re-check the affected requirements, stories, scenarios, and tasks
+
+Do not create an implementation task for a critical clarification itself. Create tasks only after the clarification is resolved or explicitly deferred by the user.
+
 ## Spec Sources
 
 The "spec" may be any of:
 - A formal specification document
+- A `lets spec export` execution brief
 - A task description from the user
 - A ticket/issue body
 - A PRD section
@@ -107,7 +145,7 @@ When no formal spec exists (e.g., user says "add a billing endpoint"):
 - The user's description IS the spec
 - Extract implicit requirements (input validation, error handling, etc.)
 - Surface what you're inferring: "I'm assuming [X] based on [Y]. Correct?"
-- These inferences go in the assumptions log
+- These inferences go in `spec-readiness.md`, `clarifications.md`, and the assumptions log
 
 ## Spec Revision Flow
 
@@ -137,3 +175,5 @@ Spec alignment and service context can conflict:
 - **"The spec is wrong so I'll just do the right thing"** — get confirmation first
 - **"This is close enough"** — close is not aligned; document the gap
 - **"The spec doesn't say NOT to do this"** — scope is what the spec says TO do, not unbounded
+- **"I'll map tasks later"** — task mapping is part of spec alignment, not a cleanup step
+- **"This checklist is advisory"** — failed blocking checklist items either get fixed or explicitly acknowledged by the user

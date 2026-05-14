@@ -3,7 +3,7 @@ name: lets-develop-feature
 description: "Full-lifecycle feature development with staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
 metadata:
   author: cogsmith-ai
-  version: "4.0.0"
+  version: "4.1.0"
   tags: [implementation, change-management, delivery, governance, architecture]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-develop-feature/SKILL.md
@@ -49,12 +49,15 @@ outcome_runtime:
     - do_not_fabricate_test_results
     - do_not_commit_secrets
     - do_not_implement_before_packet_presented
+    - do_not_implement_with_unresolved_critical_clarifications
     - do_not_expand_scope_silently
     - do_not_skip_verification
+    - do_not_skip_failed_checklists_without_user_acknowledgement
     - do_not_weaken_error_handling
     - do_not_ignore_service_context
     - do_not_leave_stages_implicit
     - do_not_proceed_past_spec_contradiction
+    - do_not_treat_unmapped_tasks_as_complete
   required_decision_frames:
     - implementation_strategy
     - architecture_decision
@@ -92,18 +95,45 @@ Staged feature development with service-context binding, spec-alignment checking
 ```
 Stage 1: Ground         → Read repo context + service constraints (BINDING)
 Stage 2: Classify       → Determine rigor level (MINIMAL / STANDARD / ELEVATED / FULL)
-Stage 3: Plan           → Execution packet + scenarios + assumptions
+Stage 3: Plan           → Spec readiness + execution packet + story tasks + scenarios
 Stage 4: Architecture   → Design gate (required | skipped with reason)
 Stage 5: Checkpoint     → User reviews plan (STANDARD+)
-Stage 6: Implement      → Per-package, with spec re-read at each milestone
+Stage 6: Implement      → Story tasks + packages, with spec re-read at each milestone
 Stage 7: Test           → Methodology-aware verification
-Stage 8: Verify         → Compare delivered work against plan + spec + service context
+Stage 8: Verify         → Compare delivered work against plan + spec + tasks + evidence
 Stage 9: Complete       → Quality scorecard + handoff
 ```
 
 **Every stage** ends in one of: `completed` | `skipped` (with reason) | `blocked` (with blocker).
 
 **No stage is ever left implicit.** The handoff shows all 9 stages accounted for.
+
+---
+
+## Spec-Driven Mode
+
+This skill is spec-driven when a spec exists and spec-constructing when it does not.
+
+When the `lets` CLI is available, prefer Core primitives over ad hoc files:
+
+```bash
+lets spec status --format json
+lets spec export <feature_key>
+lets journey init <feature_key> --repo-root .
+lets journey status <journey_id>
+```
+
+Use the results to populate the `.lets/runs/develop-feature/<run_id>/` artifacts. The spec workspace is the authority for WHAT and WHY, the execution packet is the authority for HOW, the story task list is the authority for ordered implementation, and the handoff/evidence records are the authority for completion.
+
+If no formal spec exists, derive a bounded spec-readiness record from the user's request before planning. Critical clarifications block implementation; non-critical assumptions may proceed only when documented in the assumptions log and traceability record.
+
+Core state model:
+
+- **`.lets/` workflow harness:** repo-local, resumable skill state and artifact checklist.
+- **`lets spec`:** ground-truth-compatible feature/spec source when available.
+- **`lets journey`:** link between spec, governed runs, receipts, and exported evidence.
+- **Coordination concepts:** task dependencies, blockers, attention items, and follow-ups represented in story tasks and handoff, not as a separate source of truth.
+- **Handoffs and evidence:** Stage 9 passes a concrete handoff to `lets-verify-change`; engine receipts and evidence bundles are referenced when available.
 
 ---
 
@@ -118,8 +148,13 @@ Store the run’s working artifacts *in the repo* so the workflow is resumable a
       latest
       <run_id>/
         run-state.json
+        spec-readiness.md
+        clarifications.md
         service-context.md
         execution-packet.md
+        story-tasks.md
+        design-artifacts.md
+        journey-link.md
         scenario-matrix.md
         traceability.md
         verification-record.md
@@ -182,9 +217,9 @@ Classify by type/scale/risk/complexity. Apply gate overrides.
 
 ### Stage 3 — Plan
 
-Produce execution packet with work packages, scenario matrix, assumptions.
+Establish spec readiness, resolve critical clarifications, produce the execution packet, and decompose work into user-story task slices with scenario coverage.
 
-**Output:** Execution packet, scenario matrix, assumptions log. See [references/PLANNING.md](references/PLANNING.md).
+**Output:** Spec-readiness record, clarifications log, execution packet, story tasks, scenario matrix, assumptions log. See [references/PLANNING.md](references/PLANNING.md).
 
 ### Stage 4 — Architecture Gate
 
@@ -200,7 +235,7 @@ Present plan to user for review. Validate completeness.
 
 ### Stage 6 — Implement
 
-Execute work packages in order. **Mandatory spec re-read at each milestone boundary.** Stop on spec contradiction.
+Execute story tasks and work packages in dependency order. **Mandatory spec re-read at each milestone boundary.** Mark completed task items, record blockers as attention items, and stop on spec contradiction.
 
 **Output:** Code changes + living artifacts (traceability, notes). See [references/IMPLEMENTATION.md](references/IMPLEMENTATION.md).
 
@@ -212,7 +247,7 @@ Methodology-aware testing per work package.
 
 ### Stage 8 — Verify
 
-Compare delivered work against plan, spec, service context, scenario coverage. Not "run tests again" — a dedicated comparison.
+Compare delivered work against plan, spec, story tasks, service context, scenario coverage, and available journey/evidence links. Not "run tests again" — a dedicated comparison.
 
 **Output:** Verification verdict (ready | blocked). See [references/VERIFICATION.md](references/VERIFICATION.md).
 
@@ -229,9 +264,10 @@ Quality scorecard. Handoff packet with full stage status.
 When a spec/task description exists, implementation must align to it continuously:
 
 1. **Before each work package:** Re-read the relevant section of the spec
-2. **During implementation:** If code reveals spec contradiction → STOP
-3. **On contradiction:** Surface it, update spec understanding or revise approach
-4. **At verification:** Check each spec requirement against implemented code
+2. **Before each story task:** Confirm requirement/story/scenario mapping
+3. **During implementation:** If code reveals spec contradiction → STOP
+4. **On contradiction:** Surface it, update spec understanding or revise approach
+5. **At verification:** Check each spec requirement against implemented code and evidence
 
 **Spec contradiction = hard stop.** Never silently proceed past a deviation.
 
@@ -255,6 +291,9 @@ See [references/SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md) for the full pr
 | 10 | I will NOT proceed past a spec contradiction without surfacing it |
 | 11 | I will NOT claim completion without running the quality scorecard |
 | 12 | I will NOT soften findings or imply confidence I don't have |
+| 13 | I will NOT implement while critical clarifications remain unresolved |
+| 14 | I will NOT skip a failed checklist without explicit user acknowledgement |
+| 15 | I will NOT mark tasks complete unless each task maps to a requirement, story, scenario, or documented infrastructure need |
 
 ---
 
@@ -279,6 +318,8 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 
 - If AGENTS.md is missing: proceed without service context, note `Stage 1: completed (no AGENTS.md — no service constraints bound)`
 - If spec/task description is ambiguous: extract inferred requirements, surface to user for confirmation before implementing
+- If critical clarifications remain after spec readiness: mark Stage 3 blocked and ask the user to resolve them
+- If a checklist has incomplete blocking items: stop and ask whether to fix the checklist or proceed with documented risk
 - If a spec contradiction is discovered mid-implementation: HARD STOP — surface it, do not silently proceed
 - If a work package verification fails: fix within scope or mark BLOCKED — do not skip to next package
 - If quality scorecard < 16/20: mark delivery BLOCKED — identify specific gaps before attempting fix
@@ -304,7 +345,11 @@ See [references/COMPLETION.md](references/COMPLETION.md) for full scoring rubric
 
 - Service context summary (non-negotiables, critical paths)
 - Change classification (type, scale, risk, rigor)
+- Spec-readiness record and clarifications log
 - Execution packet with scenarios and assumptions
+- Story task list with dependency order, parallel markers, and independent test criteria
+- Design artifact inventory (research decisions, data model, contracts, quickstart, or explicit skips)
+- Journey link (feature key, journey ID, engine run IDs, evidence references when available)
 - Architecture notes (or explicit skip)
 - Per-package verification evidence
 - Traceability record (requirement → code → test)
@@ -344,5 +389,10 @@ Use these to scaffold artifacts — do not invent formats from scratch.
 | [assets/templates/execution-packet.template.md](assets/templates/execution-packet.template.md) | Execution packet structure | Stage 3 |
 | [assets/templates/handoff.template.md](assets/templates/handoff.template.md) | Handoff packet structure | Stage 9 |
 | [assets/templates/traceability.template.md](assets/templates/traceability.template.md) | Implementation traceability record | Stage 6 |
+| [workflow/templates/spec-readiness.md](workflow/templates/spec-readiness.md) | Spec readiness and checklist state | Stage 3 |
+| [workflow/templates/clarifications.md](workflow/templates/clarifications.md) | Critical clarification tracking | Stage 3 |
+| [workflow/templates/story-tasks.md](workflow/templates/story-tasks.md) | Requirement/story/task decomposition | Stage 3/6 |
+| [workflow/templates/design-artifacts.md](workflow/templates/design-artifacts.md) | Research, model, contract, quickstart inventory | Stage 3/4 |
+| [workflow/templates/journey-link.md](workflow/templates/journey-link.md) | Core journey/evidence/run linkage | Stage 3/8/9 |
 | [scripts/classify_risk.sh](scripts/classify_risk.sh) | Automated risk signal scanning | Stage 2 |
 | [scripts/check_blast_radius.sh](scripts/check_blast_radius.sh) | Importer analysis for blast radius | Stage 2/3 |

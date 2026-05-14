@@ -9,7 +9,7 @@ Implementation without scenario thinking produces code that:
 - Handles obvious cases but misses boundaries
 - Passes tests but fails in production under load/concurrency
 
-The scenario matrix ensures you've THOUGHT about these cases before coding.
+The scenario matrix ensures you've THOUGHT about these cases before coding and can trace every important behavior to a story task and verification artifact.
 
 ## When to Produce a Scenario Matrix
 
@@ -56,25 +56,36 @@ Boundary conditions, unusual but valid inputs, race conditions.
 
 ## Matrix Format
 
-| # | Scenario | Type | Input | Expected Output | Error Handling | Test Coverage |
-|---|----------|------|-------|-----------------|----------------|---------------|
-| 1 | Normal user fetch | happy | Valid user_id | 200 + user data | N/A | test_get_user_happy |
-| 2 | User not found | failure | Invalid user_id | 404 + error message | Log warning | test_get_user_not_found |
-| 3 | Database timeout | failure | Valid user_id, DB slow | 503 + retry-after | Log error, circuit break | test_get_user_db_timeout |
-| 4 | Empty user_id | edge | "" | 400 + validation error | N/A | test_get_user_empty_id |
-| 5 | Concurrent updates | edge | Two PATCH same user | Last-write-wins (or conflict) | 409 if conflict mode | test_concurrent_update |
+| # | Story | Scenario | Type | Input | Expected Output | Error Handling | Test Coverage | Task IDs |
+|---|-------|----------|------|-------|-----------------|----------------|---------------|----------|
+| 1 | US1 | Normal user fetch | happy | Valid user_id | 200 + user data | N/A | test_get_user_happy | T003 |
+| 2 | US1 | User not found | failure | Invalid user_id | 404 + error message | Log warning | test_get_user_not_found | T004 |
+| 3 | US1 | Database timeout | failure | Valid user_id, DB slow | 503 + retry-after | Log error, circuit break | test_get_user_db_timeout | T005 |
+| 4 | US1 | Empty user_id | edge | "" | 400 + validation error | N/A | test_get_user_empty_id | T002 |
+| 5 | US2 | Concurrent updates | edge | Two PATCH same user | Last-write-wins (or conflict) | 409 if conflict mode | test_concurrent_update | T009 |
 
-## Scenario → Work Package Mapping
+## Scenario → Story Task → Work Package Mapping
 
-Each scenario should trace to a work package in the execution packet:
+Each scenario should trace to a user story, story task, and work package in the execution packet:
 
-| Scenario | Covered by package | How |
-|----------|-------------------|-----|
-| #1 Happy path | Package 2 (implement handler) | Main implementation |
-| #2 Not found | Package 2 (implement handler) | Error branch in handler |
-| #3 DB timeout | Package 3 (error handling) | Timeout wrapper + circuit breaker |
-| #4 Empty input | Package 1 (validation) | Input validation middleware |
-| #5 Concurrent | Package 4 (concurrency) | Optimistic locking in model |
+| Scenario | Story | Task IDs | Covered by package | How |
+|----------|-------|----------|--------------------|-----|
+| #1 Happy path | US1 | T003 | Package 2 (implement handler) | Main implementation |
+| #2 Not found | US1 | T004 | Package 2 (implement handler) | Error branch in handler |
+| #3 DB timeout | US1 | T005 | Package 3 (error handling) | Timeout wrapper + circuit breaker |
+| #4 Empty input | US1 | T002 | Package 1 (validation) | Input validation middleware |
+| #5 Concurrent | US2 | T009 | Package 4 (concurrency) | Optimistic locking in model |
+
+## Independent Test Criteria
+
+For each user story, define how it can be tested independently:
+
+| Story | Value Slice | Independent Test Criteria | MVP? |
+|---|---|---|---|
+| US1 | (fill) | (fill) | yes/no |
+| US2 | (fill) | (fill) | yes/no |
+
+This mirrors Core coordination thinking: each story slice should have a clear done state, blockers, and follow-up items that can be surfaced in the handoff.
 
 ## Scenario Discovery Techniques
 
@@ -85,11 +96,11 @@ For each input:
   - What's the valid range?
   - What happens at the boundaries?
   - What happens outside the range?
-  
+
 For each output:
   - What are all possible outputs?
   - When does each occur?
-  
+
 For each side effect:
   - What if it fails?
   - What if it's slow?
@@ -116,13 +127,13 @@ For each stateful operation:
 ```
 For each numeric parameter:
   - 0, 1, max-1, max, max+1
-  
+
 For each string parameter:
   - "", single char, very long, unicode, special chars
-  
+
 For each collection:
   - Empty, single item, many items, duplicate items
-  
+
 For each optional:
   - Present, absent, null (if distinct from absent)
 ```
@@ -138,6 +149,7 @@ When service context identifies critical paths, ensure the scenario matrix cover
 
 - **Happy path only** — the matrix must include at least one failure and one edge case
 - **Scenarios without test mapping** — every scenario should trace to either a test or an explicit "deferred" note
+- **Scenarios without task mapping** — every scenario should map to story tasks or be explicitly deferred
 - **Deferred without justification** — if a scenario is deferred, say why and when it'll be addressed
 - **Scenarios after implementation** — the matrix should be produced BEFORE coding, not after (it informs the implementation)
 - **Generic scenarios** — "what if it fails?" is not a scenario. "What if the Stripe API returns 429 rate limit?" is.

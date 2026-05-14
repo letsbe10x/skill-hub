@@ -2,8 +2,8 @@ schema_version: "1"
 
 workflow:
   id: "lets-develop-feature"
-  version: "2.0.0"
-  description: "Structured implementation with governance gates and evidence-gated handoff."
+  version: "2.1.0"
+  description: "Structured spec-driven implementation with governance gates, Core journey linkage, and evidence-gated handoff."
   run_layout:
     runs_root: ".lets/runs"
 
@@ -15,13 +15,13 @@ stages:
   - id: "classify"
     title: "Stage 2: Classify change type/scale/risk"
   - id: "plan"
-    title: "Stage 3: Build execution packet"
+    title: "Stage 3: Build spec-ready execution packet"
   - id: "architecture"
     title: "Stage 4: Architecture boundary check"
   - id: "checkpoint"
     title: "Stage 5: Governance checkpoint"
   - id: "implement"
-    title: "Stage 6: Implement bounded by packet"
+    title: "Stage 6: Implement story tasks bounded by packet"
   - id: "test"
     title: "Stage 7: Write/run verification"
   - id: "verify"
@@ -30,12 +30,27 @@ stages:
     title: "Stage 9: Handoff to verify-change"
 
 artifacts:
+  - id: "spec_readiness"
+    path: "spec-readiness.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+  - id: "clarifications"
+    path: "clarifications.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
   - id: "service_context"
     path: "service-context.md"
     required_for: ["STANDARD", "ELEVATED", "FULL"]
   - id: "execution_packet"
     path: "execution-packet.md"
     required_for: ["MINIMAL", "STANDARD", "ELEVATED", "FULL"]
+  - id: "story_tasks"
+    path: "story-tasks.md"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+  - id: "design_artifacts"
+    path: "design-artifacts.md"
+    required_for: ["ELEVATED", "FULL"]
+  - id: "journey_link"
+    path: "journey-link.md"
+    required_for: ["ELEVATED", "FULL"]
   - id: "scenario_matrix"
     path: "scenario-matrix.md"
     required_for: ["STANDARD", "ELEVATED", "FULL"]
