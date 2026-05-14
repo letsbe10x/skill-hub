@@ -1,6 +1,7 @@
 # Routing Guide
 
-How to choose the downstream skill after a brainstorm spec is approved.
+How to choose what happens after a brainstorm spec is approved. Not all brainstorms lead to
+implementation — some end with a decision, a strategy, or a research direction.
 
 ## Decision Table
 
@@ -10,6 +11,18 @@ How to choose the downstream skill after a brainstorm spec is approved.
 | `architecture` | Decision affects multiple components or teams | `lets-create-plan` | Full |
 | `direct` | Change is small, well-bounded, immediately implementable | `lets-develop-feature` (autonomous) or `lets-spec-to-pr` | Light |
 | `product` | Problem–solution fit is still open; more discovery needed | `lets-opportunity-discovery` | Full |
+| `research` | Decision requires evidence gathering, competitive scan, or user research | `lets-research-*` (appropriate variant) | Full |
+| `strategy` | Decision is made; no implementation follows (org decision, process choice, content direction) | No downstream skill — present decision summary | Either |
+
+### When the brainstorm doesn't lead to implementation
+
+Not every brainstorm routes to a build skill. When the exploration resolved a question without
+creating implementation work (e.g., "should we use Postgres or DynamoDB?" → decision made,
+recorded, done), present the decision summary and ask: "Is there anything to implement from this,
+or is the decision itself the outcome?"
+
+If the user says the decision is the outcome: commit the spec as a decision record and stop.
+No downstream routing required.
 
 ### When invoked as a handoff from lets-develop-feature
 
@@ -53,7 +66,8 @@ Wait for confirmation. If the user disagrees, re-classify and re-route.
 
 ## What Not to Do
 
-- Do not always route to `lets-create-plan` regardless of exploration type.
+- Do not always route to an implementation skill — brainstorms can end with a decision, not code.
 - Do not route to `lets-develop-feature` when invoked standalone without an approved spec — `lets-develop-feature` will invoke brainstorm itself via Phase 0 when needed.
 - Do not skip presenting the routing decision — it is a required human checkpoint.
 - Do not attempt downstream routing when invoked as a delegation from `lets-develop-feature` — just return the approved artifact.
+- Do not assume implementation follows — ask if the decision is the outcome or if something needs to be built.

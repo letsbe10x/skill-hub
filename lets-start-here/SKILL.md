@@ -98,7 +98,7 @@ These thoughts mean STOP — you are rationalizing:
 
 | Request family | Goal | Skill invoked |
 |---|---|---|
-| Explore / decide / design (path forward unclear, no implementation intent) | `explore` | `lets-brainstorm` |
+| Explore / decide / design / strategize (any open question) | `explore` | `lets-brainstorm` |
 | New feature / code change / implement (with or without spec) | `change_code` | `lets-develop-feature` |
 | Investigate failure / bug | `investigate_change` | `lets-triage-issue` |
 | On-call / incident | `inspect_service` + `investigate_change` | `lets-triage-incident` |
@@ -111,18 +111,24 @@ These thoughts mean STOP — you are rationalizing:
 | Deploy a service | `deploy_service` | `lets-deploy-check` |
 | Spec a change to PR (small, bounded, immediate) | `change_code` (spec-driven) | `lets-spec-to-pr` |
 
-**Brainstorm vs develop-feature disambiguation:** Route to `lets-brainstorm` ONLY when the user
-is exploring without implementation intent — they want to understand trade-offs, compare
-approaches, or think through a design question. Route to `lets-develop-feature` when the user
-intends to implement something, regardless of whether a spec exists. `lets-develop-feature` has
-its own Phase 0 that detects missing specs and delegates to `lets-brainstorm` internally.
+**Brainstorm vs develop-feature disambiguation:** `lets-brainstorm` is a general-purpose thinking
+tool for ANY open question — product strategy, architecture decisions, content direction, ops
+trade-offs, research design, or feature exploration. It is not limited to "pre-implementation"
+use. Route to `lets-brainstorm` whenever the user wants to explore, compare options, or make a
+decision — regardless of whether implementation follows.
+
+Route to `lets-develop-feature` when the user explicitly intends to build/implement something.
+`lets-develop-feature` has its own Phase 0 that delegates to `lets-brainstorm` internally when
+no spec exists, so you don't need to route through brainstorm first for implementation requests.
 
 | User intent signal | Route to |
 |---|---|
 | "how should we...", "what's the best way...", "help me think through" | `lets-brainstorm` |
+| "should we use X or Y?", "what are our options for..." | `lets-brainstorm` |
+| "help me decide", "let's explore", "brainstorm" | `lets-brainstorm` |
+| "what's the right strategy for...", "how should we approach..." | `lets-brainstorm` |
 | "build this", "implement this", "make this change", "code this up" | `lets-develop-feature` |
 | "I want to add X" (implementation implied) | `lets-develop-feature` |
-| "should we use X or Y?" (decision, no implementation) | `lets-brainstorm` |
 
 Only route to `lets-create-plan` when an approved spec exists and the user explicitly wants a
 plan without immediately implementing (rare — usually `lets-develop-feature` handles planning
@@ -137,7 +143,7 @@ as Stage 3 of its pipeline).
 - **Routing to multiple skills simultaneously** — pick one. If the request matches two families, ask which is primary.
 - **Bypassing lets-start-here when a trigger matches** — lets-start-here exists so governance context loads first.
 - **Routing to lets-develop-feature for investigative requests** — development and investigation are separate goal paths.
-- **Routing to lets-brainstorm when implementation is intended** — if the user wants to build something, route to `lets-develop-feature` even without a spec. It handles discovery internally via Phase 0.
+- **Routing to lets-develop-feature when the user just wants to think** — brainstorm is for any open question (product, strategy, architecture, ops, content), not only pre-implementation exploration. Only route to develop-feature when building is the explicit intent.
 - **Treating the routing table as exhaustive** — if no family matches, classify as ambiguous and ask.
 
 ## Process
