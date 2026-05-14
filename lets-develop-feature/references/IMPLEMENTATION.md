@@ -4,26 +4,42 @@ Per-package execution protocol with spec re-read discipline, scope enforcement, 
 
 ## Execution Protocol
 
-Implementation proceeds work-package-by-work-package from the execution packet. No package is started until its dependencies are met.
+Implementation proceeds story-task-by-story-task and work-package-by-work-package from the execution packet. No task or package is started until its dependencies are met.
 
 ### Per-Package Flow
 
 ```
 For each work package:
   1. Pre-flight: verify dependencies met
-  2. Spec re-read: re-read relevant spec/task section
-  3. Execute: write code per methodology
-  4. Verify: run package-specific verification
-  5. Update: traceability + implementation notes
-  6. Gate: package done or blocked
+  2. Task mapping: confirm requirement/story/scenario coverage
+  3. Spec re-read: re-read relevant spec/task section
+  4. Execute: write code per methodology
+  5. Verify: run package-specific verification
+  6. Update: story tasks + traceability + implementation notes
+  7. Gate: package done or blocked
 ```
 
 ### Step 1 — Pre-flight
 
 Before starting a package, confirm:
 - All dependency packages are completed (not just started)
+- All dependency tasks in `story-tasks.md` are checked off
 - Package verification criteria are still valid (no earlier package invalidated them)
+- Critical clarifications are resolved
 - Service constraints are not in tension with this package's work
+
+### Project Hygiene Pre-flight
+
+When the implementation introduces generated files, dependency outputs, containers, Terraform, Helm charts, or publishable packages, verify the matching ignore files before coding:
+
+- Git repo: `.gitignore`
+- Docker: `.dockerignore`
+- ESLint or Prettier: config `ignores` or `.eslintignore` / `.prettierignore`
+- Package publishing: `.npmignore` or equivalent
+- Terraform: `.terraformignore`
+- Helm charts: `.helmignore`
+
+Append only missing critical patterns. Never remove existing ignore rules unless the user explicitly asks.
 
 ### Step 2 — Mandatory Spec Re-read
 
@@ -35,6 +51,16 @@ This is NOT optional. It catches:
 - Contradictions that emerge only when you reach that part of the implementation
 
 See [SPEC-ALIGNMENT.md](SPEC-ALIGNMENT.md) for the full spec-alignment protocol.
+
+### Step 2b — Task Checklist Execution
+
+Use `story-tasks.md` as the implementation ledger:
+
+- Execute tasks in dependency order.
+- `[P]` tasks may be parallelized only when they touch different files and do not depend on incomplete work.
+- Mark each task as `[X]` only after its verification criteria pass or the task has documented non-code evidence.
+- If a task becomes invalid, do not delete it. Mark it blocked/deferred in notes and add the replacement task with rationale.
+- Record blockers, follow-ups, and course corrections as coordination attention items in `story-tasks.md` and `handoff.md`.
 
 ### Step 3 — Execute
 
@@ -59,6 +85,7 @@ Run the package-specific verification from the execution packet:
 ### Step 5 — Update Artifacts
 
 After each package, update:
+- **Story tasks:** mark completed task IDs and note blockers/follow-ups
 - **Traceability record:** which requirements are now covered
 - **Implementation notes:** decisions made, deviations from plan (with justification)
 - **Assumptions log:** mark validated/invalidated assumptions
@@ -135,11 +162,11 @@ Maintain notes as you work. Record:
 Keep a running map from requirements to code:
 
 ```markdown
-| Requirement | Package | Code | Test | Status |
-|-------------|---------|------|------|--------|
-| Users can create invoices | #2 | billing/create.py:45-80 | test_create_invoice | Done |
-| Invalid input rejected | #1 | validators/billing.py:12-30 | test_validate_input | Done |
-| DB timeout handled | #3 | — | — | Pending |
+| Requirement | Story | Tasks | Package | Code | Test | Status |
+|-------------|-------|-------|---------|------|------|--------|
+| Users can create invoices | US1 | T003 | #2 | billing/create.py:45-80 | test_create_invoice | Done |
+| Invalid input rejected | US1 | T002 | #1 | validators/billing.py:12-30 | test_validate_input | Done |
+| DB timeout handled | US1 | T005 | #3 | — | — | Pending |
 ```
 
 ## Execution Constraints
@@ -148,6 +175,7 @@ Keep a running map from requirements to code:
 - Do not weaken existing error handling
 - Do not install new dependencies without explicit approval
 - Do not run destructive commands without confirmation
+- Do not mark a story task complete without evidence
 - Use canonical project commands (Makefile, package.json, pyproject.toml) where they exist
 - Extend existing patterns before inventing new abstractions
 - Prefer the smallest safe change that satisfies the package
@@ -167,6 +195,8 @@ Keep a running map from requirements to code:
 - **Skipping spec re-read** — drift happens; re-reading catches it
 - **"I'll fix it later"** — either fix now or document as follow-up with justification
 - **Silent scope expansion** — if it's not in the packet, stop and ask
+- **Checklist laundering** — do not check a task off because related work happened elsewhere; record the actual evidence
+- **Unsafe parallelism** — `[P]` means independent files and no unmet dependencies, not "can be done quickly"
 - **Weakening error handling** — existing catches, retries, and fallbacks exist for a reason
 - **Inventing results** — if you didn't run it, you don't know the result
 - **Large packages** — if a package is growing beyond plan, stop and re-assess
