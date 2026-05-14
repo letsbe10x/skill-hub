@@ -32,6 +32,10 @@ If conflicts are found: surface them to the user. Options:
 - Accept the conflict with documented risk
 - Narrow scope to avoid the conflict
 
+Don't over-validate — if the spec was produced by brainstorm with repo context, most conflicts
+were already caught. Only flag genuinely new information from AGENTS.md/service context that
+brainstorm couldn't have known about.
+
 If the `lets` CLI is available, prefer:
 
 ```bash

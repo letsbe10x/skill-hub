@@ -82,13 +82,17 @@ Run the package-specific verification from the execution packet:
 - Confirm the expected result
 - If verification fails: fix within package scope, do not proceed until passing
 
-### Step 5 — Update Artifacts
+### Step 5 — Update Artifacts (Checkpoint)
 
-After each package, update:
-- **Story tasks:** mark completed task IDs and note blockers/follow-ups
+After each package, update ALL of these — this is the resumability seam:
+
+- **`run-state.md`:** package row → completed, task rows → done with evidence, current_package incremented, next_action updated
+- **`story-tasks.md`:** mark completed task IDs (checkboxes) and note blockers/follow-ups
 - **Traceability record:** which requirements are now covered
 - **Implementation notes:** decisions made, deviations from plan (with justification)
 - **Assumptions log:** mark validated/invalidated assumptions
+
+The `run-state.md` update is non-negotiable for STANDARD+ rigor. A new session must be able to resume from the next package without re-reading the full conversation history.
 
 ### Step 6 — Package Gate
 

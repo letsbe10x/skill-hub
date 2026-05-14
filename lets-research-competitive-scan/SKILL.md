@@ -108,11 +108,23 @@ lets persona ingest --repo-root . \
 
 ## Outputs
 
-- A competitive report (recommended name: `competitive_report.md`) containing:
+- A comparison report (recommended name: `comparison.md`) containing:
   - evidence excerpts per competitor
   - a comparison table (claims/pricing/proof/CTA/friction)
   - opportunity map and experiment ideas
 - Run IDs for each competitor snapshot and any simulations performed.
+
+When invoked as a handoff from `lets-develop-feature`, the output must include this frontmatter:
+
+```yaml
+---
+artifact_type: comparison
+produced_by: lets-research-competitive-scan
+produced_at: <ISO 8601 timestamp>
+status: approved
+approval_source: self-review
+---
+```
 
 Done when: comparison report is written with source references and retrieval timestamps for all claims.
 

@@ -160,6 +160,22 @@ The run directory and audit directory include:
 
 Done when: opportunities are ranked with signal provenance, acceptance criteria are written for the top-ranked opportunities, and open questions are listed.
 
+### Handoff Artifact
+
+When invoked as a handoff from `lets-develop-feature`, also produce a `requirements.md` summary with this frontmatter:
+
+```yaml
+---
+artifact_type: requirements
+produced_by: lets-research-prd-grooming
+produced_at: <ISO 8601 timestamp>
+status: approved
+approval_source: self-review
+---
+```
+
+The `requirements.md` condenses the grooming output into structured requirements (problem, user stories, acceptance criteria, open questions) suitable for downstream planning.
+
 ## Checkpoints
 
 - Before running: confirm raw evidence policy and whether artifacts should be materialized in the repo.

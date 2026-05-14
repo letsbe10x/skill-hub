@@ -98,8 +98,8 @@ These thoughts mean STOP — you are rationalizing:
 
 | Request family | Goal | Skill invoked |
 |---|---|---|
-| Explore / decide / design (path forward unclear) | `explore` | `lets-brainstorm` |
-| New feature / code change (spec exists) | `change_code` | `lets-develop-feature` |
+| Any open question / explore / decide / design | `explore` | `lets-brainstorm` |
+| Build / implement / code change (with or without spec) | `change_code` | `lets-develop-feature` |
 | Investigate failure / bug | `investigate_change` | `lets-triage-issue` |
 | On-call / incident | `inspect_service` + `investigate_change` | `lets-triage-incident` |
 | Plan work / spec a change (spec already written) | `create_plan` | `lets-create-plan` |
@@ -111,7 +111,15 @@ These thoughts mean STOP — you are rationalizing:
 | Deploy a service | `deploy_service` | `lets-deploy-check` |
 | Spec a change to PR | `change_code` (spec-driven) | `lets-spec-to-pr` |
 
-**Brainstorm disambiguation:** route to `lets-brainstorm` when the request is exploratory — the right approach is not yet agreed, a trade-off needs analysis, or the user is asking "how should we", "what's the best way", "should we use X or Y", "help me think through", or any open question about direction. Only route to `lets-develop-feature` when an approved spec already exists. Only route to `lets-create-plan` when an approved spec exists and the user needs an implementation plan from it.
+**Key disambiguations:**
+
+| Intent signal | Route to | Why |
+|---|---|---|
+| "how should we", "what's the best way", "help me think through", open question | `lets-brainstorm` | No implementation intent — exploring |
+| "build this", "implement", "add feature", "make this change" (regardless of spec) | `lets-develop-feature` | Implementation intent — develop-feature handles spec discovery via Phase 0 |
+| "plan the implementation" (spec already exists) | `lets-create-plan` | Plan only, not execution |
+
+**Brainstorm is for any open question** — not just pre-implementation. It handles research, strategy, architecture decisions, and any creative exploration where the right answer isn't yet agreed.
 
 **Observability disambiguation:** if the request text contains any of `["alert", "pager", "firing", "incident", "on-call", "sev1", "sev2"]`, route to `lets-triage-incident`. Otherwise route to `lets-triage-issue`.
 
@@ -122,6 +130,7 @@ These thoughts mean STOP — you are rationalizing:
 - **Routing to multiple skills simultaneously** — pick one. If the request matches two families, ask which is primary.
 - **Bypassing lets-start-here when a trigger matches** — lets-start-here exists so governance context loads first.
 - **Routing to lets-develop-feature for investigative requests** — development and investigation are separate goal paths.
+- **Routing to lets-brainstorm when implementation is clearly intended** — lets-develop-feature handles its own spec discovery via Phase 0; don't force a separate brainstorm when the user wants to build.
 - **Treating the routing table as exhaustive** — if no family matches, classify as ambiguous and ask.
 
 ## Process
