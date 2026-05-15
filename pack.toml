@@ -1,0 +1,65 @@
+schema_version = "1.0"
+plugin_id = "skill-hub"
+title = "skill-hub"
+description = "Standalone platform-neutral skills for AI coding assistants (Claude Code, Cursor, Codex, Copilot)."
+version = "0.1.0"
+license = "MIT"
+
+[author]
+name = "cogsmith-ai"
+url = "https://github.com/cogsmith-ai/letsbe10x"
+
+[[components.skills]]
+path = "lets-start-here"
+
+[[components.skills]]
+path = "lets-bootstrap-agents-md"
+
+[[components.skills]]
+path = "lets-bootstrap-repo"
+
+[[components.skills]]
+path = "lets-develop-feature"
+
+[[components.skills]]
+path = "lets-review-code"
+
+[[components.skills]]
+path = "lets-review-pr"
+
+[[components.skills]]
+path = "lets-verify-change"
+
+[[components.skills]]
+path = "lets-verify-ready"
+
+[[components.skills]]
+path = "lets-spec-to-pr"
+
+[[components.skills]]
+path = "lets-create-plan"
+
+[[components.skills]]
+path = "lets-brainstorm"
+
+[[components.skills]]
+path = "lets-onboard-repo"
+
+[[components.skills]]
+path = "lets-research-content-evaluate"
+
+[[components.skills]]
+path = "lets-research-competitive-scan"
+
+[[components.skills]]
+path = "lets-research-ux-walkthrough"
+
+[[components.skills]]
+path = "lets-research-prd-grooming"
+
+[[components.skills]]
+path = "lets-opportunity-discovery"
+
+[[components.skills]]
+path = "lets-assess-ai-readiness"
+

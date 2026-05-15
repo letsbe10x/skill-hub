@@ -23,6 +23,22 @@ Copy the skill directory into your IDE's skills folder:
 lets skill sync
 ```
 
+## Plugin Distribution (Optional)
+
+This repo is also a letsbe10x **plugin**. The plugin manifest path is `pack.toml`.
+
+```bash
+# Install from a local checkout
+lets plugin install .
+
+# (Optional) Sign the plugin manifest (writes a distribution block into pack.toml)
+lets plugin sign . --principal <your_principal_id>
+
+# (Optional) Enforce signed installs (writes an enterprise-default install-policy template)
+lets install-policy init --profile enterprise
+export L10X_ENTERPRISE_INSTALL_POLICY=~/.config/letsbe10x/install-policy.enterprise.toml
+```
+
 ## Skills
 
 ### SDLC
