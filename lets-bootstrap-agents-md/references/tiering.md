@@ -48,7 +48,7 @@ Every generated AGENTS.md (Tier 1 or 2, root or module) gets a sibling `CLAUDE.m
 @AGENTS.md
 ```
 
-This ensures Claude Code loads the same hierarchy as the `l10x` CLI.
+This ensures Claude Code loads the same hierarchy as the `lets` CLI.
 
 ## Freshness (update mode)
 

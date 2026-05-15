@@ -36,7 +36,7 @@ lets plugin sign . --principal <your_principal_id>
 
 # (Optional) Enforce signed installs (writes an enterprise-default install-policy template)
 lets install-policy init --profile enterprise
-export L10X_ENTERPRISE_INSTALL_POLICY=~/.config/letsbe10x/install-policy.enterprise.toml
+export LETS_ENTERPRISE_INSTALL_POLICY=~/.config/letsbe10x/install-policy.enterprise.toml
 ```
 
 ## Skills
@@ -75,7 +75,7 @@ export L10X_ENTERPRISE_INSTALL_POLICY=~/.config/letsbe10x/install-policy.enterpr
 ## Contributing
 
 1. Create a directory named `lets-<your-skill>/` with a `SKILL.md` file.
-2. The skill must be **platform-neutral** — no `l10x` CLI references, no runtime
+2. The skill must be **platform-neutral** — no `lets` CLI references, no runtime
    dependencies. Platform-specific hooks belong in
    [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 3. Include YAML frontmatter with at minimum: `name`, `description`, `metadata.author`,
