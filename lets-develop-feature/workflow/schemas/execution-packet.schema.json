@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Execution Packet (v2)",
+  "description": "Extended execution packet with stitch point declarations",
+  "type": "object",
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "2"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "intent": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "depends_on": { "type": "array", "items": { "type": "string" } },
+          "verification": { "type": "string" }
+        }
+      }
+    },
+    "stitch_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "component", "registration_type", "expected_at"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^ST[0-9]{3}$" },
+          "component": { "type": "string" },
+          "registration_type": { "type": "string", "enum": ["route", "factory", "config", "import"] },
+          "expected_at": { "type": "string" },
+          "pattern": { "type": "string" }
+        }
+      }
+    }
+  }
+}
