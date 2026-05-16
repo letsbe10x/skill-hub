@@ -108,6 +108,8 @@ outcome_runtime:
     - do_not_plan_without_approved_spec_or_inline_discovery
     - do_not_complete_package_without_updating_state
     - do_not_resume_without_validating_state_against_code
+    - do_not_mark_multi_repo_feature_complete_until_all_repos_delivered
+    - do_not_proceed_without_spec_file_on_disk
   required_decision_frames:
     - implementation_strategy
     - architecture_decision
@@ -123,6 +125,8 @@ outcome_runtime:
     - spec_alignment_gate
     - completion_quality_gate
     - state_consistency_gate
+    - spec_persistence_gate
+    - multi_repo_completeness_gate
   mutation_policy: additive_only
   human_checkpoint_triggers:
     - irreversible_mutation
@@ -258,10 +262,14 @@ control level (which you carry forward in context).
 
 ## Spec-Driven Mode
 
-After Phase 0, an approved spec MUST exist — either:
+After Phase 0, an approved spec MUST exist **as a file on disk** — either:
 - Pre-existing (user referenced it, or it was in `.lets/` / `lets spec`)
-- Produced by `lets-brainstorm` delegation
-- Produced inline during Phase 0 fallback
+- Produced by `lets-brainstorm` delegation (committed per brainstorm's Step 4)
+- Produced inline during Phase 0 fallback (written to `.lets/specs/` or `/tmp/`)
+
+**Hard gate:** If no spec file exists on disk at Stage 1 entry, STOP. A spec that only
+exists in conversation memory is not durable — context compaction will erase it, leaving
+downstream stages with nothing to verify against. Write it to a file first.
 
 The spec is the authority for WHAT and WHY. The execution packet is the authority for HOW.
 
@@ -525,6 +533,8 @@ See [references/SPEC-ALIGNMENT.md](references/SPEC-ALIGNMENT.md).
 | 16 | I will NOT begin planning without an approved spec (from delegation or inline discovery) |
 | 17 | I will NOT complete a package without updating run-state.md and story-tasks.md |
 | 18 | I will NOT resume a run without validating state against code reality |
+| 19 | I will NOT mark a multi-repo feature complete until every target repo has delivered packages |
+| 20 | I will NOT proceed to Stage 5 without a spec file on disk (conversation memory is not durable) |
 
 ---
 
@@ -586,6 +596,8 @@ The skill never blocks on a missing upstream skill. Required delegations have in
 - **Blocking on missing optional skills** — degrade gracefully, always
 - **Deferring state updates** — update run-state.md at the transition, not "later"
 - **Resuming without validation** — state file may be stale; always check against code
+- **Multi-repo features with single-repo packages** — if the spec says "core + control-plane + UI" but packages only cover one repo, the plan is incomplete. Enumerate ALL target repos.
+- **Treating conversation-only specs as durable** — context compaction erases conversation memory. If the spec isn't a file on disk, it doesn't exist for downstream stages.
 
 ---
 

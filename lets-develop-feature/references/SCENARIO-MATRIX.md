@@ -54,6 +54,28 @@ Boundary conditions, unusual but valid inputs, race conditions.
 | Time-sensitive? | Timezone edge, DST transition, leap year |
 | Null/missing? | Optional field absent vs. explicitly null |
 
+### Integration / End-to-End Flow
+Complete data paths that cross system boundaries (repos, services, processes). These are
+the scenarios most often missed because each individual component can pass its own tests
+while the full loop remains broken.
+
+| Question | Example |
+|----------|---------|
+| Full round-trip? | Client pushes data → server processes → client pulls result |
+| Cross-repo seam? | CLI calls HTTP API → server stores → CLI fetches and applies locally |
+| Approval loop? | User submits → operator approves → requester receives decision |
+| UI-to-backend? | Operator clicks approve → API updates state → next page load shows new status |
+| Transport exists? | Is there actual code connecting the two sides, or only matching schemas? |
+
+**When to require integration scenarios:**
+- Feature spec mentions 2+ repos or services
+- Feature has a request/response loop (push/pull, submit/approve, produce/consume)
+- Feature has a UI that renders data from a new API endpoint
+
+If the spec describes a multi-system flow but the scenario matrix has no integration
+scenario, the matrix is incomplete. Add at least one scenario that traces data from
+origin to final consumer.
+
 ## Matrix Format
 
 | # | Story | Scenario | Type | Input | Expected Output | Error Handling | Test Coverage | Task IDs |

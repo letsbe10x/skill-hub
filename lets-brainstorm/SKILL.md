@@ -134,6 +134,7 @@ Full Mode immediately.
 - **Staying in Light Mode when scope grows** — if you discover cross-boundary impact, escalate.
 - **Using superpowers:brainstorming inside letsbe10x** — this skill supersedes it.
 - **Routing before spec validation and user approval** — the spec gates are non-negotiable.
+- **Presenting design sections without writing the spec to disk** — the spec MUST be a committed file before routing. In-conversation agreement is not a spec. Context windows compact; files persist. If the spec only exists in conversation memory, it will be lost and downstream stages have nothing to verify against.
 
 ## When to Use
 
@@ -244,6 +245,15 @@ Use `assets/spec-template.md` as the starting structure. Fill every applicable s
 Use `assets/light-spec-template.md`. Required sections: Problem, Approach, Success Criteria, Testing Approach.
 
 ### Both modes
+
+**HARD GATE: The spec MUST be written to a file and committed.** A spec that exists only in
+conversation context is not a spec — it will be lost when context compacts, leaving downstream
+stages with nothing to verify against. Do not proceed to Step 5 until the file exists on disk.
+
+**Where to write:** Prefer the target repo's `.lets/specs/` directory or `ground-truth/features/`
+if the workspace has it. For multi-repo features, write to the repo where the spec has broadest
+scope (usually the workspace root or ground-truth). Fall back to `/tmp/<feature-slug>/spec.md`
+only if no repo context exists.
 
 Save the spec, then validate:
 ```bash

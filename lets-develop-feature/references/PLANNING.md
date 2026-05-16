@@ -111,12 +111,42 @@ Each work package is a self-contained unit of work:
 - Verification criteria (how we know it's done)
 - Requirement, story, or scenario mapping
 
+### Multi-Repo Scope Decomposition
+
+When the spec describes a feature spanning multiple repositories (e.g., runtime in `core/`,
+hosted surface in `control-plane/`, UI in a frontend repo), the execution packet MUST:
+
+1. **Enumerate every target repo** and its deliverables explicitly. Do not assume "we'll get
+   to the other repo later" — list it now, even if empty packages act as placeholders.
+2. **Group work packages by repo**, making the repo boundary a first-class dimension:
+
+```markdown
+#### core/ (packages 1–4)
+| # | Package | Files | ... |
+
+#### control-plane/ (packages 5–8)
+| # | Package | Files | ... |
+
+#### control-plane/ui/ (packages 9–10)
+| # | Package | Files | ... |
+```
+
+3. **Include integration packages** that cross the seam — e.g., "HTTP transport bridge: core
+   CLI calls control-plane API" — even if the individual repo packages could each pass tests
+   in isolation.
+4. **Flag the end-to-end scenario** that proves the full loop works across all repos (see
+   SCENARIO-MATRIX.md integration scenarios).
+
+If a feature's spec mentions N repos but the work packages only cover N-1, the plan is
+incomplete. Do not proceed to Stage 5 until all target repos have explicit packages.
+
 ### Work Package Ordering Principles
 
 1. **Risk-first:** High-risk packages early (fail fast)
 2. **Foundation-first:** Shared utilities before consumers
 3. **Test-first packages before test-after:** Establish invariants early
 4. **Critical path packages get extra attention:** More granular verification
+5. **Integration packages last:** Cross-boundary wiring after both sides are built
 
 ## Story Task Breakdown
 
@@ -147,12 +177,18 @@ The scenario matrix (see [SCENARIO-MATRIX.md](SCENARIO-MATRIX.md)) must be produ
 
 ### Minimum Coverage by Rigor
 
-| Rigor | Happy | Failure | Edge | Concurrency |
-|-------|-------|---------|------|-------------|
-| MINIMAL | — | — | — | — |
-| STANDARD | ≥1 | ≥1 | ≥1 | if applicable |
-| ELEVATED | comprehensive | comprehensive | comprehensive | if applicable |
-| FULL | comprehensive | comprehensive | comprehensive | required |
+| Rigor | Happy | Failure | Edge | Integration | Concurrency |
+|-------|-------|---------|------|-------------|-------------|
+| MINIMAL | — | — | — | — | — |
+| STANDARD | ≥1 | ≥1 | ≥1 | if multi-repo | if applicable |
+| ELEVATED | comprehensive | comprehensive | comprehensive | required if multi-repo | if applicable |
+| FULL | comprehensive | comprehensive | comprehensive | required | required |
+
+**Integration column:** If the spec touches 2+ repos or describes a request/response loop
+across system boundaries, at least one integration scenario is required at STANDARD+ rigor.
+This scenario must trace data from origin to final consumer (e.g., "client pushes → server
+processes → client pulls and applies"). Without it, individual components can pass their
+tests while the full loop remains unverified.
 
 ## Assumptions Log
 
