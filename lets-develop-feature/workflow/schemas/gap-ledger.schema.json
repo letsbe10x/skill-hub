@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gap Ledger",
+  "description": "Verification gap ledger for the implement→verify loop",
+  "type": "object",
+  "required": ["schema_version", "run_id", "gaps"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "run_id": { "type": "string" },
+    "iteration": { "type": "integer", "minimum": 1 },
+    "max_iterations": { "type": "integer", "minimum": 1 },
+    "carry_forward": {
+      "type": "object",
+      "properties": {
+        "passed_ids": { "type": "array", "items": { "type": "string" } },
+        "passed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "severity", "reference", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^G[0-9]{3}$" },
+          "type": { "type": "string", "enum": ["scenario_uncovered", "stitch_missing", "spec_unimplemented"] },
+          "severity": { "type": "string", "enum": ["minor", "structural"] },
+          "reference": { "type": "string" },
+          "description": { "type": "string" },
+          "context": {
+            "type": "object",
+            "properties": {
+              "expected_at": { "type": "string" },
+              "related_code": { "type": "string" },
+              "spec_section": { "type": "string" }
+            }
+          },
+          "fix_guidance": { "type": "string" },
+          "estimated_loc": { "type": ["integer", "null"] },
+          "status": { "type": "string", "enum": ["open", "resolved", "deferred"] },
+          "deferred_reason": { "type": "string" },
+          "deferred_anchor": { "type": "string" }
+        }
+      }
+    },
+    "re_verify_scope": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "enum": ["open", "resolved", "escalated"] }
+  }
+}

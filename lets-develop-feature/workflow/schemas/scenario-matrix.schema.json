@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scenario Matrix",
+  "description": "Structured scenario coverage matrix for verification gates",
+  "type": "object",
+  "required": ["schema_version", "scenarios"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "type"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^S[0-9]{3}$" },
+          "story": { "type": "string" },
+          "description": { "type": "string" },
+          "type": { "type": "string", "enum": ["happy", "failure", "edge"] },
+          "input": { "type": "string" },
+          "expected_output": { "type": "string" },
+          "test_pattern": { "type": "string" },
+          "task_ids": { "type": "array", "items": { "type": "string" } },
+          "package_id": { "type": "string" }
+        }
+      }
+    }
+  }
+}

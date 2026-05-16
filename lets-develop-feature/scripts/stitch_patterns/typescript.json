@@ -1,0 +1,26 @@
+{
+  "language": "typescript",
+  "file_extensions": [".ts", ".tsx"],
+  "registration_patterns": {
+    "route": {
+      "patterns": [
+        "router\\.(get|post|put|delete|patch|use)\\(",
+        "createRoute|registerRoute|app\\.(get|post|use)",
+        "Route.*path=|<Route"
+      ],
+      "files": ["routes.ts", "router.ts", "app.ts", "index.ts", "routes.tsx"]
+    },
+    "factory": {
+      "patterns": ["register\\(|bind\\(|provide\\(|useValue|useClass"],
+      "files": ["container.ts", "providers.ts", "module.ts", "index.ts"]
+    },
+    "config": {
+      "patterns": ["plugins.*:|modules.*:|providers.*:"],
+      "files": ["config.ts", "app.module.ts", "next.config.ts"]
+    },
+    "import": {
+      "patterns": ["^import |^export "],
+      "files": ["index.ts", "index.tsx", "barrel.ts"]
+    }
+  }
+}

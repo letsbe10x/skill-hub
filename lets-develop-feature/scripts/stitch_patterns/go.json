@@ -1,0 +1,26 @@
+{
+  "language": "go",
+  "file_extensions": [".go"],
+  "registration_patterns": {
+    "route": {
+      "patterns": [
+        "mux\\.Handle|r\\.(GET|POST|PUT|DELETE|PATCH)",
+        "gin\\.Group|echo\\.Group|chi\\.Route",
+        "http\\.HandleFunc|ServeMux"
+      ],
+      "files": ["routes.go", "router.go", "main.go", "server.go"]
+    },
+    "factory": {
+      "patterns": ["wire\\.Build|Register\\(|Provide\\("],
+      "files": ["wire.go", "container.go", "providers.go", "main.go"]
+    },
+    "config": {
+      "patterns": ["viper\\.|config\\."],
+      "files": ["config.go", "main.go"]
+    },
+    "import": {
+      "patterns": ["import \\("],
+      "files": ["*.go"]
+    }
+  }
+}

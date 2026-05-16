@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Spec Requirements",
+  "description": "Structured requirements extracted from the spec for verification",
+  "type": "object",
+  "required": ["schema_version", "requirements"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^R[0-9]{3}$" },
+          "source": { "type": "string" },
+          "description": { "type": "string" },
+          "acceptance_criteria": { "type": "string" },
+          "testable": { "type": "boolean", "default": true },
+          "task_ids": { "type": "array", "items": { "type": "string" } },
+          "package_id": { "type": "string" },
+          "code_patterns": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "language": "python",
+  "file_extensions": [".py"],
+  "registration_patterns": {
+    "route": {
+      "patterns": [
+        "app\\.route|router\\.add|urlpatterns.*path\\(",
+        "include\\(|register.*blueprint|add_url_rule"
+      ],
+      "files": ["routes.py", "urls.py", "app.py", "__init__.py"]
+    },
+    "factory": {
+      "patterns": ["register\\(|bind\\(|provide\\("],
+      "files": ["factory.py", "container.py", "providers.py", "__init__.py"]
+    },
+    "config": {
+      "patterns": ["INSTALLED_APPS|MIDDLEWARE|plugins.*="],
+      "files": ["settings.py", "config.py", "conf.py"]
+    },
+    "import": {
+      "patterns": ["^from.*import|^import "],
+      "files": ["__init__.py"]
+    }
+  }
+}

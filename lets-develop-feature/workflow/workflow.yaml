@@ -32,8 +32,35 @@ stages:
     title: "Stage 7: Write/run verification"
   - id: "verify"
     title: "Stage 8: Evidence gate"
+    gate:
+      scripts:
+        - path: scripts/verify_scenarios.py
+          args: ["${run_dir}/scenario-matrix.json", "${repo_root}"]
+          intensity: ["STANDARD", "ELEVATED", "FULL"]
+        - path: scripts/verify_stitch.py
+          args: ["${run_dir}/execution-packet.json", "${repo_root}"]
+          intensity: ["STANDARD", "ELEVATED", "FULL"]
+        - path: scripts/verify_spec_coverage.py
+          args: ["${run_dir}/spec-requirements.json", "${repo_root}"]
+          intensity: ["ELEVATED", "FULL"]
+      on_fail: loop_back
+      loop_target: implement
+      max_iterations: 2
+      carry_forward: true
+      deferral_policy:
+        MINIMAL:
+          max_deferred: null
+        STANDARD:
+          max_deferred: 3
+          severity_allowed: ["minor"]
+        ELEVATED:
+          max_deferred: 1
+          severity_allowed: ["minor"]
+        FULL:
+          max_deferred: 0
   - id: "complete"
     title: "Stage 9: Handoff to verify-change"
+    requires: ["verify.passed"]
 
 artifacts:
   # State management (STANDARD+ — the resumability anchor)
@@ -77,3 +104,20 @@ artifacts:
     path: "upstream/"
     required_for: []
     description: "Artifacts from delegated skills — write if received"
+  # Structured JSON artifacts for verification loop
+  - id: "scenario_matrix_json"
+    path: "scenario-matrix.json"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+    description: "Machine-readable scenario matrix consumed by verify_scenarios.py"
+  - id: "execution_packet_json"
+    path: "execution-packet.json"
+    required_for: ["STANDARD", "ELEVATED", "FULL"]
+    description: "Machine-readable execution packet with stitch points consumed by verify_stitch.py"
+  - id: "spec_requirements_json"
+    path: "spec-requirements.json"
+    required_for: ["ELEVATED", "FULL"]
+    description: "Machine-readable spec requirements consumed by verify_spec_coverage.py"
+  - id: "gap_ledger"
+    path: "gap-ledger.json"
+    required_for: []
+    description: "Produced only when verification gaps exist — drives the loop-back protocol"
