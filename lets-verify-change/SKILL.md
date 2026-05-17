@@ -68,6 +68,21 @@ Produces a structured gap ledger when gaps exist, enabling scoped loop-back to i
 
 ---
 
+# lets-verify-change
+
+The completeness gate for feature delivery. Runs mechanical scripts + test suite + semantic
+checks to verify that the implementation is complete, correctly wired, and aligned to the spec.
+Produces a structured gap ledger when gaps exist, enabling scoped loop-back to implementation.
+
+**This skill is NOT "run tests again." It answers:**
+1. Are all scenarios from the matrix covered by tests?
+2. Are all components wired together (registered, imported, connected)?
+3. Are all spec requirements implemented with evidence?
+4. Does the test suite pass?
+5. Do semantic spot-checks confirm the tests verify actual intent?
+
+---
+
 ## Verification Law
 
 **NO COMPLETION CLAIM WITHOUT FRESH VERIFICATION RUN.**
