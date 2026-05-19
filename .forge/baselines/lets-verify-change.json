@@ -1,0 +1,60 @@
+{
+  "skill": "lets-verify-change",
+  "updated": "2026-05-19T09:25:17.814905+00:00",
+  "eval_mode": "full_test",
+  "structural_score": 0.847,
+  "effectiveness_score": 0.0,
+  "composite_score": 0.3388,
+  "dimensions": {
+    "S1": {
+      "score": 1.0,
+      "notes": "has frontmatter; name present; description present; description mentions when/trigger; description \u22641024 chars",
+      "eval_mode": "full_test"
+    },
+    "S2": {
+      "score": 1.0,
+      "notes": "'when to use' present; 'when NOT to use' present; both sides defined",
+      "eval_mode": "full_test"
+    },
+    "S3": {
+      "score": 1.0,
+      "notes": "output spec present; 'done' defined",
+      "eval_mode": "full_test"
+    },
+    "S4": {
+      "score": 0.5,
+      "notes": "numbered steps",
+      "eval_mode": "full_test"
+    },
+    "S5": {
+      "score": 0.6,
+      "notes": "code block present; specific values/formats present",
+      "eval_mode": "full_test"
+    },
+    "S6": {
+      "score": 1.0,
+      "notes": "checkpoint gate present; explicit y/n confirmation",
+      "eval_mode": "full_test"
+    },
+    "S7": {
+      "score": 1.0,
+      "notes": "conditional error handling; fallback path; recovery described",
+      "eval_mode": "full_test"
+    },
+    "S8": {
+      "score": 1.0,
+      "notes": "not an investigation/verification skill; check skipped",
+      "eval_mode": "full_test"
+    },
+    "S9": {
+      "score": 1.0,
+      "notes": "anti-patterns section with 7 named items",
+      "eval_mode": "full_test"
+    }
+  },
+  "hard_gates": {
+    "HG1": "pass",
+    "HG2": "pass",
+    "HG3": "pass"
+  }
+}
