@@ -1,9 +1,9 @@
 ---
 name: lets-verify-change
-description: "Completeness gate: runs mechanical verification scripts (scenario coverage, stitch checks, spec alignment) + test suite, produces gap ledger on failure, and enables loop-back to lets-develop-feature for scoped fixes. Do not invoke without implementation being complete."
+description: "Use when implementation is complete and you need a fidelity gate: verify the change matches the spec/PRD and plan, is correctly wired, and passes completeness scripts + tests + smoke checks; produces a gap ledger + scoped loop-back to lets-develop-feature."
 metadata:
   author: cogsmith-ai
-  version: "2.0.0"
+  version: "2.1.0"
   tags: [testing, verification, delivery, completeness, enforcement]
 lifecycle: published
 source: https://github.com/letsbe10x/skills/blob/main/lets-verify-change/SKILL.md
@@ -51,7 +51,7 @@ outcome_runtime:
     - structural_gap_discovered
 ---
 
-> **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `l10x` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
+> **Note:** This is the standalone version. For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), use the `lets` profile from [skill-overlay](https://github.com/letsbe10x/skill-overlay).
 
 # lets-verify-change
 
@@ -62,24 +62,10 @@ Produces a structured gap ledger when gaps exist, enabling scoped loop-back to i
 **This skill is NOT "run tests again." It answers:**
 1. Are all scenarios from the matrix covered by tests?
 2. Are all components wired together (registered, imported, connected)?
-3. Are all spec requirements implemented with evidence?
+3. Are the PRD/spec requirements implemented with evidence (and no requirement drift)?
 4. Does the test suite pass?
-5. Do semantic spot-checks confirm the tests verify actual intent?
-
----
-
-# lets-verify-change
-
-The completeness gate for feature delivery. Runs mechanical scripts + test suite + semantic
-checks to verify that the implementation is complete, correctly wired, and aligned to the spec.
-Produces a structured gap ledger when gaps exist, enabling scoped loop-back to implementation.
-
-**This skill is NOT "run tests again." It answers:**
-1. Are all scenarios from the matrix covered by tests?
-2. Are all components wired together (registered, imported, connected)?
-3. Are all spec requirements implemented with evidence?
-4. Does the test suite pass?
-5. Do semantic spot-checks confirm the tests verify actual intent?
+5. Does a dry-run / smoke path confirm the real user journey works?
+6. Do semantic spot-checks confirm the tests verify actual intent?
 
 ---
 
@@ -135,10 +121,12 @@ different orchestrator.
 
 | Input | Source | Required |
 |-------|--------|----------|
-| Run directory | `lets run list` or `.lets/runs/lets-develop-feature/latest` | Yes |
+| Run directory | `lets run list` or an on-disk run directory produced by develop-feature | Yes |
 | `scenario-matrix.json` | Produced by develop-feature Stage 3 | For STANDARD+ |
 | `execution-packet.json` | Produced by develop-feature Stage 3 | For STANDARD+ |
 | `spec-requirements.json` | Produced by develop-feature Stage 3 | For ELEVATED+ |
+| Spec / PRD feature key (optional) | `LETSBE10X_SPEC_FEATURE_KEY` or run metadata | Strongly recommended |
+| Implementation plan (optional) | Approved plan or packet referenced by the run | Recommended |
 | Rigor level | From run-state.json or classification | Yes |
 | Repo root | Working directory | Yes |
 | Previous gap ledger (on loop-back) | From prior verification iteration | On re-entry |
@@ -161,7 +149,7 @@ Read from run directory:
 
 ### Mode B (standalone):
 
-Read from the run directory (`.lets/runs/lets-develop-feature/latest/`):
+Read from the run directory (for example: .lets/runs/lets-develop-feature/latest/):
 - `run-state.json` → rigor level, current iteration
 - `scenario-matrix.json`, `execution-packet.json`, `spec-requirements.json`
 - `gap-ledger.json` (if exists) → loop-back re-entry
@@ -186,6 +174,68 @@ with reduced verification or go back to produce them.
 
 ---
 
+## Phase 1.5 — Fidelity Gate (PRD / Spec / Plan / Scope)
+
+This phase prevents “tests pass” from being mistaken for “we shipped the right thing”.
+
+### 1) Identify the truth source
+
+Pick exactly one “truth anchor” for the change:
+
+- If you have a ground-truth feature key: use it (preferred).
+- Else use the approved PRD/spec document provided by the user.
+
+If you have neither: stop and ask the user for the PRD/spec reference before proceeding.
+
+### 2) Validate the spec surface (when a feature key exists)
+
+Mode A only (core present): if a feature key is available, run:
+
+```bash
+lets run spec_feature "$SPEC_FEATURE_KEY" --mode plan --json
+```
+
+If this fails or reports missing required fields, stop and resolve the spec issue before
+claiming verification.
+
+### 3) Check plan/packet fidelity (no requirement drift)
+
+Confirm that `spec-requirements.json` is a faithful projection of the PRD/spec, not a
+re-stated version of the implementation. Minimum check:
+
+- Every requirement has a stable ID.
+- The requirement text matches the PRD/spec intent (not “what we built”).
+- Any “out of scope” items are explicitly marked as such (not silently omitted).
+
+If any of these fail, record a structural gap and loop back — the verification surface is invalid.
+
+### 3b) Plan dry-run (optional, Mode A)
+
+If the implementation plan was generated via `lets plan`, re-run the planner in dry-run mode to
+detect spec drift (the plan should still describe the same work packages at the same scope):
+
+```bash
+lets plan --repo-root "$REPO_ROOT" --dry-run --format json "YOUR_ORIGINAL_REQUEST_TEXT"
+```
+
+If the dry-run plan no longer matches the packet’s scope, treat it as a fidelity gap (`plan_drift`).
+
+### 4) Check scope drift (diff matches the packet)
+
+Compare the actual changed file list to what the execution packet expects:
+
+```bash
+# Actual change surface (working tree)
+git diff --name-only
+
+# Expected surface (from packet)
+jq -r '.work_packages[].files[]' "$RUN_DIR/execution-packet.json" | sort -u
+```
+
+If files changed outside the packet, treat it as a fidelity gap (`scope_drift`) and loop back.
+
+---
+
 ## Phase 2 — Run Gate Scripts (Mechanical Verification)
 
 ### Intensity filtering
@@ -201,13 +251,16 @@ Only run scripts appropriate for the current rigor level:
 ### Mode A (core present):
 
 ```bash
-lets run exec verify-change \
+lets run exec verify_change \
   --repo-root $REPO_ROOT \
   --state-root $STATE_ROOT \
   --format json
 ```
 
 Core's `VerificationGate` runs the scripts and returns the aggregated result.
+
+If you have a feature key, run the same command with `--spec-feature-key "$SPEC_FEATURE_KEY"` so
+the run is linked to the ground-truth spec snapshot.
 
 ### Mode B (standalone):
 
@@ -259,6 +312,22 @@ Capture full output. Do not skim or scroll past failures.
 
 **Test failures are fixed in-place** (not via the loop protocol). The loop is for
 completeness gaps, not broken code.
+
+---
+
+## Phase 3.5 — Dry-run / Smoke (Fidelity in the Real System)
+
+Tests can pass while the real user journey is broken. Run at least one “realistic” command:
+
+- FULL rigor: mandatory.
+- STANDARD/ELEVATED: run when the change touches wiring, CLI flags, routing, or I/O.
+
+Select the best available smoke command, in this order:
+1. A repo-provided smoke target (e.g., `make smoke`, `npm run smoke`, `uv run python -m ... smoke`)
+2. An integration test subset that exercises the primary flow
+3. A CLI/app dry-run path (if supported) or one representative end-to-end invocation
+
+Record: the exact command(s) and the observed output/exit code.
 
 ---
 
@@ -336,7 +405,7 @@ Aggregate all gaps from script results + semantic checks into a single `gap-ledg
 ```json
 {
   "schema_version": "1",
-  "run_id": "<current-run-id>",
+  "run_id": "RUN-2026-05-16-001",
   "iteration": 1,
   "max_iterations": 2,
   "carry_forward": {
@@ -349,7 +418,7 @@ Aggregate all gaps from script results + semantic checks into a single `gap-ledg
 }
 ```
 
-Write to `$RUN_DIR/gap-ledger.json`.
+Write to RUN_DIR/gap-ledger.json.
 
 ### Step 2: Present gaps to user
 
@@ -431,9 +500,9 @@ When verification passes, proceed to `lets-review-code`.
 
 ### Mode A:
 ```bash
-lets run exec review-change \
-  --repo-root $REPO_ROOT \
-  --state-root $STATE_ROOT
+lets run exec review_change \
+	  --repo-root $REPO_ROOT \
+	  --state-root $STATE_ROOT
 ```
 
 ### Mode B:
@@ -488,6 +557,7 @@ lets-verify-change
 ## Anti-patterns
 
 - **Running tests without gate scripts** — tests prove code correctness, not completeness
+- **Skipping the PRD/spec fidelity gate** — if the truth source is unclear, verification is not possible
 - **Skipping semantic checks at ELEVATED+ rigor** — a test that asserts nothing is worse than no test
 - **Deferring structural gaps** — structural gaps (requirement not implemented) should loop back, not defer
 - **Re-running full verification on loop-back** — incremental mode checks only the gap scope
@@ -527,6 +597,7 @@ lets-verify-change
 All of the following are true:
 - Gate scripts pass (or no applicable scripts at this rigor level)
 - Test suite passes (or documented skip)
+- Dry-run / smoke checks run when required (FULL, or wiring/I/O changes)
 - Semantic checks pass threshold (or rigor doesn't require them)
 - No open structural gaps remain
 - All deferred gaps are within policy
