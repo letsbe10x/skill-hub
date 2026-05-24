@@ -97,6 +97,7 @@ npx github:letsbe10x/skill-hub install engineering --agent cursor
 | "Compare competitors" | `lets-research-competitive-scan` |
 | "Evaluate copy or messaging" | `lets-research-content-evaluate` |
 | "Walk through a UX flow and log friction" | `lets-research-ux-walkthrough` |
+| "Generate a CLI for Splunk / NewRelic / any tool" | `lets-generate-cli` |
 
 ## Suggested Skill Sets
 
@@ -161,6 +162,7 @@ For product strategy, PRDs, UX, and messaging:
 | `lets-research-competitive-scan` | Draft | Competitive scan |
 | `lets-research-content-evaluate` | Draft | Content evaluation |
 | `lets-research-ux-walkthrough` | Draft | UX walkthrough |
+| `lets-generate-cli` | Published | Generate an agent-native CLI for any tool (REST, GraphQL, stateful, process, GUI) |
 
 ## Contributing
 

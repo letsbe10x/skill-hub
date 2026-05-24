@@ -26,6 +26,7 @@ const bundles = {
     "lets-research-prd-grooming",
     "lets-opportunity-discovery",
     "lets-assess-ai-readiness",
+    "lets-generate-cli",
   ],
   engineering: [
     "lets-start-here",
