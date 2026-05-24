@@ -52,7 +52,7 @@ shows up in generated code when an agent rushes.
 
 ## Documentation
 
-- **Skipping the generated `SKILL.md`.** Phase 9 is not optional. Without it, the new CLI is invisible to downstream agents.
+- **Shipping commands with empty or boilerplate `--help` text.** The CLI is its own discoverability surface; every command and subcommand needs a meaningful docstring/help body so an agent can pick the right call without external docs.
 - **Documenting features that don't exist.** README claims drive support tickets when they don't match behavior.
 - **Generic install instructions.** Document the actual install command for the user's likely environment.
 
