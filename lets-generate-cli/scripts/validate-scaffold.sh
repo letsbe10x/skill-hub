@@ -28,7 +28,7 @@ warn() { echo "⚠ $1"; }
 fail() { echo "✗ $1" >&2; fail=$((fail + 1)); }
 
 # Required top-level files
-for f in pyproject.toml README.md SKILL.md; do
+for f in pyproject.toml README.md; do
   if [ -f "$f" ]; then pass "$f present"; else fail "$f missing"; fi
 done
 

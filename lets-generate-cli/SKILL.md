@@ -1,6 +1,6 @@
 ---
 name: lets-generate-cli
-description: "Use when generating a working, agent-native CLI for any target tool — REST API, GraphQL API, stateful workflow, process-backed tool, or GUI app. The agent follows a structured 8-phase methodology to produce an installable Python package with Typer commands, an HTTP/process client, JSON output, --dry-run support, tests, and a SKILL.md for downstream agent use."
+description: "Use when generating a working, agent-native CLI for any target tool — REST API, GraphQL API, stateful workflow, process-backed tool, or GUI app. The agent follows a structured methodology to produce an installable Python package with Typer commands, an HTTP/process client, JSON output, --dry-run support, and tests. Discoverability is handled by the CLI's own --help surface."
 metadata:
   author: letsbe10x
   version: "0.1.0"
@@ -36,11 +36,12 @@ discovery_signals:
 
 This skill turns any tool — a SaaS API, an internal platform, a desktop
 application, a CLI wrapper, a stateful workflow engine — into an agent-operable
-command-line interface. The agent reads a documented 8-phase generation
-protocol and writes a real, installable Python package: Typer CLI, HTTP or
-process client, `--json` output on every command, `--dry-run` for safety, an
-agent-facing `SKILL.md` for the generated CLI, and tests that exercise the real
-shape (fixture HTTP server, request-plan assertion, or recorded responses).
+command-line interface. The agent reads a documented generation protocol and
+writes a real, installable Python package: Typer CLI, HTTP or process client,
+`--json` output on every command, `--dry-run` for safety, rich `--help` text on
+every command and subcommand for agent/LLM discoverability, and tests that
+exercise the real shape (fixture HTTP server, request-plan assertion, or
+recorded responses).
 
 The skill is **methodology-driven**, not template-driven. The agent makes
 target-specific judgement calls (auth quirks, pagination, response shapes,
@@ -89,7 +90,6 @@ stateful workflows, headless backends) using the patterns in
 | Installable Python package | `<output-dir>/` with `pyproject.toml`, `src/<package>/`, `tests/` | Python source + `pyproject.toml` |
 | CLI entrypoint | `<output-dir>/src/<package>/cli.py` | Typer app with one command per capability |
 | Upstream client | `<output-dir>/src/<package>/client.py` (REST/GraphQL) or `adapters/<tool>_backend.py` (process/GUI) | Python module |
-| Generated `SKILL.md` | `<output-dir>/SKILL.md` | Agent-facing skill file for the generated CLI |
 | Generated `README.md` | `<output-dir>/README.md` | Human-facing install + usage docs |
 | Test suite | `<output-dir>/tests/` | At minimum: contract test, request-plan test, fixture-server test |
 | `cligen.blueprint.json` (optional) | `<output-dir>/cligen.blueprint.json` | Typed JSON description of the CLI's commands, capabilities, auth, integration kind |
@@ -105,7 +105,7 @@ stateful workflows, headless backends) using the patterns in
 5. Agent adds NewRelic quirks: `Api-Key` header, GraphQL cursor pagination, response unwrapping at `data.actor`.
 6. Agent writes tests: contract test, request-plan test on a few commands, fixture-server test using `pytest-httpserver` with canned NerdGraph responses.
 7. Agent runs `pytest tests -q` from the output directory; all green.
-8. Agent emits a `SKILL.md` for the generated CLI so downstream agents can discover and call it.
+8. Agent verifies discoverability: every command and subcommand has rich `--help` text so an agent can introspect the CLI without external docs.
 
 Result: `~/newrelic-cli/` is an installable package. `pip install -e . && newrelic --help` works. Commands have `--json --dry-run`. Tests pass against a fixture.
 
@@ -121,8 +121,7 @@ The full protocol lives in [`references/generation-protocol.md`](references/gene
 6. **Handle target quirks.** Centralize in the client: default query params, response unwrapping, pagination, rate-limit retries, auth header customization.
 7. **Build workflow orchestrators.** For stateful targets (Splunk-like search jobs), add a top-level `run` command that drives create → poll → fetch end-to-end.
 8. **Write tests.** Contract test (auto-pattern), request-plan tests for API commands, fixture-server tests for response-parsing paths, workflow tests for orchestrators.
-9. **Emit the generated SKILL.md.** So downstream agents can discover and use the new CLI as an Agent Skill in their own workflows.
-10. **Verify.** Run `pytest tests -q` from the output dir. Run `pip install -e . && <cli-name> --help`. Confirm every command lists, every command has `--json`, every mutating command has `--dry-run`.
+9. **Verify.** Run `pytest tests -q` from the output dir. Run `pip install -e . && <cli-name> --help`. Confirm every command lists, every command has `--json`, every mutating command has `--dry-run`, and every command/subcommand has a meaningful `--help` body.
 
 ## Outputs
 
@@ -132,7 +131,6 @@ The generated package directory contains:
 <output-dir>/
 ├── pyproject.toml                  # installable Python package config
 ├── README.md                       # human-facing install + usage docs
-├── SKILL.md                        # agent-facing skill file
 ├── cligen.blueprint.json           # (optional) typed CLI description
 ├── src/<package>/
 │   ├── __init__.py
@@ -179,6 +177,6 @@ This skill is a **gate** for CLI generation. When invoked, the agent must:
 - **Never emit code without the corresponding entry in the blueprint** (if a blueprint is being used). The blueprint and the code must stay in sync.
 - **Never ship a generated CLI without at least one passing test** beyond the auto-generated contract test.
 - **Never expose a stateful API as raw endpoints** without also adding a workflow orchestrator command.
-- **Never skip the generated `SKILL.md`** — the whole point is that the new CLI is itself agent-discoverable.
+- **Never ship a command without meaningful `--help` text.** The generated CLI is its own discoverability surface — every command and subcommand must carry a docstring/help body that an agent can read to pick the right call without external docs.
 
 If any of the above can't be honored, stop and explain to the user why.

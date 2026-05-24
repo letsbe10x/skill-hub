@@ -171,37 +171,7 @@ tests/
 
 All green: `pytest tests -q` → 12 passed.
 
-### Phase 9 — Generated SKILL.md
-
-```yaml
----
-name: newrelic
-description: "Agent-native CLI for NewRelic. Wraps NerdGraph (GraphQL) for entities, alerts, dashboards, and arbitrary queries."
-metadata:
-  version: "0.1.0"
-  tags: [graphql, observability, newrelic, monitoring]
-lifecycle: published
-compatibility:
-  agents: [claude-code, cursor, codex, copilot]
-triggers:
-  - "query newrelic"
-  - "list newrelic alerts"
-  - "create newrelic alert"
-  - "search newrelic entities"
----
-
-# newrelic
-
-Agent-native CLI for NewRelic. Reads `NEW_RELIC_API_KEY` from env. All commands
-support `--json`. Mutating commands support `--dry-run`.
-
-## Steps
-1. `export NEW_RELIC_API_KEY=NRAK-...`
-2. `newrelic --help`
-3. `newrelic nerdgraph-query --query '{ actor { user { email } } }' --json`
-```
-
-### Phase 10 — Verify
+### Phase 9 — Verify
 
 ```bash
 cd ~/newrelic-cli

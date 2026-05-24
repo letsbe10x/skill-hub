@@ -1,11 +1,11 @@
 # Generation Protocol
 
-The full 8-phase methodology for generating an agent-native CLI for any target.
+The full 9-phase methodology for generating an agent-native CLI for any target.
 The agent reads this end-to-end before starting a generation run.
 
 ## Operating Contract
 
-Every generation run follows these 8 phases in order. Skipping a phase requires
+Every generation run follows these 9 phases in order. Skipping a phase requires
 explicit user permission and a one-line note in the generated `README.md`
 explaining why.
 
@@ -82,7 +82,7 @@ Create the minimal installable skeleton before writing real commands:
 ```
 <output-dir>/
 ├── pyproject.toml          # package config, deps (typer, httpx, etc.)
-├── README.md               # placeholder; fills in Phase 9
+├── README.md               # placeholder; fills in once commands are wired
 ├── src/<package>/
 │   ├── __init__.py
 │   ├── cli.py              # Typer app, command stubs
@@ -150,50 +150,7 @@ Every command must have tests beyond the contract floor. See [`testing-guide.md`
 
 Run from the output dir: `pytest tests -q`. All green before declaring done.
 
-### Phase 9 — Emit the Generated SKILL.md
-
-Every generated CLI ships with an Agent Skills–compatible `SKILL.md` so downstream agents can discover and invoke it. Use this template:
-
-```yaml
----
-name: <cli-name>
-description: "Agent-native CLI for <display-name>. <One-line summary of what the tool does.>"
-metadata:
-  version: "0.1.0"
-  tags: [<integration-kind>, <domain>]
-lifecycle: published
-compatibility:
-  agents: [claude-code, cursor, codex, copilot]
-triggers:
-  - "<verb> <noun> in <display-name>"
-  - "query <display-name>"
-  - "use <display-name> to <action>"
----
-
-# <cli-name>
-
-## Overview
-<What this CLI does, what it wraps, what auth it needs.>
-
-## When to Use
-- <Concrete scenarios where an agent should reach for this CLI.>
-
-## Inputs and Outputs
-- Auth: <env var or auth flow>
-- Output: every command emits JSON via `--json`
-- Dry-run: every mutating command supports `--dry-run`
-
-## Steps
-1. Ensure auth is configured: `export <ENV_VAR>=...`
-2. List commands: `<cli-name> --help`
-3. Run a command: `<cli-name> <command> --json`
-
-## Anti-patterns
-- **<anti-pattern 1>** — <reason>
-- **<anti-pattern 2>** — <reason>
-```
-
-### Phase 10 — Verify
+### Phase 9 — Verify
 
 Final checks before declaring done:
 
@@ -217,4 +174,4 @@ If any step fails, fix it. Do not declare done.
 6. **No secrets in logs, docs, examples, tests, or blueprints.** Redact at source.
 7. **No silent failures.** Missing binary / missing env var → fail loud with the fix in the message.
 8. **Tests prove behavior, not coverage.** Contract test is floor, not ceiling.
-9. **Generated CLI ships with its own SKILL.md.** Phase 9 is not optional.
+9. **Every command and subcommand has meaningful `--help` text.** The CLI is its own discoverability surface — an agent must be able to introspect it (`<cli> --help`, `<cli> <cmd> --help`) and pick the right call without external docs.
