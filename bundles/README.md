@@ -8,9 +8,14 @@ using the `npx` installer or by copying skill directories manually.
 
 | Bundle | Purpose | Install |
 |--------|---------|---------|
+| starter | First-time setup — intent routing + repo bootstrap | `npx github:letsbe10x/skill-hub install starter --agent cursor` |
 | engineering | Code delivery, review, verification | `npx github:letsbe10x/skill-hub install engineering --agent cursor` |
+| sdlc | Engineering subset focused on the change loop | `npx github:letsbe10x/skill-hub install sdlc --agent cursor` |
 | pm | PRDs, acceptance criteria, opportunities | `npx github:letsbe10x/skill-hub install pm --agent cursor` |
 | design | Design briefs, UX flows, content | `npx github:letsbe10x/skill-hub install design --agent cursor` |
+| research | Competitive scan, content eval, UX, PRD grooming, opportunities | `npx github:letsbe10x/skill-hub install research --agent cursor` |
+| repo-readiness | Score + bootstrap a repo for AI readiness | `npx github:letsbe10x/skill-hub install repo-readiness --agent cursor` |
+| all | Every skill in the repo | `npx github:letsbe10x/skill-hub install all --agent cursor` |
 
 Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
 `--agent copilot`.
@@ -34,6 +39,9 @@ When you install a bundle manually:
 
 ## Per-bundle docs
 
+- [starter.md](starter.md) — First-time setup
 - [engineering.md](engineering.md) — Code delivery workflows
 - [pm.md](pm.md) — Product management workflows
 - [design.md](design.md) — Design workflows
+- [research.md](research.md) — Cross-functional research workflows
+- [repo-readiness.md](repo-readiness.md) — AI-readiness assessment + bootstrap
