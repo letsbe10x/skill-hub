@@ -1,38 +1,35 @@
 # Workflow Bundles
 
-Bundles group related workflows for one-command installation.
+Bundles group related workflows so users can choose a practical starter set.
+They are documentation-level groupings in this standalone repo: install them by
+copying the listed skill directories or by using the `Makefile` targets.
 
 ## Available bundles
 
-| Bundle | Purpose | Install |
+| Bundle | Purpose | Starter install |
 |--------|---------|---------|
-| engineering | Code delivery, review, verification | `lets install engineering` |
-| pm | PRDs, acceptance criteria, opportunities | `lets install pm` |
-| design | Design briefs, UX flows, content | `lets install design` |
-| pgm | Milestones, risks, release planning | `lets install pgm` |
+| engineering | Code delivery, review, verification | `make sdlc PLATFORM=cursor` |
+| pm | PRDs, acceptance criteria, opportunities | `make research PLATFORM=cursor` |
+| design | Design briefs, UX flows, content | `make lets-research-ux-walkthrough lets-research-content-evaluate PLATFORM=cursor` |
 
-## Customizing with kits
+Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
 
-Kits add domain-specific Rules/Guardrails to a bundle:
+## Manual install
 
 ```bash
-lets install engineering --with stack.python
-lets install engineering --with domain.healthcare
+mkdir -p ~/.cursor/skills
+cp -R lets-start-here ~/.cursor/skills/
+cp -R lets-create-plan ~/.cursor/skills/
 ```
-
-See `lets kit status` for enabled kits.
 
 ## Bundle composition
 
-When you install a bundle, the runtime:
+When you install a bundle manually:
 
-1. Resolves all member workflows (skills)
-2. Resolves requested kits and their dependencies
-3. Writes a deterministic lockfile
-4. Installs skills to your agent host
-
-Kits compose through an 8-layer fixed order — later layers can tighten
-policy but never loosen it.
+1. Pick the bundle doc.
+2. Copy each listed skill directory into your agent's skills directory.
+3. Restart or reload the agent if your host requires it.
+4. Invoke the skill by name or let the agent select it from context.
 
 ## Per-bundle docs
 

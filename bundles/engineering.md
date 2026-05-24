@@ -5,9 +5,10 @@ The engineering bundle installs workflows for the full code delivery lifecycle.
 ## Install
 
 ```bash
-lets install engineering
-lets install engineering --with stack.python
+make sdlc PLATFORM=cursor
 ```
+
+Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
 
 ## Included workflows
 

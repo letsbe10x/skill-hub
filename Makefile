@@ -32,8 +32,7 @@ endef
   lets-review-code lets-review-pr lets-verify-change lets-verify-ready \
   lets-spec-to-pr lets-create-plan lets-brainstorm lets-onboard-repo \
   lets-research-content-evaluate lets-research-competitive-scan \
-  lets-research-ux-walkthrough lets-research-prd-grooming lets-opportunity-discovery \
-  lets-audit-repo lets-author-skill
+  lets-research-ux-walkthrough lets-research-prd-grooming lets-opportunity-discovery
 
 lets-start-here:            $(call install_skill,lets-start-here)
 lets-bootstrap-agents-md:   $(call install_skill,lets-bootstrap-agents-md)
@@ -52,8 +51,6 @@ lets-research-competitive-scan:   $(call install_skill,lets-research-competitive
 lets-research-ux-walkthrough:     $(call install_skill,lets-research-ux-walkthrough)
 lets-research-prd-grooming:       $(call install_skill,lets-research-prd-grooming)
 lets-opportunity-discovery:       $(call install_skill,lets-opportunity-discovery)
-lets-audit-repo:            $(call install_skill,lets-audit-repo)
-lets-author-skill:          $(call install_skill,lets-author-skill)
 
 sdlc: lets-start-here lets-bootstrap-agents-md lets-bootstrap-repo lets-develop-feature \
       lets-review-code lets-review-pr lets-verify-change lets-verify-ready \
@@ -62,6 +59,6 @@ sdlc: lets-start-here lets-bootstrap-agents-md lets-bootstrap-repo lets-develop-
 research: lets-research-content-evaluate lets-research-competitive-scan \
           lets-research-ux-walkthrough lets-research-prd-grooming lets-opportunity-discovery
 
-meta: lets-audit-repo lets-author-skill
+meta:
 
 all: sdlc research meta

@@ -5,8 +5,10 @@ The design bundle installs workflows for UX research, content evaluation, and de
 ## Install
 
 ```bash
-lets install design
+make lets-research-ux-walkthrough lets-research-content-evaluate PLATFORM=cursor
 ```
+
+Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
 
 ## Included workflows
 
@@ -27,4 +29,3 @@ lets install design
 ## Cross-functional handoff
 
 Design receives PRDs from PM and produces design briefs consumed by Engineering.
-In the `ship-feature` DAG: `pm → design → pgm → engineering`.

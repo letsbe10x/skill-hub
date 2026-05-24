@@ -1,43 +1,51 @@
-# Your first install
+# Your First Install
 
-## 1. Install a bundle
+`skill-hub` is a plain Agent Skills repository. You can install skills by copying
+the skill folders into your agent's skills directory.
 
-```bash
-lets install engineering
-```
+## 1. Choose A Starter Set
 
-This installs workflows for code delivery, review, and verification.
-
-## 2. (Optional) Add a kit
+For code delivery, start with the engineering skills:
 
 ```bash
-lets install engineering --with stack.python
+make lets-start-here lets-create-plan lets-develop-feature lets-verify-change lets-verify-ready lets-review-code PLATFORM=cursor
 ```
 
-Kits add language-specific or domain-specific rules/guardrails.
+Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot` as needed.
 
-## 3. Start working
+## 2. Or Copy Manually
 
 ```bash
-lets develop-feature
+mkdir -p ~/.cursor/skills
+cp -R lets-start-here ~/.cursor/skills/
+cp -R lets-create-plan ~/.cursor/skills/
+cp -R lets-develop-feature ~/.cursor/skills/
+cp -R lets-verify-change ~/.cursor/skills/
+cp -R lets-verify-ready ~/.cursor/skills/
+cp -R lets-review-code ~/.cursor/skills/
 ```
+
+## 3. Start Working
+
+In your agent chat, invoke `lets-start-here` first if you are not sure which
+workflow applies. It routes the task to the right skill.
 
 ## What just happened?
 
-- **Bundle** = group of workflows installed together
-- **Kit** = rules/guardrails that customize behavior for your stack
-- **Workflow** = a goal-oriented skill (review, verify, develop)
+- **Skill** = one workflow directory with a `SKILL.md` entrypoint.
+- **Starter set** = a practical group of skills installed together.
+- **Workflow** = a goal-oriented process such as plan, verify, review, or develop.
 
 ## Checking what's installed
 
 ```bash
-lets kit status
+ls ~/.cursor/skills
 ```
 
-Shows your installed bundles, enabled kits, and lock hash.
+Use the equivalent skills directory for your agent.
 
 ## Next steps
 
-- Add more kits: `lets kit enable domain.healthcare --on engineering`
-- Try a review: `lets review-code`
+- Try a review with `lets-review-code`.
+- Add repo-readiness skills like `lets-assess-ai-readiness`.
 - See all bundles: [bundles/README.md](../bundles/README.md)

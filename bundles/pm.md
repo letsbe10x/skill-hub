@@ -5,8 +5,10 @@ The PM bundle installs workflows for product requirements and opportunity analys
 ## Install
 
 ```bash
-lets install pm
+make lets-brainstorm lets-opportunity-discovery lets-research-prd-grooming PLATFORM=cursor
 ```
+
+Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
 
 ## Included workflows
 
@@ -15,7 +17,6 @@ lets install pm
 | lets-brainstorm | Structured ideation and problem framing |
 | lets-opportunity-discovery | Market opportunity identification |
 | lets-research-prd-grooming | PRD refinement and gap analysis |
-| lets-research-prd-control-plane | PRD lifecycle management |
 
 ## Artifacts produced
 
