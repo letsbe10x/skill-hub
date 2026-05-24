@@ -77,6 +77,12 @@ const bundles = {
     "lets-bootstrap-agents-md",
     "lets-assess-ai-readiness",
   ],
+  starter: [
+    "lets-start-here",
+    "lets-onboard-repo",
+    "lets-bootstrap-repo",
+    "lets-bootstrap-agents-md",
+  ],
 };
 
 const agentDirs = {
@@ -106,7 +112,7 @@ Usage:
   skill-hub install <bundle-or-skill> [--agent cursor] [--scope user|project] [--dir path]
 
 Bundles:
-  all, engineering, sdlc, research, pm, design, repo-readiness
+  all, starter, engineering, sdlc, research, pm, design, repo-readiness
 
 Agents:
   claude-code, cursor, codex, copilot
