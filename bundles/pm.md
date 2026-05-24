@@ -21,13 +21,13 @@ Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
 
 ## Artifacts produced
 
-| Artifact | Type | Consumed by |
-|----------|------|-------------|
-| PRD | `prd` | Design, Engineering, Review |
-| Problem statement | `problem_statement` | Design |
-| Success metrics | `success_metrics` | Verify |
-| Acceptance criteria | `acceptance_criteria` | Engineering, Verify, Review |
-| Opportunity map | `opportunity_map` | PgM |
+| Artifact | Used by |
+|----------|---------|
+| PRD | Design, Engineering, Review |
+| Problem statement | Design |
+| Success metrics | Verify |
+| Acceptance criteria | Engineering, Verify, Review |
+| Opportunity map | Engineering planning |
 
 ## Typical flow
 
@@ -35,7 +35,8 @@ Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
 lets-brainstorm → lets-opportunity-discovery → lets-research-prd-grooming
 ```
 
-## Cross-functional handoff
+## Pairs well with
 
-PM artifacts are the starting point for the `ship-feature` workflow.
-Design and PgM consume PRDs; Engineering requires both PRD and acceptance criteria.
+- `design` — consume PRDs to produce design briefs and UX flows.
+- `engineering` — turn PRDs + acceptance criteria into shipped code.
+- `research` — broader research toolkit (competitive scan, UX, content evaluation).

@@ -23,28 +23,13 @@ Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
 | lets-bootstrap-repo | Scaffold repo structure and configuration |
 | lets-create-plan | Architecture and implementation planning |
 
-## Kit compatibility
-
-| Kit | What it adds |
-|-----|-------------|
-| stack.python | Python typing, import ordering, docstring rules |
-| stack.java | Java naming conventions, pattern enforcement |
-| platform.frontend | Component structure, accessibility checks |
-| domain.healthcare | HIPAA/PHI handling, audit trail requirements |
-
 ## Typical flow
 
 ```
 lets-create-plan → lets-develop-feature → lets-verify-change → lets-review-code
 ```
 
-## Artifact requirements
+## Pairs well with
 
-When used in a cross-functional workflow (`ship-feature`), engineering
-requires these artifacts from upstream personas:
-
-- PRD (from PM)
-- Acceptance criteria (from PM)
-- Design brief (from Design)
-- Risk register (from PgM)
-- Release checklist (from PgM)
+- `repo-readiness` — bootstrap repo context once so the engineering skills run grounded in real facts.
+- `pm` — capture the PRD / acceptance criteria the engineering loop verifies against.

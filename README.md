@@ -168,17 +168,32 @@ For product strategy, PRDs, UX, and messaging:
 2. Keep the skill platform-neutral. Do not require a specific agent runtime inside the base skill unless the skill truly depends on it.
 3. Include YAML frontmatter with at minimum `name`, `description`, `metadata.author`, `metadata.version`, and `compatibility.agents`.
 4. Keep the main `SKILL.md` focused. Put long templates, rubrics, and examples under `references/`.
-5. Validate with `skill-forge` before opening a PR.
+5. Validate the `SKILL.md` frontmatter parses as YAML and the file renders cleanly in any markdown viewer before opening a PR.
 
-## Optional: Using The lets CLI
+## Going Further — The `lets` CLI (Optional)
 
-The skills in this repository are plain folders and work without the `lets` CLI.
+Everything in this repo works as plain Agent Skills with no CLI required. If you want more than copy-and-paste — repeatable installs, drift detection, a knowledge base bound to your repo, and curated bundles — there is a separate, optional companion CLI called [`lets`](https://github.com/letsbe10x/core) that consumes this repository and adds the management layer around it.
 
-If you do use the `lets` CLI, the experience can become smoother because `pack.toml` lets a runtime install and sync the skills as a bundle, apply overlays, and enforce organization policy.
+**What `lets` adds on top of skill-hub:**
+
+| Capability | What you get | Command |
+|---|---|---|
+| **Repo bootstrapping** | One command that scores your repo's AI-readiness and recommends the next steps | `lets init` then `lets repo launchpad` |
+| **Knowledge base** | Builds and maintains a verified context pack about your repo (modules, commands, conventions) so skills run grounded in real facts instead of guesses | `lets init` |
+| **Skill management** | Tracks every installed skill, detects when an installed skill has drifted from its upstream source, and re-syncs on demand | `lets status`, `lets sync` |
+| **Curated bundles** | Browse and install grouped skill sets without remembering names | `lets catalog list`, `lets catalog bundles` |
+| **Health checks** | One-shot diagnostic of runtime + installed skills + pending drift | `lets doctor` |
+
+**Install:**
 
 ```bash
-# Install from a local checkout when using letsbe10x tooling
-lets plugin install .
+pipx install letsbe10x   # canonical
+# or
+pip install letsbe10x
+
+lets doctor --quickstart  # verify install + next steps
 ```
 
-Runtime augmentation such as context pre-flight, governance checks, and pack enrichment belongs in [skill-overlay](https://github.com/letsbe10x/skill-overlay). This repo stays the clean, portable base skill library.
+**Read more:** [letsbe10x/core](https://github.com/letsbe10x/core) — the `lets` CLI source and full documentation.
+
+`skill-hub` itself stays a clean, portable Agent Skills library with no dependency on `lets`. You can use the skills with Claude Code, Cursor, Codex, Copilot, or any other Agent Skills–compatible tool, with or without the CLI.
