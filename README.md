@@ -172,7 +172,7 @@ For product strategy, PRDs, UX, and messaging:
 
 ## Going Further — The `lets` CLI (Optional)
 
-Everything in this repo works as plain Agent Skills with no CLI required. If you want more than copy-and-paste — repeatable installs, drift detection, a knowledge base bound to your repo, and curated bundles — there is a separate, optional companion CLI called [`lets`](https://github.com/letsbe10x/core) that consumes this repository and adds the management layer around it.
+Everything in this repo works as plain Agent Skills with no CLI required. If you want more than copy-and-paste — repeatable installs, drift detection, a knowledge base bound to your repo, and curated bundles — there is a separate, optional companion CLI called `lets` (PyPI package `letsbe10x`) that consumes this repository and adds the management layer around it.
 
 **What `lets` adds on top of skill-hub:**
 
@@ -193,7 +193,5 @@ pip install letsbe10x
 
 lets doctor --quickstart  # verify install + next steps
 ```
-
-**Read more:** [letsbe10x/core](https://github.com/letsbe10x/core) — the `lets` CLI source and full documentation.
 
 `skill-hub` itself stays a clean, portable Agent Skills library with no dependency on `lets`. You can use the skills with Claude Code, Cursor, Codex, Copilot, or any other Agent Skills–compatible tool, with or without the CLI.
