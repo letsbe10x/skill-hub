@@ -1,31 +1,22 @@
-# PM Bundle
+# PM bundle
 
-The PM bundle installs workflows for product requirements and opportunity analysis.
+Skills for product requirements, opportunity analysis, and PRD grooming.
 
 ## Install
 
 ```bash
-lets install pm
+make pm                                             # default IDE: claude
+make pm IDE=cursor                                  # single IDE
+make pm IDE="claude cursor"                         # multiple IDEs
 ```
 
-## Included workflows
+## Included skills
 
-| Workflow | Purpose |
-|----------|---------|
-| lets-brainstorm | Structured ideation and problem framing |
-| lets-opportunity-discovery | Market opportunity identification |
-| lets-research-prd-grooming | PRD refinement and gap analysis |
-| lets-research-prd-control-plane | PRD lifecycle management |
-
-## Artifacts produced
-
-| Artifact | Type | Consumed by |
-|----------|------|-------------|
-| PRD | `prd` | Design, Engineering, Review |
-| Problem statement | `problem_statement` | Design |
-| Success metrics | `success_metrics` | Verify |
-| Acceptance criteria | `acceptance_criteria` | Engineering, Verify, Review |
-| Opportunity map | `opportunity_map` | PgM |
+| Skill | Purpose |
+|---|---|
+| `lets-brainstorm` | Structured ideation and problem framing |
+| `lets-opportunity-discovery` | Surface and rank market opportunities |
+| `lets-research-prd-grooming` | PRD refinement and gap analysis |
 
 ## Typical flow
 
@@ -33,7 +24,7 @@ lets install pm
 lets-brainstorm → lets-opportunity-discovery → lets-research-prd-grooming
 ```
 
-## Cross-functional handoff
+## Suggested companions
 
-PM artifacts are the starting point for the `ship-feature` workflow.
-Design and PgM consume PRDs; Engineering requires both PRD and acceptance criteria.
+- `make research` adds competitive scanning, UX walkthroughs, and content evaluation.
+- `make design` adds UX flow + content review skills used downstream of PRDs.

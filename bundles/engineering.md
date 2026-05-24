@@ -1,48 +1,36 @@
-# Engineering Bundle
+# Engineering bundle
 
-The engineering bundle installs workflows for the full code delivery lifecycle.
+Skills for the full code delivery lifecycle — plan, build, verify, review, ship.
 
 ## Install
 
 ```bash
-lets install engineering
-lets install engineering --with stack.python
+make engineering                                    # default IDE: claude
+make engineering IDE=cursor                         # single IDE
+make engineering IDE="claude cursor codex"          # multiple IDEs
 ```
 
-## Included workflows
+## Included skills
 
-| Workflow | Purpose |
-|----------|---------|
-| lets-develop-feature | Plan + implement a code change |
-| lets-verify-change | Verify implementation against acceptance criteria |
-| lets-review-code | Structured code review |
-| lets-review-pr | PR-level review with architectural checks |
-| lets-onboard-repo | Bootstrap context for a new repository |
-| lets-bootstrap-repo | Scaffold repo structure and configuration |
-| lets-create-plan | Architecture and implementation planning |
-
-## Kit compatibility
-
-| Kit | What it adds |
-|-----|-------------|
-| stack.python | Python typing, import ordering, docstring rules |
-| stack.java | Java naming conventions, pattern enforcement |
-| platform.frontend | Component structure, accessibility checks |
-| domain.healthcare | HIPAA/PHI handling, audit trail requirements |
+| Skill | Purpose |
+|---|---|
+| `lets-create-plan` | Architecture and implementation planning |
+| `lets-develop-feature` | Staged feature development with spec alignment and quality scorecard |
+| `lets-verify-change` | Verify implementation against acceptance criteria |
+| `lets-verify-ready` | Verify a branch is ready to merge |
+| `lets-review-code` | Multi-lens code review |
+| `lets-review-pr` | PR-level review with architectural checks |
+| `lets-spec-to-pr` | Implement a spec end-to-end as a pull request |
 
 ## Typical flow
 
 ```
 lets-create-plan → lets-develop-feature → lets-verify-change → lets-review-code
+                                                                      ↓
+                                            lets-verify-ready → lets-review-pr
 ```
 
-## Artifact requirements
+## Suggested companions
 
-When used in a cross-functional workflow (`ship-feature`), engineering
-requires these artifacts from upstream personas:
-
-- PRD (from PM)
-- Acceptance criteria (from PM)
-- Design brief (from Design)
-- Risk register (from PgM)
-- Release checklist (from PgM)
+- Run `make starter` first if you haven't bootstrapped the repo for AI use.
+- Run `make readiness` once to score the repo and identify AI-readiness gaps.
