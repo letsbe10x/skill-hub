@@ -1,95 +1,184 @@
 # skill-hub
 
-A collection of standalone skills for AI coding assistants — Claude Code, Cursor, Codex, and Copilot.
+Evidence-gated workflow skills for AI coding assistants.
 
-Skills work out of the box with no platform dependencies. Each skill is a self-contained `SKILL.md` file with a clear procedure, worked examples, and anti-patterns.
+`skill-hub` gives Claude Code, Cursor, Codex, Copilot, and other Agent Skills-compatible tools a disciplined engineering operating model: start from intent, create the right spec or plan, implement carefully, verify with fresh evidence, review findings, and only then call work ready.
 
-## Install a skill
+These are plain Agent Skills. You do **not** need the `lets` CLI to use them.
 
-### Claude Code
-```bash
-lets skill install <skill-name>
-```
+## Why This Exists
 
-### Manual
-Copy the skill directory into your IDE's skills folder:
-- Claude Code: `~/.claude/skills/`
-- Cursor: `~/.cursor/skills/`
-- Codex: `~/.codex/skills/`
+AI coding agents often fail in predictable ways:
 
-## Sync updates
+- They start coding before the requirement is clear.
+- They invent repo facts instead of checking evidence.
+- They claim tests pass without running them.
+- They make broad changes when a narrow slice would do.
+- They review code without verifying findings against the actual diff.
 
-```bash
-lets skill sync
-```
+`skill-hub` packages the workflows that prevent those failures. Each skill is a self-contained directory with a `SKILL.md` entrypoint and, when needed, `references/` or `scripts/` loaded on demand.
 
-## Plugin Distribution (Optional)
+## Quick Install
 
-This repo is also a letsbe10x **plugin**. The plugin manifest path is `pack.toml`.
+Install a bundle with `npx`:
 
 ```bash
-# Install from a local checkout
-lets plugin install .
-
-# (Optional) Sign the plugin manifest (writes a distribution block into pack.toml)
-lets plugin sign . --principal <your_principal_id>
-
-# (Optional) Enforce signed installs (writes an enterprise-default install-policy template)
-lets install-policy init --profile enterprise
-export LETS_ENTERPRISE_INSTALL_POLICY=~/.config/letsbe10x/install-policy.enterprise.toml
+npx github:letsbe10x/skill-hub install engineering --agent cursor
 ```
 
-## Skills
+For a project-local install, add `--scope project`:
 
-### SDLC
+```bash
+npx github:letsbe10x/skill-hub install engineering --agent cursor --scope project
+```
+
+You can also install one skill:
+
+```bash
+npx github:letsbe10x/skill-hub install lets-verify-ready --agent cursor
+```
+
+Supported agents:
+
+| Agent | User-level skills directory | Project-level skills directory |
+|---|---|---|
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| Cursor | `~/.cursor/skills/` | `.cursor/skills/` |
+| Codex | `~/.codex/skills/` | `.codex/skills/` |
+| Copilot | `~/.github/skills/` | `.github/skills/` |
+
+For local development from a checkout, run:
+
+```bash
+npx . install engineering --agent cursor
+```
+
+Manual copy still works:
+
+```bash
+mkdir -p ~/.cursor/skills
+cp -R lets-start-here ~/.cursor/skills/
+cp -R lets-verify-ready ~/.cursor/skills/
+cp -R lets-review-code ~/.cursor/skills/
+```
+
+## Start Here
+
+If you are unsure which skill to use, install and invoke:
+
+| Skill | Use when |
+|---|---|
+| `lets-start-here` | You want the agent to classify the task and route to the right workflow |
+
+For most engineering work, a good starter set is:
+
+```bash
+npx github:letsbe10x/skill-hub install engineering --agent cursor
+```
+
+## What Can It Do?
+
+| User intent | Skill |
+|---|---|
+| "Where should I start?" | `lets-start-here` |
+| "Make this repo AI-ready" | `lets-bootstrap-repo` |
+| "Generate or refresh AGENTS.md" | `lets-bootstrap-agents-md` |
+| "Assess how ready this repo is for AI coding" | `lets-assess-ai-readiness` |
+| "Think through this idea before coding" | `lets-brainstorm` |
+| "Create an implementation plan" | `lets-create-plan` |
+| "Implement this feature/change" | `lets-develop-feature` |
+| "Implement this approved spec as a PR" | `lets-spec-to-pr` |
+| "Verify this implementation is complete" | `lets-verify-change` |
+| "Before saying done, prove it" | `lets-verify-ready` |
+| "Review this code" | `lets-review-code` |
+| "Review this PR" | `lets-review-pr` |
+| "Find product opportunities" | `lets-opportunity-discovery` |
+| "Groom this PRD from evidence" | `lets-research-prd-grooming` |
+| "Compare competitors" | `lets-research-competitive-scan` |
+| "Evaluate copy or messaging" | `lets-research-content-evaluate` |
+| "Walk through a UX flow and log friction" | `lets-research-ux-walkthrough` |
+
+## Suggested Skill Sets
+
+### Engineering
+
+For code delivery from plan through review:
+
 | Skill | What it does |
 |---|---|
-| `lets-start-here` | Classify intent and route to the right skill |
-| `lets-bootstrap-agents-md` | Generate AGENTS.md from repo evidence |
-| `lets-bootstrap-repo` | Bootstrap a new repo with initial structure |
-| `lets-develop-feature` | Staged feature development with spec-alignment, graduated rigor, and quality scorecard |
-| `lets-review-code` | Multi-lens code review with planner-driven depth, finding verification, and confidence scoring |
-| `lets-review-pr` | PR review controlplane with context discovery, multi-lens routing, spec alignment, and GitHub posting |
-| `lets-verify-change` | Verify a change meets requirements |
-| `lets-verify-ready` | Verify a branch is ready to merge |
-| `lets-spec-to-pr` | Implement a spec as a pull request |
-| `lets-create-plan` | Create a structured implementation plan |
-| `lets-brainstorm` | Explore ideas and options |
-| `lets-onboard-repo` | Onboard a new repo with context |
+| `lets-start-here` | Classify intent and route to the right workflow |
+| `lets-create-plan` | Turn requirements into a step-by-step implementation plan |
+| `lets-develop-feature` | Implement changes with staged execution and evidence gates |
+| `lets-verify-change` | Verify implementation against requirements, tests, and smoke checks |
+| `lets-verify-ready` | Block completion claims until fresh verification output exists |
+| `lets-review-code` | Run multi-lens code review with verified findings |
+| `lets-review-pr` | Review pull requests with diff context, spec alignment, and verdicts |
+| `lets-spec-to-pr` | Implement an approved spec through PR creation |
 
-### Research
+### Repo Readiness
+
+For making an existing repo easier and safer for AI agents:
+
 | Skill | What it does |
 |---|---|
-| `lets-research-content-evaluate` | Evaluate content quality and effectiveness |
-| `lets-research-competitive-scan` | Scan the competitive landscape |
-| `lets-research-ux-walkthrough` | Walkthrough UX flows and identify improvements |
-| `lets-research-prd-grooming` | Groom and refine PRDs |
-| `lets-opportunity-discovery` | Discover opportunities in market or product data |
+| `lets-onboard-repo` | Build a first-time reader map of an unfamiliar repo |
+| `lets-bootstrap-repo` | Capture maintainer-confirmed service truth and readiness context |
+| `lets-bootstrap-agents-md` | Generate evidence-backed AGENTS.md files for module hierarchies |
+| `lets-assess-ai-readiness` | Score repo readiness across feedback, determinism, safety, context, and recovery pillars |
 
-### Meta
+### Product And Research
+
+For product strategy, PRDs, UX, and messaging:
+
 | Skill | What it does |
 |---|---|
-| `lets-assess-ai-readiness` | Assess a repo's AI-assisted development readiness across 8 pillars with leveled scoring and scaffold plans |
-| `lets-author-skill` | Author a new skill |
+| `lets-brainstorm` | Turn unresolved ideas into validated spec artifacts |
+| `lets-opportunity-discovery` | Rank opportunities from a solution, hypothesis, or research corpus |
+| `lets-research-prd-grooming` | Transform feedback into PRD deltas, criteria, and open questions |
+| `lets-research-competitive-scan` | Compare competitor positioning, pricing, proof, and CTAs |
+| `lets-research-content-evaluate` | Evaluate copy or messaging against a rubric and audience |
+| `lets-research-ux-walkthrough` | Walk through a UX flow and produce a friction log |
+
+## Full Catalog
+
+| Skill | Status | Notes |
+|---|---|---|
+| `lets-start-here` | Published | Entry router |
+| `lets-bootstrap-agents-md` | Published | Repo documentation generation |
+| `lets-bootstrap-repo` | Published | Repo context bootstrap |
+| `lets-develop-feature` | Published | Implementation workflow |
+| `lets-review-code` | Published | Code review |
+| `lets-review-pr` | Published | Pull request review |
+| `lets-verify-change` | Published | Implementation verification |
+| `lets-verify-ready` | Published | Completion evidence gate |
+| `lets-spec-to-pr` | Published | Claude Code-oriented spec-to-PR workflow |
+| `lets-create-plan` | Published | Implementation planning |
+| `lets-onboard-repo` | Published | Repo onboarding |
+| `lets-assess-ai-readiness` | Published | AI-readiness maturity assessment |
+| `lets-brainstorm` | Draft | Idea/spec exploration |
+| `lets-opportunity-discovery` | Draft | Opportunity ranking |
+| `lets-research-prd-grooming` | Draft | PRD evolution |
+| `lets-research-competitive-scan` | Draft | Competitive scan |
+| `lets-research-content-evaluate` | Draft | Content evaluation |
+| `lets-research-ux-walkthrough` | Draft | UX walkthrough |
 
 ## Contributing
 
 1. Create a directory named `lets-<your-skill>/` with a `SKILL.md` file.
-2. The skill must be **platform-neutral** — no `lets` CLI references, no runtime
-   dependencies. Platform-specific hooks belong in
-   [skill-overlay](https://github.com/letsbe10x/skill-overlay).
-3. Include YAML frontmatter with at minimum: `name`, `description`, `metadata.author`,
-   `metadata.version`, `lifecycle`, `compatibility.agents`.
-4. Validate with `forge check lets-<name>/SKILL.md` (from a skill-forge checkout).
-5. Open a PR. CI runs `forge check` on all changed skills.
+2. Keep the skill platform-neutral. Do not require a specific agent runtime inside the base skill unless the skill truly depends on it.
+3. Include YAML frontmatter with at minimum `name`, `description`, `metadata.author`, `metadata.version`, and `compatibility.agents`.
+4. Keep the main `SKILL.md` focused. Put long templates, rubrics, and examples under `references/`.
+5. Validate with `skill-forge` before opening a PR.
 
-### Overlay composition
+## Optional: Using The lets CLI
 
-skill-hub provides clean base skills. Runtime augmentation (context pre-flight,
-governance checks, pack enrichment) is injected via
-[skill-overlay](https://github.com/letsbe10x/skill-overlay) at sync time using
-anchor-based composition. See the overlay repo for details.
+The skills in this repository are plain folders and work without the `lets` CLI.
 
-## letsbe10x augmentation
+If you do use the `lets` CLI, the experience can become smoother because `pack.toml` lets a runtime install and sync the skills as a bundle, apply overlays, and enforce organization policy.
 
-For letsbe10x runtime augmentation (context pre-flight, governance, pack enrichment), see [skill-overlay](https://github.com/letsbe10x/skill-overlay).
+```bash
+# Install from a local checkout when using letsbe10x tooling
+lets plugin install .
+```
+
+Runtime augmentation such as context pre-flight, governance checks, and pack enrichment belongs in [skill-overlay](https://github.com/letsbe10x/skill-overlay). This repo stays the clean, portable base skill library.

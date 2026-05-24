@@ -1,0 +1,24 @@
+{
+  "name": "@letsbe10x/skill-hub",
+  "version": "0.1.0",
+  "description": "Evidence-gated workflow skills for AI coding assistants.",
+  "license": "MIT",
+  "bin": {
+    "skill-hub": "./bin/skill-hub.js"
+  },
+  "files": [
+    "bin/",
+    "bundles/",
+    "getting-started/",
+    "lets-*/**/*",
+    "README.md",
+    "LICENSE",
+    "pack.toml"
+  ],
+  "scripts": {
+    "test": "node ./bin/skill-hub.js list"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

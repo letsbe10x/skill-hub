@@ -5,8 +5,11 @@ The design bundle installs workflows for UX research, content evaluation, and de
 ## Install
 
 ```bash
-lets install design
+npx github:letsbe10x/skill-hub install design --agent cursor
 ```
+
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Included workflows
 
@@ -27,4 +30,3 @@ lets install design
 ## Cross-functional handoff
 
 Design receives PRDs from PM and produces design briefs consumed by Engineering.
-In the `ship-feature` DAG: `pm → design → pgm → engineering`.

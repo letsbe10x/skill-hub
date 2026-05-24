@@ -5,8 +5,11 @@ The PM bundle installs workflows for product requirements and opportunity analys
 ## Install
 
 ```bash
-lets install pm
+npx github:letsbe10x/skill-hub install pm --agent cursor
 ```
+
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Included workflows
 
@@ -15,7 +18,6 @@ lets install pm
 | lets-brainstorm | Structured ideation and problem framing |
 | lets-opportunity-discovery | Market opportunity identification |
 | lets-research-prd-grooming | PRD refinement and gap analysis |
-| lets-research-prd-control-plane | PRD lifecycle management |
 
 ## Artifacts produced
 

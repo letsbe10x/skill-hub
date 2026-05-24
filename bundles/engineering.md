@@ -5,9 +5,11 @@ The engineering bundle installs workflows for the full code delivery lifecycle.
 ## Install
 
 ```bash
-lets install engineering
-lets install engineering --with stack.python
+npx github:letsbe10x/skill-hub install engineering --agent cursor
 ```
+
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Included workflows
 
