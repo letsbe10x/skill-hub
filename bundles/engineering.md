@@ -5,10 +5,11 @@ The engineering bundle installs workflows for the full code delivery lifecycle.
 ## Install
 
 ```bash
-make sdlc PLATFORM=cursor
+npx github:letsbe10x/skill-hub install engineering --agent cursor
 ```
 
-Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Included workflows
 

@@ -2,17 +2,18 @@
 
 Bundles group related workflows so users can choose a practical starter set.
 They are documentation-level groupings in this standalone repo: install them by
-copying the listed skill directories or by using the `Makefile` targets.
+using the `npx` installer or by copying skill directories manually.
 
 ## Available bundles
 
-| Bundle | Purpose | Starter install |
+| Bundle | Purpose | Install |
 |--------|---------|---------|
-| engineering | Code delivery, review, verification | `make sdlc PLATFORM=cursor` |
-| pm | PRDs, acceptance criteria, opportunities | `make research PLATFORM=cursor` |
-| design | Design briefs, UX flows, content | `make lets-research-ux-walkthrough lets-research-content-evaluate PLATFORM=cursor` |
+| engineering | Code delivery, review, verification | `npx github:letsbe10x/skill-hub install engineering --agent cursor` |
+| pm | PRDs, acceptance criteria, opportunities | `npx github:letsbe10x/skill-hub install pm --agent cursor` |
+| design | Design briefs, UX flows, content | `npx github:letsbe10x/skill-hub install design --agent cursor` |
 
-Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Manual install
 

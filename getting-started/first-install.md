@@ -8,10 +8,17 @@ the skill folders into your agent's skills directory.
 For code delivery, start with the engineering skills:
 
 ```bash
-make lets-start-here lets-create-plan lets-develop-feature lets-verify-change lets-verify-ready lets-review-code PLATFORM=cursor
+npx github:letsbe10x/skill-hub install engineering --agent cursor
 ```
 
-Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot` as needed.
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot` as needed.
+
+For a project-local install:
+
+```bash
+npx github:letsbe10x/skill-hub install engineering --agent cursor --scope project
+```
 
 ## 2. Or Copy Manually
 

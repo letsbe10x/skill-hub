@@ -20,7 +20,25 @@ AI coding agents often fail in predictable ways:
 
 ## Quick Install
 
-Pick the skills you want and copy each skill directory into your agent's skills directory.
+Install a bundle with `npx`:
+
+```bash
+npx github:letsbe10x/skill-hub install engineering --agent cursor
+```
+
+For a project-local install, add `--scope project`:
+
+```bash
+npx github:letsbe10x/skill-hub install engineering --agent cursor --scope project
+```
+
+You can also install one skill:
+
+```bash
+npx github:letsbe10x/skill-hub install lets-verify-ready --agent cursor
+```
+
+Supported agents:
 
 | Agent | User-level skills directory | Project-level skills directory |
 |---|---|---|
@@ -29,30 +47,19 @@ Pick the skills you want and copy each skill directory into your agent's skills 
 | Codex | `~/.codex/skills/` | `.codex/skills/` |
 | Copilot | `~/.github/skills/` | `.github/skills/` |
 
-Example:
+For local development from a checkout, run:
 
 ```bash
-# Cursor user-level install
+npx . install engineering --agent cursor
+```
+
+Manual copy still works:
+
+```bash
 mkdir -p ~/.cursor/skills
 cp -R lets-start-here ~/.cursor/skills/
 cp -R lets-verify-ready ~/.cursor/skills/
 cp -R lets-review-code ~/.cursor/skills/
-```
-
-Install everything for a specific platform with `make`:
-
-```bash
-# Default: Claude Code
-make all
-
-# Cursor
-make all PLATFORM=cursor
-
-# Codex
-make all PLATFORM=codex
-
-# Copilot
-make all PLATFORM=copilot
 ```
 
 ## Start Here
@@ -66,7 +73,7 @@ If you are unsure which skill to use, install and invoke:
 For most engineering work, a good starter set is:
 
 ```bash
-make lets-start-here lets-create-plan lets-develop-feature lets-verify-change lets-verify-ready lets-review-code PLATFORM=cursor
+npx github:letsbe10x/skill-hub install engineering --agent cursor
 ```
 
 ## What Can It Do?

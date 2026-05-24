@@ -5,10 +5,11 @@ The design bundle installs workflows for UX research, content evaluation, and de
 ## Install
 
 ```bash
-make lets-research-ux-walkthrough lets-research-content-evaluate PLATFORM=cursor
+npx github:letsbe10x/skill-hub install design --agent cursor
 ```
 
-Change `PLATFORM=cursor` to `claude-code`, `codex`, or `copilot`.
+Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
+`--agent copilot`.
 
 ## Included workflows
 
