@@ -1,6 +1,26 @@
-# skill-hub
+<h1 align="center">skill-hub</h1>
 
-Evidence-gated workflow skills for AI coding assistants.
+<p align="center"><em>Evidence-gated workflow skills for AI coding assistants.</em></p>
+
+<p align="center">
+  <img src="assets/demo.gif" width="900" alt="Installing the engineering bundle into Cursor in one command">
+</p>
+
+<p align="center">
+  <a href="https://github.com/letsbe10x/skill-hub/blob/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/letsbe10x/skill-hub?color=blue"></a>
+  <a href="https://github.com/letsbe10x/skill-hub/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/letsbe10x/skill-hub?style=flat&color=yellow"></a>
+  <a href="https://github.com/letsbe10x/skill-hub/pulls"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen"></a>
+  <a href="#quick-install"><img alt="Works with Claude Code, Cursor, Codex, Copilot" src="https://img.shields.io/badge/works%20with-Claude%20Code%20%7C%20Cursor%20%7C%20Codex%20%7C%20Copilot-8A2BE2"></a>
+</p>
+
+<p align="center">
+  <a href="#quick-install"><b>Install</b></a> ·
+  <a href="#suggested-skill-sets"><b>Bundles</b></a> ·
+  <a href="#why-this-exists"><b>Why</b></a> ·
+  <a href="#full-catalog"><b>Catalog</b></a>
+</p>
+
+---
 
 `skill-hub` gives Claude Code, Cursor, Codex, Copilot, and other Agent Skills-compatible tools a disciplined engineering operating model: start from intent, create the right spec or plan, implement carefully, verify with fresh evidence, review findings, and only then call work ready.
 

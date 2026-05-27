@@ -63,3 +63,9 @@ path = "lets-opportunity-discovery"
 [[components.skills]]
 path = "lets-assess-ai-readiness"
 
+[[components.skills]]
+path = "lets-generate-cli"
+
+[[components.skills]]
+path = "lets-create-readme-gifs"
+
