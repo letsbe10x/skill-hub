@@ -3,7 +3,8 @@
   "name": "grafana",
   "version": "0.1.0",
   "description": "Grafana — dashboards, datasources, folders, health.",
-  "category": "dashboards",
+  "vertical": "observability",
+  "categories": ["dashboards", "alerting", "datasources"],
   "supported_ops": ["dashboard-list", "dashboard-get", "dashboard-create", "dashboard-delete", "datasource-list", "folder-list", "health"],
   "env_vars": {
     "required": ["GRAFANA_URL"],

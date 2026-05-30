@@ -6,38 +6,44 @@ and `lets-investigate-incident` query backends here.
 
 ```
 observability/
-├── logging/
-│   └── splunk/                  # Splunk Enterprise
-├── monitoring/
-│   └── prometheus/              # Prometheus
-├── tracing/
-│   └── jaeger/                  # Jaeger
-└── dashboarding/
-    └── grafana/                 # Grafana
+├── splunk/         Splunk Enterprise
+├── prometheus/     Prometheus
+├── jaeger/         Jaeger
+└── grafana/        Grafana
 ```
 
-## Mirrored layout under `../../sandboxes/observability/`
+Per-tool categorization (logging / metrics / tracing / dashboards / etc.)
+lives as metadata in each adapter's `manifest.json` under the `categories`
+key. Many tools span multiple categories — Splunk is both logging and
+monitoring, Grafana spans dashboards + alerting + datasources, Datadog
+covers everything. Single-category directories would force false choices,
+so we kept the directory layout one-level-flat and put taxonomy where it
+belongs: in metadata.
 
-Every adapter under this directory has a matching Docker sandbox at the
-same relative path under `../../sandboxes/observability/`:
+## Catalog
 
-| Adapter | Sandbox |
-|---------|---------|
-| `logging/splunk/`         | `sandboxes/observability/logging/splunk/`         |
-| `monitoring/prometheus/`  | `sandboxes/observability/monitoring/prometheus/`  |
-| `tracing/jaeger/`         | `sandboxes/observability/tracing/jaeger/`         |
-| `dashboarding/grafana/`   | `sandboxes/observability/dashboarding/grafana/`   |
+| Adapter | Categories | Required env vars |
+|---------|------------|-------------------|
+| `splunk/`     | logging, monitoring  | `SPLUNK_MGMT_URL`, `SPLUNK_USER`, `SPLUNK_PASSWORD` |
+| `prometheus/` | metrics              | `PROMETHEUS_URL` |
+| `jaeger/`     | tracing              | `JAEGER_URL` |
+| `grafana/`    | dashboards, alerting, datasources | `GRAFANA_URL` |
 
-Smoke-test pattern:
+For full detail per adapter, see its own `README.md` and `manifest.json`.
+
+## Mirrored sandboxes
+
+Every adapter here has a matching Docker sandbox at the same path under
+`../../sandboxes/observability/<tool>/`. Smoke pattern:
 
 ```bash
 # Start the backend
-cd sandboxes/observability/logging/splunk
+cd sandboxes/observability/splunk
 docker compose up -d
 ./smoke.sh
 
 # Use the adapter against it
-cd ../../../../adapters/observability/logging/splunk
+cd ../../../adapters/observability/splunk
 pip install -e .
 SPLUNK_MGMT_URL=https://localhost:8089 SPLUNK_USER=admin SPLUNK_PASSWORD=changeme \
   lets-splunk search --query "search index=main | head 5" --json
@@ -45,11 +51,12 @@ SPLUNK_MGMT_URL=https://localhost:8089 SPLUNK_USER=admin SPLUNK_PASSWORD=changem
 
 ## Future adapters in this vertical
 
-- `logging/loki/`         — Grafana Loki (PRD TBD)
-- `logging/kibana/`       — Elastic / Kibana (PRD TBD)
-- `logging/datadog/`      — Datadog Logs (PRD TBD)
-- `logging/honeycomb/`    — Honeycomb (PRD TBD)
-- `tracing/tempo/`        — Grafana Tempo (PRD TBD)
-- `alerting/<tool>/`      — Alertmanager / PagerDuty / Opsgenie (PRD TBD)
+Each lands as its own PR per the contract documented in `../README.md`:
 
-Each lands as a follow-up PR per the contract documented in `../README.md`.
+- `loki/`         — Grafana Loki
+- `kibana/`       — Elastic / Kibana
+- `datadog/`      — Datadog (logs + metrics + traces + APM)
+- `honeycomb/`    — Honeycomb
+- `tempo/`        — Grafana Tempo
+- `alertmanager/` — Prometheus Alertmanager
+- `pagerduty/`    — PagerDuty

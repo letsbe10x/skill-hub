@@ -17,7 +17,7 @@ real Confluence instance — no Atlassian Cloud account required.
 - **Shared postgres sandbox up first** (Confluence uses the shared
   `lets-sandbox-data` network — it will not start without it):
   ```bash
-  cd ~/lets/skill-hub/sandboxes/databases/rdbms/postgres
+  cd ~/lets/skill-hub/sandboxes/databases/postgres
   KEEP_RUNNING=1 ./smoke.sh
   ```
 - ~3–5 minutes for Confluence's **first** boot (subsequent boots are ~30s)

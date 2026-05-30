@@ -3,7 +3,8 @@
   "name": "prometheus",
   "version": "0.1.0",
   "description": "Prometheus — instant and range queries, label/series introspection, target health.",
-  "category": "metrics",
+  "vertical": "observability",
+  "categories": ["metrics"],
   "supported_ops": ["query", "query-range", "labels", "series", "targets", "status"],
   "env_vars": {
     "required": ["PROMETHEUS_URL"],

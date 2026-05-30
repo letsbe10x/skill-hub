@@ -13,12 +13,19 @@ container and any volumes it created.
 
 ```
 sandboxes/
-├── observability/    Logs, metrics, traces, dashboards
-├── ticketing/        Issue trackers and project boards
-├── documentation/    Knowledge bases and wikis
-├── databases/        Relational, NoSQL, warehouses, streaming
-└── communication/    Chatops, team messaging
+├── observability/    splunk, prometheus, jaeger, grafana
+├── ticketing/        jira
+├── documentation/    confluence
+├── databases/        postgres
+└── communication/    (placeholder — chatops/messaging)
 ```
+
+Each tool sits directly under its vertical (`sandboxes/observability/splunk/`,
+`sandboxes/databases/postgres/`). Categorization (logging vs monitoring,
+relational vs NoSQL) lives as metadata in the tool's README, not as extra
+directory levels. Many tools span categories — Splunk does logging AND
+monitoring, Grafana spans dashboards AND alerting — and forcing a single
+category created false choices.
 
 ## How each sandbox is structured
 

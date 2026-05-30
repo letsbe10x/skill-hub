@@ -44,7 +44,7 @@ can connect, prints `OK`. Tears down unless `KEEP_RUNNING=1`.
 
 ```bash
 # Start once
-cd ~/lets/skill-hub/sandboxes/databases/rdbms/postgres
+cd ~/lets/skill-hub/sandboxes/databases/postgres
 KEEP_RUNNING=1 ./smoke.sh
 
 # Then any app sandbox that wires up shared postgres

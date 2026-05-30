@@ -3,7 +3,8 @@
   "name": "jaeger",
   "version": "0.1.0",
   "description": "Jaeger — service / operation discovery and trace search via Query API.",
-  "category": "tracing",
+  "vertical": "observability",
+  "categories": ["tracing"],
   "supported_ops": ["services", "operations", "trace-search", "trace-get"],
   "env_vars": {
     "required": ["JAEGER_URL"],

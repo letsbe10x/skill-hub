@@ -1,7 +1,7 @@
 # Jira sandbox
 
 Spins up Jira Software locally via Atlassian's official Docker image, backed
-by the shared `databases/rdbms/postgres/` sandbox. Creates a demo project +
+by the shared `databases/postgres/` sandbox. Creates a demo project +
 an issue via the REST API, then queries the issue back to prove the
 integration works end-to-end.
 
@@ -18,7 +18,7 @@ end-to-end against a real Jira instance.
 - **Shared postgres sandbox up first** (Jira uses the shared `lets-sandbox-data`
   network — it will not start without it):
   ```bash
-  cd ~/lets/skill-hub/sandboxes/databases/rdbms/postgres
+  cd ~/lets/skill-hub/sandboxes/databases/postgres
   KEEP_RUNNING=1 ./smoke.sh
   ```
 - ~3–5 minutes for Jira's **first** boot (subsequent boots are ~30s)

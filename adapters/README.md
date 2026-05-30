@@ -8,11 +8,18 @@ target backend locally for end-to-end validation.
 ```
 adapters/
 └── observability/
-    ├── logging/splunk/         → Splunk Enterprise
-    ├── monitoring/prometheus/  → Prometheus
-    ├── tracing/jaeger/         → Jaeger
-    └── dashboarding/grafana/   → Grafana
+    ├── splunk/     → Splunk Enterprise
+    ├── prometheus/ → Prometheus
+    ├── jaeger/     → Jaeger
+    └── grafana/    → Grafana
 ```
+
+Per-tool taxonomy (logging / metrics / tracing / dashboards / etc.) lives
+as metadata in each adapter's `manifest.json` under `categories`. Many
+tools span multiple categories — Splunk is both logging and monitoring,
+Grafana spans dashboards + alerting + datasources, Datadog covers
+everything. Putting taxonomy in metadata keeps the directory tree flat
+and avoids forcing false single-category choices.
 
 Future verticals (each tracked under their own PRD before landing):
 
@@ -20,7 +27,7 @@ Future verticals (each tracked under their own PRD before landing):
 adapters/
 ├── ticketing/<tool>/           e.g. jira, linear, github-issues
 ├── documentation/<tool>/       e.g. confluence, notion
-├── databases/rdbms/<tool>/     e.g. postgres, mysql
+├── databases/<tool>/           e.g. postgres, mysql, mongo
 └── communication/<tool>/       e.g. slack, discord
 ```
 

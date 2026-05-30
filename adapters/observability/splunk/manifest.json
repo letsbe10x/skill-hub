@@ -3,7 +3,8 @@
   "name": "splunk",
   "version": "0.1.0",
   "description": "Splunk Enterprise — search via management REST API, ingest via HEC.",
-  "category": "logging",
+  "vertical": "observability",
+  "categories": ["logging", "monitoring"],
   "supported_ops": ["search", "ingest", "server-info"],
   "env_vars": {
     "required": ["SPLUNK_MGMT_URL", "SPLUNK_USER", "SPLUNK_PASSWORD"],

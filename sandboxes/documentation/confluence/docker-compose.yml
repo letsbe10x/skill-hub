@@ -38,7 +38,7 @@ volumes:
   confluence_data:
 
 # This sandbox depends on the shared postgres sandbox. Bring up postgres
-# FIRST: `cd ~/lets/skill-hub/sandboxes/databases/rdbms/postgres && ./smoke.sh`
+# FIRST: `cd ~/lets/skill-hub/sandboxes/databases/postgres && ./smoke.sh`
 # (with KEEP_RUNNING=1 if you want it to persist for jira/confluence to use).
 networks:
   default:

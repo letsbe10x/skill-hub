@@ -5,29 +5,29 @@ search backends. Some of these double as **shared infrastructure** for other
 sandboxes (the Atlassian apps in `ticketing/jira/` and `documentation/confluence/`
 both use the shared postgres on the `lets-sandbox-data` network).
 
-## Categories
+## Tools shipped
 
-| Category | What it covers | Tools shipped |
-|---|---|---|
-| [rdbms/](rdbms/) | Relational databases | postgres |
+| Tool | Notes |
+|---|---|
+| [`postgres/`](postgres/) | Relational. Used by jira + confluence sandboxes. |
 
 ## Planned
 
-| Category | Tools |
+| Tool | Kind |
 |---|---|
-| `rdbms/` | mysql, mariadb |
-| `nosql/` | mongodb, cassandra, dynamodb-local |
-| `kv/` | redis, etcd, memcached |
-| `warehouse/` | clickhouse, duckdb |
-| `streaming/` | kafka (KRaft), rabbitmq, nats |
-| `search/` | elasticsearch, opensearch, meilisearch, typesense |
+| `mysql/`, `mariadb/` | relational |
+| `mongodb/`, `cassandra/`, `dynamodb-local/` | NoSQL |
+| `redis/`, `etcd/`, `memcached/` | key-value |
+| `clickhouse/`, `duckdb/` | warehouse |
+| `kafka/` (KRaft), `rabbitmq/`, `nats/` | streaming |
+| `elasticsearch/`, `opensearch/`, `meilisearch/`, `typesense/` | search |
 
 ## Sandboxes that depend on this vertical
 
 | App sandbox | Depends on |
 |---|---|
-| [`ticketing/jira/`](../ticketing/jira/) | `rdbms/postgres/` |
-| [`documentation/confluence/`](../documentation/confluence/) | `rdbms/postgres/` |
+| [`ticketing/jira/`](../ticketing/jira/) | `databases/postgres/` |
+| [`documentation/confluence/`](../documentation/confluence/) | `databases/postgres/` |
 
 These app sandboxes will not start without the shared postgres up — bring up
-`databases/rdbms/postgres/` first.
+`databases/postgres/` first.
