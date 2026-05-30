@@ -2,7 +2,7 @@
 name: lets-assess-ai-readiness
 description: "Holistic AI readiness assessment for any repository. Evaluates 8 pillars (feedback velocity, error clarity, determinism, change safety, context discoverability, pattern consistency, recovery cost, environment independence) across 6 maturity levels (L0-L5). Produces a hybrid report with deterministic gates, heuristic signals, blockers-to-next-level, and optional scaffolding plans."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.0.0"
   tags: [readiness, audit, ai-readiness, maturity, assessment]
 lifecycle: published

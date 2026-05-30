@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "name": "grafana",
+  "version": "0.1.0",
+  "description": "Grafana — dashboards, datasources, folders, health.",
+  "category": "dashboards",
+  "supported_ops": ["dashboard-list", "dashboard-get", "dashboard-create", "dashboard-delete", "datasource-list", "folder-list", "health"],
+  "env_vars": {
+    "required": ["GRAFANA_URL"],
+    "optional": ["GRAFANA_USER", "GRAFANA_PASSWORD", "GRAFANA_TOKEN"]
+  },
+  "cli_command": "lets-grafana",
+  "package": "lets-grafana",
+  "shim_status": "follow-up"
+}

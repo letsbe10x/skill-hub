@@ -2,7 +2,7 @@
 name: lets-review-pr
 description: "Planner-driven PR review controlplane with repo context discovery, multi-lens reviewer routing, finding consolidation, spec alignment, and GitHub posting with structured verdicts. The canonical workflow for reviewing pull requests."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "3.1.0"
   tags: [review, pull-request, code-quality, architecture, security]
 lifecycle: published

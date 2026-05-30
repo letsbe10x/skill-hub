@@ -2,7 +2,7 @@
 name: lets-verify-change
 description: "Use when implementation is complete and you need a fidelity gate: verify the change matches the spec/PRD and plan, is correctly wired, and passes completeness scripts + tests + smoke checks; produces a gap ledger + scoped loop-back to lets-develop-feature."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "2.1.0"
   tags: [testing, verification, delivery, completeness, enforcement]
 lifecycle: published

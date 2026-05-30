@@ -2,7 +2,7 @@
 name: lets-review-code
 description: "Multi-lens code review with planner-driven depth selection, 6 review lenses, AI failure-mode detection, finding verification, and evidence-quality discipline. Produces severity-ranked findings with confidence scores and gates PR creation on zero blocking issues."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "3.1.0"
   tags: [review, code-quality, delivery, security, architecture]
 lifecycle: published

@@ -2,7 +2,7 @@
 name: lets-create-plan
 description: "Use when you have an approved spec and need a step-by-step implementation plan. Translates spec requirements into bite-sized tasks with exact file paths, complete code, and run commands."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.2.0"
   tags: [planning, implementation, workflow]
 lifecycle: published
