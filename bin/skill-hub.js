@@ -28,6 +28,13 @@ const bundles = {
     "lets-assess-ai-readiness",
     "lets-generate-cli",
     "lets-create-readme-gifs",
+    "lets-search-logs",
+    "lets-inspect-metrics",
+    "lets-manage-alerts",
+    "lets-watch-service",
+    "lets-deploy-check",
+    "lets-triage-incident",
+    "lets-diagnose-k8s",
   ],
   engineering: [
     "lets-start-here",
@@ -84,6 +91,15 @@ const bundles = {
     "lets-onboard-repo",
     "lets-bootstrap-repo",
     "lets-bootstrap-agents-md",
+  ],
+  observability: [
+    "lets-search-logs",
+    "lets-inspect-metrics",
+    "lets-manage-alerts",
+    "lets-watch-service",
+    "lets-deploy-check",
+    "lets-triage-incident",
+    "lets-diagnose-k8s",
   ],
 };
 

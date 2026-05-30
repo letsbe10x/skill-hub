@@ -15,6 +15,7 @@ using the `npx` installer or by copying skill directories manually.
 | design | Design briefs, UX flows, content | `npx github:letsbe10x/skill-hub install design --agent cursor` |
 | research | Competitive scan, content eval, UX, PRD grooming, opportunities | `npx github:letsbe10x/skill-hub install research --agent cursor` |
 | repo-readiness | Score + bootstrap a repo for AI readiness | `npx github:letsbe10x/skill-hub install repo-readiness --agent cursor` |
+| observability | SRE / on-call: logs, metrics, alerts, deploys, incident triage | `npx github:letsbe10x/skill-hub install observability --agent cursor` |
 | all | Every skill in the repo | `npx github:letsbe10x/skill-hub install all --agent cursor` |
 
 Change `--agent cursor` to `--agent claude-code`, `--agent codex`, or
@@ -45,3 +46,4 @@ When you install a bundle manually:
 - [design.md](design.md) — Design workflows
 - [research.md](research.md) — Cross-functional research workflows
 - [repo-readiness.md](repo-readiness.md) — AI-readiness assessment + bootstrap
+- [observability.md](observability.md) — SRE / on-call workflows
