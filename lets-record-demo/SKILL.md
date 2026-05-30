@@ -48,36 +48,6 @@ preview URL, or production page you have permission to record. It is the
 sibling of `lets-create-readme-gifs` (terminal flows via VHS); this skill is
 specifically for **browser demo videos meant for human review surfaces**.
 
-## Install
-
-Install on its own:
-
-```bash
-# Claude Code (default agent)
-npx github:letsbe10x/skill-hub install lets-record-demo
-
-# Cursor / Codex / Copilot
-npx github:letsbe10x/skill-hub install lets-record-demo --agent cursor
-npx github:letsbe10x/skill-hub install lets-record-demo --agent codex
-npx github:letsbe10x/skill-hub install lets-record-demo --agent copilot
-
-# Project-scoped (writes to .claude/skills/ in cwd instead of ~/)
-npx github:letsbe10x/skill-hub install lets-record-demo --scope project
-```
-
-Or as part of a bundle that already includes it:
-
-```bash
-npx github:letsbe10x/skill-hub install engineering --agent claude-code
-npx github:letsbe10x/skill-hub install design       --agent claude-code
-npx github:letsbe10x/skill-hub install all          --agent claude-code
-```
-
-The installer copies the skill directory to the host agent's skills
-directory. **No further setup is needed.** The first time the agent
-invokes the recorder, Playwright + Chromium install themselves
-automatically (see below).
-
 ## How dependencies are handled (no setup step)
 
 The recorder is **self-bootstrapping**. On first invocation it:
