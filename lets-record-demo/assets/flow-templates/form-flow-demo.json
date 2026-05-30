@@ -1,0 +1,25 @@
+{
+  "$schema": "../../references/flow-spec.md",
+  "_description": "Template: a form interaction — focus, type, submit, confirm. Rewrite url + selectors for your app. Never type real credentials.",
+  "url": "http://127.0.0.1:3000/signup",
+  "viewport": { "width": 1280, "height": 800 },
+  "deviceScaleFactor": 2,
+  "colorScheme": "light",
+  "waitUntil": "networkidle",
+  "trailingPauseMs": 800,
+  "steps": [
+    { "action": "wait", "ms": 1200 },
+    { "action": "hover", "selector": "input[name='email']" },
+    { "action": "wait", "ms": 300 },
+    { "action": "click", "selector": "input[name='email']" },
+    { "action": "type", "selector": "input[name='email']", "text": "demo@example.com", "delayMs": 60 },
+    { "action": "wait", "ms": 400 },
+    { "action": "click", "selector": "input[name='workspace']" },
+    { "action": "type", "selector": "input[name='workspace']", "text": "acme-co", "delayMs": 60 },
+    { "action": "wait", "ms": 600 },
+    { "action": "hover", "role": "button", "role_options": { "name": "Continue" } },
+    { "action": "wait", "ms": 400 },
+    { "action": "click", "role": "button", "role_options": { "name": "Continue" } },
+    { "action": "wait", "ms": 2000, "_note": "Capture the success state." }
+  ]
+}

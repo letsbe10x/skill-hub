@@ -28,6 +28,7 @@ const bundles = {
     "lets-assess-ai-readiness",
     "lets-generate-cli",
     "lets-create-readme-gifs",
+    "lets-record-demo",
     "lets-search-logs",
     "lets-inspect-metrics",
     "lets-manage-alerts",
@@ -49,6 +50,7 @@ const bundles = {
     "lets-create-plan",
     "lets-brainstorm",
     "lets-onboard-repo",
+    "lets-record-demo",
   ],
   sdlc: [
     "lets-start-here",
@@ -79,6 +81,7 @@ const bundles = {
   design: [
     "lets-research-ux-walkthrough",
     "lets-research-content-evaluate",
+    "lets-record-demo",
   ],
   "repo-readiness": [
     "lets-onboard-repo",

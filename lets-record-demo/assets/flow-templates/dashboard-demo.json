@@ -1,0 +1,31 @@
+{
+  "$schema": "../../references/flow-spec.md",
+  "_description": "Template: operator-style dashboard with rail nav + table + detail page. Rewrite url + selectors for your app.",
+  "url": "http://127.0.0.1:5173",
+  "viewport": { "width": 1440, "height": 900 },
+  "deviceScaleFactor": 2,
+  "colorScheme": "dark",
+  "waitUntil": "networkidle",
+  "trailingPauseMs": 800,
+  "steps": [
+    { "action": "wait", "ms": 1500, "_note": "Let the hero settle." },
+    { "action": "moveMouse", "x": 720, "y": 400, "steps": 25 },
+    { "action": "wait", "ms": 600 },
+    { "action": "scroll", "y": 320, "durationMs": 700 },
+    { "action": "wait", "ms": 900 },
+    { "action": "scroll", "y": 0, "durationMs": 500 },
+    { "action": "wait", "ms": 500 },
+    { "action": "hover", "selector": "nav a", "nth": 1, "_note": "Rail nav 'Skills' link — adjust nth or use role." },
+    { "action": "wait", "ms": 400 },
+    { "action": "click", "selector": "nav a", "nth": 1 },
+    { "action": "wait", "ms": 1500 },
+    { "action": "hover", "selector": "table tbody tr", "nth": 0 },
+    { "action": "wait", "ms": 500 },
+    { "action": "click", "selector": "table tbody tr", "nth": 0 },
+    { "action": "wait", "ms": 1800 },
+    { "action": "scroll", "y": 400, "durationMs": 700 },
+    { "action": "wait", "ms": 1200 },
+    { "action": "scroll", "y": 0, "durationMs": 500 },
+    { "action": "wait", "ms": 600 }
+  ]
+}

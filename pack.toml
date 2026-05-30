@@ -92,3 +92,6 @@ path = "lets-triage-incident"
 [[components.skills]]
 path = "lets-diagnose-k8s"
 
+[[components.skills]]
+path = "lets-record-demo"
+
