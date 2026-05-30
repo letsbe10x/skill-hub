@@ -1,0 +1,24 @@
+{
+  "_comment": "Templates used by seed.sh. space_key, space_name, page_title are substituted at runtime.",
+  "space": {
+    "key": "${CONFLUENCE_SPACE_KEY}",
+    "name": "${CONFLUENCE_SPACE_NAME}",
+    "description": {
+      "plain": {
+        "value": "Demo space for the lets-sandbox smoke test. Safe to delete.",
+        "representation": "plain"
+      }
+    }
+  },
+  "page": {
+    "type": "page",
+    "title": "Sandbox smoke page",
+    "space": {"key": "${CONFLUENCE_SPACE_KEY}"},
+    "body": {
+      "storage": {
+        "value": "<p>Created by the lets-sandbox smoke test. Safe to delete.</p>",
+        "representation": "storage"
+      }
+    }
+  }
+}

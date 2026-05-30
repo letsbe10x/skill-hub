@@ -1,0 +1,27 @@
+services:
+  jira:
+    # Jira 6.4.13 — last release of the 6.x line (2015). Jira 6.x's setup
+    # wizard offered "Set it up for me" which auto-provisioned an embedded
+    # database AND auto-generated a temporary evaluation license inline —
+    # no MyAtlassian signup, no manual license key entry. Atlassian removed
+    # this path starting in Jira 7.x.
+    #
+    # This image (cptactionhank/atlassian-jira) is the older repo predating
+    # the rename to "atlassian-jira-software". Java 8, port 8080.
+    image: cptactionhank/atlassian-jira:6.4.13
+    platform: linux/amd64
+    container_name: lets-sandbox-jira
+    hostname: jira
+    ports:
+      - "8080:8080"
+    volumes:
+      - jira_data:/var/atlassian/jira
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/status || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+volumes:
+  jira_data:

@@ -74,3 +74,6 @@ for each adapter, this table will tick green.
 - PRD-178 — skill-hub as OSS ground truth, multi-backend foundation
 - decision-008 — adapter companion repo boundary (private adapters stay
   in `letsbe10x/adapters`; only the public OSS subset lives here)
+- `sandboxes/` — sibling top-level directory in this repo. Each sandbox
+  spins up a real instance of the backend an adapter targets, lets you
+  smoke-test the adapter end-to-end before pointing it at production.
