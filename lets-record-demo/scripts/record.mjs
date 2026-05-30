@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-// Generic Playwright recorder for lets-record-demo.
+// Generic browser-flow recorder for lets-record-demo.
+//
+// Self-bootstrapping: on first run, installs Playwright + Chromium into a
+// per-user cache. No separate setup step. Subsequent runs reuse the cache.
 //
 // Drives a headless Chromium through a declarative flow spec (JSON) and
 // writes a .webm. If --out ends in .mov / .mp4 / .gif, the script also
@@ -12,15 +15,17 @@
 // JSON flow schema: see ../references/flow-spec.md.
 // JS escape-hatch: a .mjs flow exports `default async function(page, helpers)`.
 
-import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
-import { dirname, extname, resolve, basename } from "node:path";
+import { execFileSync, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { dirname, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HOME = process.env.HOME || process.env.USERPROFILE || "";
-const TOOLS_DIR = process.env.LETS_RECORD_DEMO_HOME || `${HOME}/.letsbe10x/tools/record-demo`;
 const SCRIPT_DIR = dirname(new URL(import.meta.url).pathname);
+const CACHE_DIR = process.env.LETS_RECORD_DEMO_CACHE || `${HOME}/.cache/lets-record-demo`;
+const PLAYWRIGHT_VERSION = process.env.LETS_RECORD_DEMO_PLAYWRIGHT_VERSION || "1.60.0";
 
+// --- Arg parsing -------------------------------------------------------------
 const args = (() => {
   const out = {};
   const argv = process.argv.slice(2);
@@ -57,10 +62,72 @@ Required:
 Optional:
   --url <url>     Override the flow's "url" field.
   --quiet         Suppress per-step log lines.
+
+First run installs Playwright + Chromium into ${CACHE_DIR}
+(~120 MB, one-time). Override with LETS_RECORD_DEMO_CACHE.
 `);
   process.exit(args.help ? 0 : 1);
 }
 
+// --- Self-bootstrap: ensure Playwright + Chromium ----------------------------
+function ensureNode18() {
+  const major = Number(process.versions.node.split(".")[0]);
+  if (Number.isFinite(major) && major < 18) {
+    console.error(`[record] node ${process.versions.node} detected — need >= 18`);
+    process.exit(3);
+  }
+}
+
+function ensurePlaywrightInstalled() {
+  const pkgPath = `${CACHE_DIR}/node_modules/playwright/package.json`;
+  if (existsSync(pkgPath)) {
+    try {
+      const installed = JSON.parse(readFileSync(pkgPath, "utf8")).version;
+      if (installed === PLAYWRIGHT_VERSION) return;
+    } catch { /* fall through to reinstall */ }
+  }
+  mkdirSync(CACHE_DIR, { recursive: true });
+  const pkgJson = `${CACHE_DIR}/package.json`;
+  if (!existsSync(pkgJson)) {
+    writeFileSync(
+      pkgJson,
+      JSON.stringify({ name: "lets-record-demo-cache", private: true, version: "0.0.0", type: "module" }, null, 2) + "\n",
+    );
+  }
+  console.log(`[record] installing playwright@${PLAYWRIGHT_VERSION} into ${CACHE_DIR} (one-time)…`);
+  const r = spawnSync(
+    "npm",
+    ["install", "--silent", "--no-fund", "--no-audit", `playwright@${PLAYWRIGHT_VERSION}`],
+    { cwd: CACHE_DIR, stdio: "inherit" },
+  );
+  if (r.status !== 0) {
+    console.error(`[record] failed to install playwright (exit ${r.status}). Set HTTPS_PROXY if behind a proxy.`);
+    process.exit(3);
+  }
+}
+
+function ensureChromiumDownloaded() {
+  // Playwright's "install" CLI is idempotent and prints "is already installed"
+  // when the matching browser is present. Cheap to call every run.
+  const r = spawnSync(
+    process.execPath,
+    [`${CACHE_DIR}/node_modules/playwright/cli.js`, "install", "chromium"],
+    { stdio: "inherit" },
+  );
+  if (r.status !== 0) {
+    console.error(`[record] failed to install chromium (exit ${r.status})`);
+    process.exit(3);
+  }
+}
+
+ensureNode18();
+ensurePlaywrightInstalled();
+ensureChromiumDownloaded();
+
+const pwUrl = pathToFileURL(`${CACHE_DIR}/node_modules/playwright/index.mjs`).href;
+const { chromium } = await import(pwUrl);
+
+// --- Paths -------------------------------------------------------------------
 const FLOW_PATH = resolve(args.flow);
 const OUT_PATH = resolve(args.out || `${process.env.PWD || "."}/demo.mov`);
 const OUT_EXT = extname(OUT_PATH).toLowerCase();
@@ -72,16 +139,6 @@ if (!existsSync(FLOW_PATH)) {
   console.error(`[record] flow not found: ${FLOW_PATH}`);
   process.exit(2);
 }
-
-if (!existsSync(`${TOOLS_DIR}/node_modules/playwright/package.json`)) {
-  console.error(`[record] playwright not installed under ${TOOLS_DIR}`);
-  console.error(`[record] run: bash ${SCRIPT_DIR}/setup.sh`);
-  process.exit(3);
-}
-
-// Lazy-import Playwright from the tools dir.
-const pwUrl = pathToFileURL(`${TOOLS_DIR}/node_modules/playwright/index.mjs`).href;
-const { chromium } = await import(pwUrl);
 
 mkdirSync(dirname(OUT_PATH), { recursive: true });
 if (existsSync(VIDEO_DIR)) rmSync(VIDEO_DIR, { recursive: true, force: true });
@@ -111,7 +168,7 @@ log(`flow=${FLOW_PATH}`);
 log(`out=${OUT_PATH}`);
 log(`viewport=${viewport.width}x${viewport.height} scale=${deviceScaleFactor} colorScheme=${colorScheme}`);
 
-// --- Helpers ----------------------------------------------------------------
+// --- Helpers -----------------------------------------------------------------
 async function smoothScrollTo(page, targetY, durationMs = 600) {
   await page.evaluate(
     ([target, dur]) => {
@@ -134,7 +191,9 @@ async function smoothScrollTo(page, targetY, durationMs = 600) {
 }
 
 function locatorFor(page, step) {
-  if (!step.selector) throw new Error(`step "${step.action}" requires "selector"`);
+  if (!step.selector && !step.role && !step.text) {
+    throw new Error(`step "${step.action}" requires "selector", "role", or "text"`);
+  }
   let loc = step.role
     ? page.getByRole(step.role, step.role_options || {})
     : step.text
@@ -191,18 +250,18 @@ try {
           await page.mouse.move(step.x, step.y, { steps: step.steps ?? 20 });
           break;
         case "hover":
-          log(`${tag} ${step.selector}`);
+          log(`${tag} ${step.selector || step.role || step.text}`);
           await locatorFor(page, step).hover();
           break;
         case "click":
-          log(`${tag} ${step.selector}`);
+          log(`${tag} ${step.selector || step.role || step.text}`);
           await locatorFor(page, step).click({
             button: step.button || "left",
             clickCount: step.clickCount || 1,
           });
           break;
         case "type":
-          log(`${tag} ${step.selector}`);
+          log(`${tag} ${step.selector || step.role || step.text}`);
           await locatorFor(page, step).fill("");
           await locatorFor(page, step).type(step.text ?? "", { delay: step.delayMs ?? 40 });
           break;
@@ -250,12 +309,23 @@ rmSync(VIDEO_DIR, { recursive: true, force: true });
 const size = statSync(WEBM_PATH).size;
 log(`wrote ${WEBM_PATH} (${(size / 1024).toFixed(1)} KB)`);
 
-// --- Optional conversion ----------------------------------------------------
+// --- Optional conversion -----------------------------------------------------
 if (!KEEP_WEBM) {
   const convert = `${SCRIPT_DIR}/convert.sh`;
   if (!existsSync(convert)) {
     console.error(`[record] convert.sh not found at ${convert}`);
     process.exit(6);
+  }
+  // ffmpeg presence check — friendlier error than convert.sh's
+  try {
+    execFileSync("ffmpeg", ["-version"], { stdio: "ignore" });
+  } catch {
+    console.error(`[record] ffmpeg not on PATH — install it to convert to ${OUT_EXT}:`);
+    console.error(`         macOS:   brew install ffmpeg`);
+    console.error(`         Debian:  sudo apt install ffmpeg`);
+    console.error(`         Windows: choco install ffmpeg`);
+    console.error(`[record] kept the .webm at ${WEBM_PATH}`);
+    process.exit(7);
   }
   log(`convert -> ${OUT_PATH}`);
   const r = spawnSync("bash", [convert, WEBM_PATH, OUT_PATH], { stdio: "inherit" });

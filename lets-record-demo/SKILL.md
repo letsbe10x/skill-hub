@@ -1,6 +1,6 @@
 ---
 name: lets-record-demo
-description: "Use when you need a polished browser-flow demo video (.mov / .mp4 / .webm / .gif) to attach to a pull request, release note, or design review. Drives a Chromium browser via Playwright through a declarative JSON flow you describe — goto, scroll, click, hover, wait — and produces a faststart-flagged video ready to drop into GitHub. Works against any local or remote URL; the skill is host-agnostic and does not assume any particular app."
+description: "Use when you need a polished browser-flow demo video (.mov / .mp4 / .webm / .gif) to attach to a pull request, release note, or design review. Drives a headless Chromium via Playwright through a declarative JSON flow you describe — goto, scroll, click, hover, wait — and produces a faststart-flagged video ready to drop into GitHub. Host-agnostic: works against any local or remote URL the user has permission to record."
 metadata:
   author: letsbe10x
   version: "0.1.0"
@@ -11,8 +11,7 @@ compatibility:
   agents: [claude-code, cursor, codex, copilot]
   requirements:
     - Node.js 18+ on PATH
-    - ffmpeg on PATH (Homebrew, apt, choco — see scripts/setup.sh)
-    - ~120 MB free disk for Playwright's headless Chromium
+    - ffmpeg on PATH (only required for .mov / .mp4 / .gif output; .webm works without it)
 triggers:
   - record a demo video for the PR
   - create a screencast of this flow
@@ -46,32 +45,28 @@ requests, release notes, and design reviews. The agent:
 
 The skill is **host-agnostic** — point it at any local dev server, deployed
 preview URL, or production page you have permission to record. It is the
-sibling of `lets-create-readme-gifs` (terminal flows via VHS) and
-`lets-browser-evidence` (rerunnable proof for ship gates); this skill is
-specifically for **demo videos meant for human review surfaces**.
+sibling of `lets-create-readme-gifs` (terminal flows via VHS); this skill is
+specifically for **browser demo videos meant for human review surfaces**.
 
-## Install and setup (one-time, idempotent)
+## How dependencies are handled (no setup step)
 
-```bash
-# After installing the skill into your agent's skills dir:
-bash ~/.claude/skills/lets-record-demo/scripts/setup.sh
-# (Adjust path for your agent: ~/.cursor/skills/, ~/.codex/skills/, ~/.github/skills/)
-```
+The recorder is **self-bootstrapping**. On first invocation it:
 
-The setup script:
+- Verifies `node >= 18`.
+- Installs Playwright (`1.60.0` by default) into `~/.cache/lets-record-demo/`
+  via `npm install` (single, one-time, idempotent).
+- Downloads the headless Chromium binary into Playwright's standard cache
+  (`~/Library/Caches/ms-playwright/` on macOS).
 
-1. Verifies `node >= 18` and `ffmpeg` are on PATH; prints platform-specific
-   install hints if not.
-2. Creates `~/.letsbe10x/tools/record-demo/` and runs
-   `npm i playwright@1.60.0 --silent` into it.
-3. Downloads Chromium headless shell via `npx playwright install chromium`.
-4. Writes `~/.letsbe10x/config/record-demo-ready.json` with paths and
-   versions; subsequent runs detect this and skip reinstall.
+Subsequent runs reuse both caches and skip straight to recording. To pin a
+different Playwright version: `LETS_RECORD_DEMO_PLAYWRIGHT_VERSION=1.59.0`.
+To relocate the cache: `LETS_RECORD_DEMO_CACHE=/some/path`.
 
-Skip in CI / air-gapped: `LETS_SKIP_RECORD_DEMO_SETUP=1` (the skill will
-error with a clear message if the tools dir is missing at run time).
-
-Verify readiness any time with [`scripts/doctor.sh`](scripts/doctor.sh).
+`ffmpeg` is the only system dependency — install via your OS package
+manager (`brew install ffmpeg`, `apt install ffmpeg`, `choco install
+ffmpeg`). The recorder produces `.webm` without ffmpeg and emits a clear
+hint with the install command if you ask for `.mov` / `.mp4` / `.gif`
+without it on PATH.
 
 ## When to use
 
@@ -86,8 +81,6 @@ Verify readiness any time with [`scripts/doctor.sh`](scripts/doctor.sh).
 ## When not to use
 
 - The demo is a terminal flow → `lets-create-readme-gifs` (VHS-based).
-- You need rerunnable proof for a ship gate (asserting state, not just
-  showing it) → `lets-browser-evidence`.
 - You need an authenticated production session and don't have an explicit
   consent gate from the data owner.
 - The recording is one-off / throwaway and the OS screen recorder is faster.
@@ -95,46 +88,41 @@ Verify readiness any time with [`scripts/doctor.sh`](scripts/doctor.sh).
 ## Steps
 
 1. Announce: "Using `lets-record-demo`."
-2. **Confirm readiness:** run [`scripts/doctor.sh`](scripts/doctor.sh). If it
-   reports missing tools, tell the user to run
-   [`scripts/setup.sh`](scripts/setup.sh) once.
-3. **Capture intent with the user.** Ask explicitly:
+2. **Capture intent with the user.** Ask explicitly:
    - URL to record (localhost? deployed preview? prod?)
    - Viewport (default `1440 × 900` desktop)
    - The flow in plain English ("land on /, scroll the hero, click 'Skills',
      hover the first row, click it, scroll through the detail page")
    - Output filename + location (default `~/Documents/<slug>.mov`)
    - Output format(s): `mov` (PR-friendly, default), `mp4` (broader),
-     `webm` (smallest), `gif` (no audio, smallest LOC).
-4. **Translate intent → flow spec.** Write a JSON file at
+     `webm` (smallest), `gif` (no audio).
+3. **Translate intent → flow spec.** Write a JSON file at
    `<output-dir>/<slug>.flow.json` following
-   [`references/flow-spec.md`](references/flow-spec.md). Use one of
-   [`assets/flow-templates/`](assets/flow-templates/) as a starting point.
-5. **Checkpoint — confirm the flow spec with the user before recording.**
+   [`references/flow-spec.md`](references/flow-spec.md). Start from one of
+   [`assets/flow-templates/`](assets/flow-templates/) and rewrite the URL,
+   selectors, and timings.
+4. **Checkpoint — confirm the flow spec with the user before recording.**
    Show the JSON and the plain-English summary. Do not proceed without
    explicit y/n confirmation, especially if recording involves
-   click/type actions or non-localhost URLs.
-6. **Record.** Invoke:
+   `click`/`type` actions or non-localhost URLs.
+5. **Record.** Invoke the recorder. First run will install Playwright +
+   Chromium one-time (~120 MB total, ~30s on a fast connection):
    ```bash
-   node ~/.claude/skills/lets-record-demo/scripts/record.mjs \
+   node <skill-dir>/scripts/record.mjs \
      --flow <output-dir>/<slug>.flow.json \
-     --out <output-dir>/<slug>.webm
+     --out <output-dir>/<slug>.mov
    ```
-   The script prints `[record] wrote <path>` on success and exits non-zero
-   on failure.
-7. **Convert** to requested format(s) using
-   [`scripts/convert.sh`](scripts/convert.sh):
-   ```bash
-   bash ~/.claude/skills/lets-record-demo/scripts/convert.sh \
-     <output-dir>/<slug>.webm <output-dir>/<slug>.mov
-   ```
-8. **Report** the absolute paths and the duration / size of each artifact
-   back to the user. Suggest the GitHub markdown to attach the `.mov`
-   (drag-drop into PR description).
-9. **Promotion (optional):** if the user wants the flow spec checked into
+   When `--out` ends in `.mov` / `.mp4` / `.gif`, the script records the
+   `.webm` and then converts in one shot. Exits non-zero on failure with a
+   specific error.
+6. **Report** the absolute paths and the duration / size of each artifact
+   back to the user (use `ffprobe -v error -show_entries
+   format=duration,size <file>`). Suggest the GitHub markdown to attach
+   the `.mov` (drag-drop into the PR description).
+7. **Promotion (optional):** if the user wants the flow spec checked into
    the repo so the next person can rerender, commit
-   `<slug>.flow.json` and a short README pointing at this skill. Do not
-   commit the binary `.mov` unless the repo's policy permits it.
+   `<slug>.flow.json`. Do not commit the binary `.mov` unless the repo's
+   policy permits it.
 
 ## Flow spec — the recording DSL
 
@@ -173,31 +161,27 @@ pass `--flow <file>.mjs` instead — see
 ## Commands
 
 ```bash
-# One-time setup
-bash ~/.claude/skills/lets-record-demo/scripts/setup.sh
+# Record + auto-convert in one shot (writes both .webm and .mov)
+node <skill-dir>/scripts/record.mjs \
+  --flow ~/Documents/my-demo.flow.json \
+  --out ~/Documents/my-demo.mov
 
-# Readiness check
-bash ~/.claude/skills/lets-record-demo/scripts/doctor.sh
-
-# Record (writes .webm)
-node ~/.claude/skills/lets-record-demo/scripts/record.mjs \
+# Record only (writes .webm; no ffmpeg required)
+node <skill-dir>/scripts/record.mjs \
   --flow ~/Documents/my-demo.flow.json \
   --out ~/Documents/my-demo.webm
 
-# Convert (writes .mov via H.264 + faststart)
-bash ~/.claude/skills/lets-record-demo/scripts/convert.sh \
-  ~/Documents/my-demo.webm ~/Documents/my-demo.mov
+# Convert an existing .webm to .mov / .mp4 / .gif
+bash <skill-dir>/scripts/convert.sh ~/Documents/my-demo.webm ~/Documents/my-demo.gif
 
-# Convert to .gif (uses palettegen for quality)
-bash ~/.claude/skills/lets-record-demo/scripts/convert.sh \
-  ~/Documents/my-demo.webm ~/Documents/my-demo.gif
-
-# One-shot: record + convert (uses default mov output)
-node ~/.claude/skills/lets-record-demo/scripts/record.mjs \
-  --flow ~/Documents/my-demo.flow.json \
-  --out ~/Documents/my-demo.mov
-# (when --out ends in .mov/.mp4/.gif the script also converts)
+# Override the flow's url without editing the JSON
+node <skill-dir>/scripts/record.mjs \
+  --flow my-demo.flow.json --out my-demo.mov --url https://staging.example.com
 ```
+
+`<skill-dir>` resolves to `~/.claude/skills/lets-record-demo/`,
+`~/.cursor/skills/lets-record-demo/`, `~/.codex/skills/lets-record-demo/`,
+or `~/.github/skills/lets-record-demo/` depending on the host agent.
 
 ## Output contract
 
@@ -206,8 +190,8 @@ Done when all of the following are satisfied:
 | Artifact | Required | Location / notes |
 |----------|----------|------------------|
 | `<slug>.flow.json` | yes | The declarative spec — keep it; rerunnable |
-| `<slug>.webm` | yes | Raw Playwright capture (1080p+ if viewport is) |
-| `<slug>.<format>` | yes | Final artifact in the format(s) the user asked for; `mov` is faststart-flagged for GitHub inline playback |
+| `<slug>.webm` | yes | Raw Playwright capture at the chosen viewport |
+| `<slug>.<format>` | yes | Final artifact in the format(s) the user asked for; `.mov` is faststart-flagged for GitHub inline playback |
 | Report | yes | Absolute paths + duration / file size for each artifact, returned to the user |
 
 ## Outputs
@@ -232,30 +216,32 @@ Done when all of the following are satisfied:
 - **Committing binary `.mov` / `.mp4` files to repos without policy
   approval.** Most repos prefer hosted attachments; commit the `flow.json`
   source-of-truth and link to the GitHub-hosted attachment instead.
-- **Pure black on dark UIs.** When recording a dark UI, set
-  `colorScheme: "dark"` in the spec so the browser emits proper
-  `prefers-color-scheme: dark` (some apps key off it).
-- **Forgetting `deviceScaleFactor`.** Default to 2 for crisp text on retina;
-  drop to 1 only if file size is a constraint.
+- **Selectors tied to React-internal class names** (`__cls_a1b2c3`) —
+  they change on every build. Prefer `role` + accessible name,
+  `data-testid`, or stable semantic selectors.
+- **No `wait` between hover and click** — the hover state won't render in
+  the video.
 
 ## Error handling
 
-- **`playwright not installed`**: rerun `scripts/setup.sh`. If the install
-  fails behind a corporate proxy, set `HTTPS_PROXY` and retry.
-- **`ffmpeg: command not found`**: print platform-specific install command
-  (`brew install ffmpeg`, `apt install ffmpeg`, `choco install ffmpeg`).
+- **`failed to install playwright`**: rerun in a shell with `HTTPS_PROXY`
+  set if behind a corporate proxy. The cache lives at
+  `~/.cache/lets-record-demo/`; delete it to force a clean reinstall.
+- **`failed to install chromium`**: same proxy story; or set
+  `PLAYWRIGHT_BROWSERS_PATH` to a writable location.
+- **`ffmpeg not on PATH`**: install via `brew install ffmpeg`,
+  `sudo apt install ffmpeg`, or `choco install ffmpeg`. The `.webm` is
+  preserved on conversion failure so you don't lose the recording.
 - **`Timeout 30000ms exceeded` on a selector**: the page didn't render the
   expected element. Re-check the selector, increase the preceding `wait`,
   or add a `waitForSelector` step.
 - **Recording is blank / black**: the browser likely couldn't reach the
   URL. Confirm the dev server is running and curl the URL first.
 - **Cursor not visible in recording**: Playwright's headless mode does not
-  render a real cursor; the skill compensates with subtle `moveMouse`
-  + `hover` actions before clicks. If you need a visible cursor overlay,
-  document it as a follow-up — this skill does not currently inject one.
+  render a real cursor; the skill compensates with `moveMouse` + `hover`
+  actions before clicks to suggest cursor location.
 
 ## Related skills
 
 - Terminal screencasts (VHS / GIF) → [`lets-create-readme-gifs`](../lets-create-readme-gifs/)
-- Rerunnable browser proof for ship gates → [`lets-browser-evidence`](../lets-browser-evidence/)
 - UX walkthroughs with friction logging → [`lets-research-ux-walkthrough`](../lets-research-ux-walkthrough/)

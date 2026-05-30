@@ -4,12 +4,7 @@ End-to-end procedure the agent follows when a user asks for a demo
 recording. Each step lists the action, the artifact produced, and the
 checkpoint (if any) before continuing.
 
-## 1. Confirm tooling
-
-Run `scripts/doctor.sh`. If anything's missing, point the user at
-`scripts/setup.sh` and stop.
-
-## 2. Gather intent
+## 1. Gather intent
 
 Ask explicitly (do not assume):
 
@@ -28,7 +23,7 @@ Ask explicitly (do not assume):
 - Flow includes typing into auth forms (passwords, tokens).
 - Recording would capture other users' data.
 
-## 3. Translate intent → flow spec
+## 2. Translate intent → flow spec
 
 Pick a starting template from `assets/flow-templates/`:
 
@@ -47,7 +42,7 @@ Rewrite the URL, selectors, and timings for the user's flow. Keep:
 
 Save as `<output-dir>/<slug>.flow.json`.
 
-## 4. Checkpoint — confirm the flow
+## 3. Checkpoint — confirm the flow
 
 Show the user:
 1. The JSON (or a summary like "8 steps: goto → wait → moveMouse → scroll
@@ -57,18 +52,22 @@ Show the user:
 
 Get explicit confirmation. Do not skip this for non-localhost URLs.
 
-## 5. Record
+## 4. Record
 
 ```bash
-node ~/.claude/skills/lets-record-demo/scripts/record.mjs \
+node <skill-dir>/scripts/record.mjs \
   --flow <output-dir>/<slug>.flow.json \
   --out <output-dir>/<slug>.mov
 ```
 
-The recorder will write the `.webm` and (if `--out` ends in `.mov`/`.mp4`/`.gif`)
-also produce the converted artifact in one shot.
+First invocation installs Playwright + Chromium under
+`~/.cache/lets-record-demo/` and `~/Library/Caches/ms-playwright/`
+(~120 MB, one-time, ~30s). Subsequent runs skip straight to recording.
 
-## 6. Report
+The recorder writes the `.webm` and (if `--out` ends in `.mov`/`.mp4`/`.gif`)
+converts in one shot via `scripts/convert.sh` (needs `ffmpeg`).
+
+## 5. Report
 
 Tell the user, in order:
 1. Whether recording succeeded (exit code 0 + final paths printed).
@@ -79,7 +78,7 @@ Tell the user, in order:
 4. Whether to commit the `.flow.json` to the repo (yes by default — it's
    tiny and rerunnable; binaries usually not).
 
-## 7. (Optional) Iterate
+## 6. (Optional) Iterate
 
 If the recording missed something:
 - The cursor moved too fast → bump `moveMouse` `steps` or add intermediate
