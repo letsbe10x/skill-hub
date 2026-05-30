@@ -1,15 +1,27 @@
 # adapters/
 
 Per-backend integration code that skills in this repo use to query real
-observability, logging, and tracing tools. Each subdirectory is a
-self-contained adapter for one backend.
+external tools. Adapters are organized by vertical to match the structure
+under `../sandboxes/` — each sandbox spins up the matching adapter's
+target backend locally for end-to-end validation.
 
 ```
 adapters/
-├── splunk/      → Splunk Enterprise (logs)
-├── prometheus/  → Prometheus (metrics)
-├── jaeger/      → Jaeger (traces)
-└── grafana/     → Grafana (dashboards + datasource queries)
+└── observability/
+    ├── logging/splunk/         → Splunk Enterprise
+    ├── monitoring/prometheus/  → Prometheus
+    ├── tracing/jaeger/         → Jaeger
+    └── dashboarding/grafana/   → Grafana
+```
+
+Future verticals (each tracked under their own PRD before landing):
+
+```
+adapters/
+├── ticketing/<tool>/           e.g. jira, linear, github-issues
+├── documentation/<tool>/       e.g. confluence, notion
+├── databases/rdbms/<tool>/     e.g. postgres, mysql
+└── communication/<tool>/       e.g. slack, discord
 ```
 
 ## How adapters are used
