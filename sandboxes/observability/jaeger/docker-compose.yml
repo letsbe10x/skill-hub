@@ -1,0 +1,18 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: lets-sandbox-jaeger
+    hostname: jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # web UI + query API
+      - "4318:4318"     # OTLP HTTP
+      - "4317:4317"     # OTLP gRPC
+      - "14268:14268"   # Jaeger thrift HTTP
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:16686/"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s

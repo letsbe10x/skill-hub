@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "jaeger",
+  "version": "0.1.0",
+  "description": "Jaeger — service / operation discovery and trace search via Query API.",
+  "vertical": "observability",
+  "categories": ["tracing"],
+  "supported_ops": ["services", "operations", "trace-search", "trace-get"],
+  "env_vars": {
+    "required": ["JAEGER_URL"],
+    "optional": ["JAEGER_TOKEN"]
+  },
+  "cli_command": "lets-jaeger",
+  "package": "lets-jaeger",
+  "shim_status": "follow-up"
+}

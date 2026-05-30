@@ -2,7 +2,7 @@
 name: lets-research-prd-grooming
 description: "Use to transform partner or customer feedback into structured PRD inputs — ranked opportunities, acceptance criteria, and open questions. Not for grooming engineering backlogs or technical specs."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.1.0"
   tags: [research, prd, product, requirements, grooming]
 lifecycle: draft

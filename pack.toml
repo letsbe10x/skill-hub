@@ -6,8 +6,8 @@ version = "0.1.0"
 license = "MIT"
 
 [author]
-name = "cogsmith-ai"
-url = "https://github.com/cogsmith-ai/letsbe10x"
+name = "letsbe10x"
+url = "https://github.com/letsbe10x"
 
 [[components.skills]]
 path = "lets-start-here"

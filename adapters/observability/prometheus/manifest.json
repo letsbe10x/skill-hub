@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "prometheus",
+  "version": "0.1.0",
+  "description": "Prometheus — instant and range queries, label/series introspection, target health.",
+  "vertical": "observability",
+  "categories": ["metrics"],
+  "supported_ops": ["query", "query-range", "labels", "series", "targets", "status"],
+  "env_vars": {
+    "required": ["PROMETHEUS_URL"],
+    "optional": ["PROMETHEUS_TOKEN"]
+  },
+  "cli_command": "lets-prometheus",
+  "package": "lets-prometheus",
+  "shim_status": "follow-up"
+}

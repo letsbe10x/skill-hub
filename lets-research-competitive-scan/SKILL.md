@@ -2,7 +2,7 @@
 name: lets-research-competitive-scan
 description: "Use when collecting and comparing competitor positioning, pricing, proof points, and CTAs. Produces a structured comparison report. Not for technical stack analysis or patent research."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.1.0"
   tags: [research, competitive, marketing, ux]
 lifecycle: draft

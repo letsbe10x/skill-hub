@@ -2,7 +2,7 @@
 name: lets-onboard-repo
 description: "Use when you need to understand an unfamiliar repo's structure, commands, and context. Runs onboard_repo goal to discover and write context artifacts."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.0.0"
   tags: [onboarding, bootstrap, context]
 lifecycle: published

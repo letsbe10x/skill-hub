@@ -1,0 +1,32 @@
+[project]
+name = "lets-jaeger"
+version = "0.1.0"
+description = "Agent-native CLI for Jaeger."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "typer>=0.12",
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
+[project.scripts]
+lets-jaeger = "lets_jaeger.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lets_jaeger"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "live: requires a live Jaeger at JAEGER_URL (default http://localhost:16686)",
+]

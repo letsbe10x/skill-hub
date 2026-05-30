@@ -2,7 +2,7 @@
 name: lets-research-ux-walkthrough
 description: "Use when performing a guided UX walkthrough of a flow to log friction, confusion, and drop-off signals. Produces a friction log with severity ratings. Not for A/B testing or quantitative metrics analysis."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.1.0"
   tags: [research, ux, walkthrough]
 lifecycle: draft

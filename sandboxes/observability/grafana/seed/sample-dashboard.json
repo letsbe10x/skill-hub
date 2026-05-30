@@ -1,0 +1,36 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "lets-sandbox-demo",
+    "title": "lets-sandbox-demo",
+    "tags": ["lets-sandbox"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Demo panel",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "datasource": {"type": "grafana", "uid": "grafana"},
+        "targets": [
+          {
+            "refId": "A",
+            "queryType": "randomWalk",
+            "datasource": {"type": "grafana", "uid": "grafana"}
+          }
+        ],
+        "options": {
+          "reduceOptions": {"calcs": ["lastNotNull"]},
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      }
+    ]
+  },
+  "folderId": 0,
+  "overwrite": true,
+  "message": "Seeded by lets sandbox"
+}

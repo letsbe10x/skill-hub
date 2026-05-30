@@ -1,0 +1,19 @@
+{
+  "_comment": "Templates used by seed.sh. project_key, project_name, lead_user, summary, description are substituted at runtime.",
+  "project": {
+    "key": "${JIRA_PROJECT_KEY}",
+    "name": "${JIRA_PROJECT_NAME}",
+    "projectTypeKey": "software",
+    "projectTemplateKey": "com.pyxis.greenhopper.jira:gh-scrum-template",
+    "leadAccountId": "${LEAD_ACCOUNT_ID}",
+    "assigneeType": "PROJECT_LEAD"
+  },
+  "issue": {
+    "fields": {
+      "project": {"key": "${JIRA_PROJECT_KEY}"},
+      "summary": "Sandbox smoke issue",
+      "description": "Created by the lets-sandbox smoke test. Safe to delete.",
+      "issuetype": {"name": "Task"}
+    }
+  }
+}

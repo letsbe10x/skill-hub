@@ -2,7 +2,7 @@
 name: lets-verify-ready
 description: "Use to confirm a change is ready to ship — all checks pass, no red flags are active. Invoke before merging or deploying."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.0.0"
   tags: [verification, completion, quality-gate]
 lifecycle: published

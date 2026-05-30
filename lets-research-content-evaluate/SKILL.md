@@ -2,7 +2,7 @@
 name: lets-research-content-evaluate
 description: "Use when evaluating messaging, copy, or content against a rubric and target personas. Produces scored findings and improvement variants. Not for evaluating code or technical documentation."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.1.0"
   tags: [research, content, messaging, marketing]
 lifecycle: draft

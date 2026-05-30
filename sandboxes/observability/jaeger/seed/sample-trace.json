@@ -1,0 +1,33 @@
+{
+  "_comment": "Template — seed.sh substitutes ${TRACE_ID}, ${SPAN_ID}, ${START_NS}, ${END_NS} at runtime. Hand-editing this file directly is fine for local experimentation; the smoke test uses seed.sh which generates fresh IDs and timestamps each run.",
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {"key": "service.name", "value": {"stringValue": "lets-sandbox-demo"}},
+          {"key": "service.version", "value": {"stringValue": "0.1.0"}}
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {"name": "lets-sandbox", "version": "0.1.0"},
+          "spans": [
+            {
+              "traceId": "${TRACE_ID}",
+              "spanId": "${SPAN_ID}",
+              "name": "demo-operation",
+              "kind": 1,
+              "startTimeUnixNano": "${START_NS}",
+              "endTimeUnixNano": "${END_NS}",
+              "attributes": [
+                {"key": "demo.attribute", "value": {"stringValue": "hello"}},
+                {"key": "demo.count", "value": {"intValue": 42}}
+              ],
+              "status": {"code": 1}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
