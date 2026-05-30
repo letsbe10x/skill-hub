@@ -73,10 +73,10 @@ npx github:letsbe10x/skill-hub install design       --agent claude-code
 npx github:letsbe10x/skill-hub install all          --agent claude-code
 ```
 
-The installer copies the skill directory to the agent's skills dir (e.g.
-`~/.claude/skills/lets-record-demo/`). **No further setup is needed.** The
-first time the agent invokes the recorder, Playwright + Chromium install
-themselves automatically (see below).
+The installer copies the skill directory to the host agent's skills
+directory. **No further setup is needed.** The first time the agent
+invokes the recorder, Playwright + Chromium install themselves
+automatically (see below).
 
 ## How dependencies are handled (no setup step)
 
@@ -135,10 +135,11 @@ without it on PATH.
    Show the JSON and the plain-English summary. Do not proceed without
    explicit y/n confirmation, especially if recording involves
    `click`/`type` actions or non-localhost URLs.
-5. **Record.** Invoke the recorder. First run will install Playwright +
-   Chromium one-time (~120 MB total, ~30s on a fast connection):
+5. **Record.** Invoke the recorder (path is relative to this skill's
+   directory). First run will install Playwright + Chromium one-time
+   (~120 MB total, ~30s on a fast connection):
    ```bash
-   node <skill-dir>/scripts/record.mjs \
+   node scripts/record.mjs \
      --flow <output-dir>/<slug>.flow.json \
      --out <output-dir>/<slug>.mov
    ```
@@ -190,28 +191,29 @@ pass `--flow <file>.mjs` instead — see
 
 ## Commands
 
+All paths below are **relative to this skill's directory**. The host
+agent (Claude Code / Cursor / Codex / Copilot) loads SKILL.md from inside
+its skills dir and resolves these paths from there — no absolute path is
+needed.
+
 ```bash
 # Record + auto-convert in one shot (writes both .webm and .mov)
-node <skill-dir>/scripts/record.mjs \
+node scripts/record.mjs \
   --flow ~/Documents/my-demo.flow.json \
   --out ~/Documents/my-demo.mov
 
 # Record only (writes .webm; no ffmpeg required)
-node <skill-dir>/scripts/record.mjs \
+node scripts/record.mjs \
   --flow ~/Documents/my-demo.flow.json \
   --out ~/Documents/my-demo.webm
 
 # Convert an existing .webm to .mov / .mp4 / .gif
-bash <skill-dir>/scripts/convert.sh ~/Documents/my-demo.webm ~/Documents/my-demo.gif
+bash scripts/convert.sh ~/Documents/my-demo.webm ~/Documents/my-demo.gif
 
 # Override the flow's url without editing the JSON
-node <skill-dir>/scripts/record.mjs \
+node scripts/record.mjs \
   --flow my-demo.flow.json --out my-demo.mov --url https://staging.example.com
 ```
-
-`<skill-dir>` resolves to `~/.claude/skills/lets-record-demo/`,
-`~/.cursor/skills/lets-record-demo/`, `~/.codex/skills/lets-record-demo/`,
-or `~/.github/skills/lets-record-demo/` depending on the host agent.
 
 ## Output contract
 

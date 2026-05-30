@@ -55,7 +55,7 @@ Get explicit confirmation. Do not skip this for non-localhost URLs.
 ## 4. Record
 
 ```bash
-node <skill-dir>/scripts/record.mjs \
+node scripts/record.mjs \
   --flow <output-dir>/<slug>.flow.json \
   --out <output-dir>/<slug>.mov
 ```
