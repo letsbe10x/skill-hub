@@ -1,0 +1,17 @@
+# Responsive matrix (fill per project)
+
+targets:
+  - name: small_mobile
+    width_px: 360
+  - name: typical_mobile
+    width_px: 390
+  - name: tablet
+    width_px: 768
+  - name: desktop
+    width_px: 1280
+
+checks:
+  - no_horizontal_scroll: true
+  - touch_safe_targets: true
+  - fixed_elements_not_obscuring_content: true
+  - typography_readable: true

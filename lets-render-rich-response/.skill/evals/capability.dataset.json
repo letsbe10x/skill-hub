@@ -1,0 +1,94 @@
+{
+  "schema_version": "2",
+  "dataset": {
+    "id": "capability",
+    "description": "Representative capability coverage tasks.",
+    "default_runtime_targets": [
+      "claude"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "cap-diff-view-message",
+      "description": "Correct diff-view structured message emission for a 2-file diff payload",
+      "prompt": "You are using the lets-render-rich-response skill. A run step has produced a diff between two files: file_a.py (before) and file_a.py (after). The diff adds 3 lines and removes 1 line. Emit the correct RailMessage for a diff-view structured fast-path response. Include all required fields: kind, messageId, runId, episodeId, emittedAt, schemaId, schemaVersion, and a payload with files array containing both file entries with their hunks.",
+      "format": "single",
+      "split": "eval",
+      "type": "capability",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "\"kind\": \"structured\"",
+          "\"schemaId\": \"diff-view\"",
+          "\"schemaVersion\": \"1.0.0\"",
+          "\"payload\""
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "cap-generated-tile-spec-complete",
+      "description": "Correct generated tile spec with all required fields and declaredActions",
+      "prompt": "You are using the lets-render-rich-response skill. Generate a GeneratedTileSpec for a comparison card that lets the operator pick between 'Approach A' and 'Approach B'. The tile must declare two actions (pick-a, pick-b), include a tileId, jsx using React.createElement only, a label, and an allowlist with at least one navigateRoutes entry. Show the complete JSON spec.",
+      "format": "single",
+      "split": "eval",
+      "type": "capability",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "\"tileId\"",
+          "\"jsx\"",
+          "React.createElement",
+          "\"label\"",
+          "\"declaredActions\"",
+          "\"pick-a\"",
+          "\"pick-b\""
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "cap-fallback-to-text-on-validation-failure",
+      "description": "Correct fallback to kind:text when JSX fails validation",
+      "prompt": "You are using the lets-render-rich-response skill. You attempted to generate JSX for a tile but the generated code contains eval('malicious'). The validator has rejected it. Show the correct fallback behavior: emit a RailTextMessage (kind: text) and emit a validation_failure audit record. Include runId, episodeId, tileId, reason, and timestamp in the audit record.",
+      "format": "single",
+      "split": "eval",
+      "type": "capability",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "\"kind\": \"text\"",
+          "validation_failure",
+          "runId",
+          "episodeId",
+          "reason"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    }
+  ]
+}

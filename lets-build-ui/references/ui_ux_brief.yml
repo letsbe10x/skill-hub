@@ -1,0 +1,96 @@
+# UI/UX Brief (fill before recommendations or code changes)
+#
+# Purpose: turn “make it look better” into concrete constraints + success criteria.
+# Rule: if you cannot access the UI (URL/dev server/screenshots), request that first.
+
+project:
+  name: ""
+  repo: ""
+  primary_goal: "" # e.g. increase activation, improve trust, reduce time-to-task, modernize
+  success_metrics:
+    - "" # e.g. "time-to-first-success < 2m", "checkout completion +8%", "support tickets -20%"
+  north_star_tasks:
+    - "" # 3–7 key tasks users return for (see ux_architecture.md)
+  primary_pain_points:
+    - "" # observed or reported friction; link to evidence if available
+
+evidence:
+  access:
+    type: "" # url | localhost | screenshots | design_mock
+    details: "" # URL / dev server command / screenshot paths / mock link
+  browser_automation:
+    tool: "" # webwright | playwright_e2e | cursor_browser_mcp | manual
+    workspace: "" # Webwright WORKSPACE_DIR, e.g. outputs/ui-audit-onboarding
+    crafted_script: "" # path to final_script.py or repo e2e spec used for regression
+    last_run: "" # e.g. final_runs/run_1 or CI run link
+  representative_surfaces:
+    - "" # e.g. landing, pricing, dashboard, settings, checkout, onboarding
+  representative_states:
+    - "" # e.g. loading, empty, error, long-form validation, success
+
+users:
+  audience: "" # consumers | SMB admins | enterprise operators | internal teams
+  contexts:
+    - "" # e.g. mobile commuting, desktop at work, low bandwidth
+  accessibility_needs:
+    - "" # e.g. keyboard-only, reduced motion, large text, color-vision deficiency
+
+surface:
+  platform: "" # web | ios | android | desktop
+  device_targets:
+    - "" # e.g. 360–430px mobile, 768px tablet, 1280px desktop
+  pages_or_flows:
+    - name: ""
+      success_state: "" # what “done” looks like on this page/flow
+  navigation_notes:
+    current_structure: "" # e.g. sidebar sections, tabs, nested routes, command palette
+    known_problems:
+      - "" # e.g. "users can't find settings", "too many top-level items"
+    constraints:
+      - "" # e.g. "must preserve routes/deep links"
+
+tech:
+  stack: "" # React | Next.js | Vue | Svelte | SwiftUI | Flutter | etc.
+  styling: "" # Tailwind | CSS Modules | styled-components | etc.
+  component_lib: "" # shadcn/ui | MUI | Chakra | custom | etc.
+  data_notes:
+    primary_entities:
+      - "" # e.g. Project, Task, User, Report
+    async_risks:
+      - "" # e.g. "slow API", "eventual consistency", "permissions vary per user"
+
+direction:
+  product_type: "" # SaaS dashboard | ecommerce | fintech | healthcare | portfolio | etc.
+  style_keywords:
+    - "" # minimal | warm | premium | playful | content-dense | glassy
+  density: "" # low | medium | high
+  motion_level: "" # none | subtle | expressive
+  brand_voice: "" # calm | confident | friendly | technical | luxury
+
+constraints:
+  must_keep:
+    - "" # e.g. IA, route structure, data model, brand logo
+  must_change:
+    - "" # e.g. spacing system, typography, button hierarchy, forms
+  non_goals:
+    - "" # e.g. “do not change IA”, “no new illustrations”, “no rebrand”
+
+ux_architecture:
+  reference: "references/ux_architecture.md"
+  ia_map_created: false
+  data_flow_map_created: false
+  cognitive_load_risks:
+    - "" # decision fatigue, too many controls, unclear hierarchy, jargon, etc.
+  inspiration_scan:
+    comparable_products:
+      - "" # name + link (optional)
+    extracted_principles:
+      - "" # e.g. "fast keyboard-first creation", "clear hierarchy + empty state guidance"
+
+definition_of_done:
+  functional:
+    - "" # e.g. works end-to-end, states covered
+  quality:
+    - "" # e.g. a11y basics pass, responsive pass, no CLS regressions
+  acceptance_tests:
+    - "" # e.g. “Try checkout on 375px and 1280px”

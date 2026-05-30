@@ -1,0 +1,42 @@
+# Functional Inventory (do not lose functionality)
+#
+# Purpose: capture what the app does today so a redesign/rebuild can preserve it.
+# Treat this as the contract for “no functionality regression”.
+
+product:
+  name: ""
+  domain: "" # e.g. SaaS analytics, ecommerce, fintech
+
+roles_and_permissions:
+  - role: "" # e.g. Admin
+    can:
+      - "" # e.g. manage users, edit billing
+    cannot:
+      - "" # e.g. access org-wide export
+
+core_objects:
+  - name: "" # e.g. Project, Invoice, Workspace
+    key_fields:
+      - ""
+    key_actions:
+      - "" # create/edit/delete/export/share
+
+key_surfaces:
+  - surface: "" # page/screen/flow name
+    routes_or_entrypoints:
+      - ""
+    critical_actions:
+      - ""
+    states_required:
+      - loading
+      - empty
+      - error
+
+non_negotiables:
+  - "" # e.g. “Checkout flow must not change steps without PM approval”
+
+test_anchors:
+  unit_or_integration:
+    - "" # command(s) or test suites that must keep passing
+  e2e_or_smoke:
+    - "" # smoke checklist or e2e suite

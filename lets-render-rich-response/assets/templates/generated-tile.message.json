@@ -1,0 +1,18 @@
+{
+  "kind": "generated",
+  "messageId": "{{messageId}}",
+  "runId": "{{runId}}",
+  "episodeId": "{{episodeId}}",
+  "emittedAt": "{{emittedAt}}",
+  "summary": "{{summary}}",
+  "tile": {
+    "tileId": "{{tileId}}",
+    "label": "{{label}}",
+    "jsx": "",
+    "declaredActions": [],
+    "allowlist": {
+      "fetchUrls": [],
+      "navigateRoutes": []
+    }
+  }
+}

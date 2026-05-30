@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RecipeTrace",
+  "description": "Links a generated tile back to the recipe evaluation that shaped it (PRD-162)",
+  "type": "object",
+  "required": ["recipeId", "recipeVersion", "matchScore"],
+  "additionalProperties": false,
+  "properties": {
+    "recipeId": { "type": "string", "description": "Stable ID of the recipe that matched" },
+    "recipeVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "Semver version of the recipe" },
+    "matchScore": { "type": "number", "minimum": 0, "maximum": 100, "description": "0-100 confidence score from RecipeExecutor.evaluateRecipes()" }
+  }
+}

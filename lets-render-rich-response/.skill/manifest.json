@@ -1,0 +1,54 @@
+{
+  "schema_version": "1",
+  "skill": {
+    "entrypoint": "SKILL.md",
+    "name": "lets-render-rich-response"
+  },
+  "evals": [
+    {
+      "id": "smoke",
+      "suite": "smoke",
+      "path": "evals/smoke.dataset.json",
+      "description": "Fast confidence checks for the skill."
+    },
+    {
+      "id": "trigger",
+      "suite": "trigger",
+      "path": "evals/trigger.dataset.json",
+      "description": "Runtime trigger tests that verify when the skill should activate."
+    },
+    {
+      "id": "capability",
+      "suite": "capability",
+      "path": "evals/capability.dataset.json",
+      "description": "Representative capability coverage tasks."
+    },
+    {
+      "id": "regression",
+      "suite": "regression",
+      "path": "evals/regression.dataset.json",
+      "description": "Historical regressions and edge cases."
+    }
+  ],
+  "runtime_targets": [
+    "claude"
+  ],
+  "quality": {
+    "thresholds_path": "quality/thresholds.json",
+    "rubric_baseline_path": "quality/rubric-baseline.json",
+    "calibration_path": "quality/calibration.json",
+    "latest_summary_path": "quality/latest-summary.json",
+    "accepted_runs_path": "evidence/accepted-runs.jsonl"
+  },
+  "agentic_eval": {
+    "scenarios_path": "evals/agent-scenarios.json",
+    "latest_result_path": "quality/agentic-latest.json",
+    "minimum_composite": 0.0,
+    "minimum_counterfactual_gap": 0.0
+  },
+  "provenance": {
+    "skill_sha256": null,
+    "datasets": {},
+    "verifiers": {}
+  }
+}

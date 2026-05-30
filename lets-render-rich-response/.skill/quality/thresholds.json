@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "required_suites": [
+    "smoke"
+  ],
+  "minimum_skill_pass_rate": 0.8,
+  "minimum_delta": 0.0,
+  "maximum_runtime_regression_s": null,
+  "runtime_matrix": [
+    "claude"
+  ]
+}

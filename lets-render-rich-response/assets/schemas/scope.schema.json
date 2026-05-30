@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scope",
+  "description": "Collaboration scope for a generated tile — who can see and interact with it",
+  "type": "object",
+  "required": ["level"],
+  "additionalProperties": false,
+  "properties": {
+    "level": { "type": "string", "enum": ["personal", "group", "org"], "description": "personal = creating user only; group = named users/group; org = all users in the tenant" },
+    "owner": { "type": "string", "description": "IMS user ID or group ID of the scope owner" }
+  }
+}

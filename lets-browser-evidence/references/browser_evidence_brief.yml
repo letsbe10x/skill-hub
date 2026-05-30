@@ -1,0 +1,29 @@
+# Browser evidence brief — shared across lets-build-ui, lets-research-ux-walkthrough, verify flows
+#
+# Fill before capturing live browser evidence.
+
+task:
+  program: "" # ui_build | ux_walkthrough | journey_smoke | regression | competitive_capture
+  summary: "" # one sentence
+
+target:
+  base_url: "" # http://localhost:3000 or staging URL (user-approved)
+  entry_path: "" # e.g. /signup
+  auth_state: "" # logged_out | test_user | none
+  environment: "" # local | staging | production (production requires explicit approval)
+
+evidence:
+  tool: "" # webwright_plugin | webwright_cli | repo_playwright_e2e | ide_browser_mcp
+  workspace: "" # e.g. outputs/browser-evidence-onboarding
+  crafted_script: "" # path to final_script.py or e2e spec after promotion
+  last_run: "" # e.g. final_runs/run_1 or CI URL
+
+constraints:
+  read_only: true # default true for discovery/walkthrough
+  allowed_mutations: [] # empty unless user approved write actions
+  viewport_widths: [] # e.g. [375, 768, 1024, 1440] for UI audits
+
+outputs:
+  plan_path: "" # plan.md in workspace
+  screenshot_glob: "" # where PNGs live
+  log_path: "" # final_script_log.txt when applicable

@@ -69,3 +69,23 @@ path = "lets-generate-cli"
 [[components.skills]]
 path = "lets-create-readme-gifs"
 
+# imported from letsbe10x/skills (PRD-178 Phase 3 follow-through)
+
+[[components.skills]]
+path = "lets-resolve-merge-conflicts"
+
+[[components.skills]]
+path = "lets-render-rich-response"
+
+[[components.skills]]
+path = "lets-build-ui"
+
+[[components.skills]]
+path = "lets-browser-evidence"
+
+[[components.skills]]
+path = "lets-audit-repo"
+
+[[components.skills]]
+path = "lets-triage-issue"
+

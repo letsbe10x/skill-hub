@@ -28,6 +28,12 @@ const bundles = {
     "lets-assess-ai-readiness",
     "lets-generate-cli",
     "lets-create-readme-gifs",
+    "lets-resolve-merge-conflicts",
+    "lets-render-rich-response",
+    "lets-build-ui",
+    "lets-browser-evidence",
+    "lets-audit-repo",
+    "lets-triage-issue",
   ],
   engineering: [
     "lets-start-here",
@@ -42,6 +48,7 @@ const bundles = {
     "lets-create-plan",
     "lets-brainstorm",
     "lets-onboard-repo",
+    "lets-resolve-merge-conflicts",
   ],
   sdlc: [
     "lets-start-here",
@@ -78,6 +85,11 @@ const bundles = {
     "lets-bootstrap-repo",
     "lets-bootstrap-agents-md",
     "lets-assess-ai-readiness",
+    "lets-audit-repo",
+  ],
+  ui: [
+    "lets-build-ui",
+    "lets-browser-evidence",
   ],
   starter: [
     "lets-start-here",
@@ -114,7 +126,7 @@ Usage:
   skill-hub install <bundle-or-skill> [--agent cursor] [--scope user|project] [--dir path]
 
 Bundles:
-  all, starter, engineering, sdlc, research, pm, design, repo-readiness
+  all, starter, engineering, sdlc, research, pm, design, repo-readiness, ui
 
 Agents:
   claude-code, cursor, codex, copilot
