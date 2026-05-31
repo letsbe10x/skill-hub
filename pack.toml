@@ -95,3 +95,6 @@ path = "lets-diagnose-k8s"
 [[components.skills]]
 path = "lets-record-demo"
 
+[[components.skills]]
+path = "lets-graphify-code"
+
