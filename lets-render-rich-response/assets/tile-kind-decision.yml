@@ -1,0 +1,47 @@
+# Decision tree for tile kind — load before classifying.
+# Output must match assets/component-catalog.yml render_paths[].id where applicable.
+
+start: q_intent
+
+nodes:
+  q_intent:
+    question: Does this turn need visual structure beyond prose?
+    no: text-fallback
+    yes: q_diff
+
+  q_diff:
+    question: Is the primary content a before/after text comparison?
+    yes: diff-view
+    no: q_form
+
+  q_form:
+    question: Is the primary goal collecting structured field input?
+    yes: simple-form
+    no: q_registry
+
+  q_registry:
+    question: Does HostCapabilityProfile list a matching schemaId@version?
+    yes: structured
+    no: q_generated
+
+  q_generated:
+    question: Is a custom layout required and embeddable as static createElement data?
+    yes: generated-tile
+    no: text-fallback
+
+outcomes:
+  diff-view:
+    rail_kind: structured
+    catalog_id: diff-view
+  simple-form:
+    rail_kind: structured
+    catalog_id: simple-form
+  structured:
+    rail_kind: structured
+    catalog_id: custom
+  generated-tile:
+    rail_kind: generated
+    catalog_id: generated-tile
+  text-fallback:
+    rail_kind: text
+    catalog_id: text-fallback

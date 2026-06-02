@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WidgetActionSpec",
+  "description": "A single declared action the tile may dispatch via bridge.dispatchAction",
+  "type": "object",
+  "required": ["id", "label"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "kebab-case action identifier; must be unique within the tile" },
+    "label": { "type": "string", "minLength": 1, "description": "Human-readable label for command palette display" },
+    "description": { "type": "string", "description": "What this action does; shown in tool graph" },
+    "inputSchema": { "type": "object", "description": "JSON Schema for the payload the tile passes when dispatching" }
+  }
+}

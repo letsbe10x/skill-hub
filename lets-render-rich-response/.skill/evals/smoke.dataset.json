@@ -1,0 +1,35 @@
+{
+  "schema_version": "2",
+  "dataset": {
+    "id": "smoke",
+    "description": "Fast confidence checks for the skill.",
+    "default_runtime_targets": [
+      "claude"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "runtime-smoke",
+      "description": "Confirms the selected runtime can execute a simple deterministic prompt.",
+      "prompt": "Reply with exactly: SKILL_FORGE_SMOKE_OK",
+      "format": "single",
+      "split": "eval",
+      "type": "capability",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "SKILL_FORGE_SMOKE_OK"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 30
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    }
+  ]
+}

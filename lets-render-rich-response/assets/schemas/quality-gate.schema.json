@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QualityGate",
+  "description": "A quality attestation carried by the tile spec, displayed as QualityChrome by the host",
+  "type": "object",
+  "required": ["id", "label", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "enum": ["created", "reviewed", "tested", "accessible", "localized", "documented", "design_reviewed"] },
+    "label": { "type": "string" },
+    "status": { "type": "string", "enum": ["pass", "fail", "pending", "skipped"] },
+    "passedAt": { "type": "string", "format": "date-time" },
+    "detail": { "type": "string", "description": "Reviewer notes or test output summary" }
+  }
+}

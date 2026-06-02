@@ -1,0 +1,92 @@
+# ux-engine inventory template — fill during lets-build-ui Step 2 when touching @letsbe10x/ux-*
+# Ground against: ground-truth/features/agentic-ux-engine/docs/ux-engine-repo-baseline.md
+
+repo_baseline_sha: a4c7147
+repo_baseline_date: 2026-05-22
+target_repo: ux-engine | gt-ui | control-plane/ui | lens-ui | other
+target_packages: []
+
+surfaces:
+  - id: inbox
+    package: "@letsbe10x/ux-surfaces"
+    shipped: true
+    touched: false
+  - id: workbench
+    package: "@letsbe10x/ux-surfaces"
+    shipped: true
+    touched: false
+  - id: fleet
+    package: "@letsbe10x/ux-surfaces"
+    shipped: true
+    touched: false
+  - id: compare
+    package: "@letsbe10x/ux-surfaces"
+    shipped: true
+    touched: false
+  - id: audit
+    package: "@letsbe10x/ux-surfaces"
+    shipped: true
+    touched: false
+  - id: board
+    package: "@letsbe10x/ux-surfaces"
+    shipped: false
+    touched: false
+
+widgets:
+  - id: TrustBar
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    has_widget_identity: false
+    has_declared_actions: false
+    states_covered: [ready]
+    notes: "Stage 9 → QualityChrome; trust pills incl. lens ids in contracts"
+  - id: GateViewerPanel
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    plan_alias: HitlDrawer
+    has_widget_identity: false
+    notes: "HITL/gate UX — panel not drawer"
+  - id: ArtifactsPanel
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    plan_alias: EvidenceExplorer
+    has_widget_identity: false
+    notes: "Artifact index + preview"
+  - id: InboxPanel
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    has_widget_identity: false
+    notes: "useInboxKeyboard j/k/Enter/e/s/d shipped"
+  - id: CompareView
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    has_widget_identity: false
+    has_declared_actions: false
+    states_covered: [ready, empty]
+    notes: "Stage 9 bellwether"
+  - id: WorkbenchLayout
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+    plan_alias: CockpitTabs
+    notes: "Composes rail, timeline, artifacts, gates, flow"
+  - id: FlowCanvas
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+  - id: FleetView
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+  - id: AuditLogViewer
+    package: "@letsbe10x/ux-widgets"
+    shipped: true
+
+patterns_touched: []
+primitives_touched: []
+
+action_model:
+  domain_actions_used: []   # DomainActionSpec.actionId from profile
+  rail_actions_used: []     # RailAction.actionId
+  new_widget_action_specs: []  # only after decision-031 Phase 1
+
+functional_parity:
+  core_journeys_file: references/core_journeys.yml
+  regressions_allowed: false

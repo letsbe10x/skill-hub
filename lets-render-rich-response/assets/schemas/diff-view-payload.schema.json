@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lets-render-rich-response/diff-view-payload",
+  "title": "DiffViewPayload",
+  "description": "Matches DiffViewRenderer payload (ux-engine track-2-patterns)",
+  "type": "object",
+  "required": ["left", "right"],
+  "additionalProperties": false,
+  "properties": {
+    "left": { "type": "string" },
+    "right": { "type": "string" },
+    "mode": { "type": "string", "enum": ["line", "char"] },
+    "title": { "type": "string" }
+  }
+}

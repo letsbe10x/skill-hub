@@ -1,0 +1,34 @@
+# Component + Surface Inventory
+#
+# Purpose: scope and sequence work (tokens → primitives → components → pages).
+
+surfaces:
+  - name: "" # e.g. Dashboard
+    routes:
+      - "" # /dashboard
+    key_components:
+      - "" # e.g. StatCard, DateRangePicker, ChartPanel
+    states:
+      loading: false
+      empty: false
+      error: false
+
+shared_components:
+  buttons:
+    - "" # PrimaryButton, IconButton
+  forms:
+    - "" # TextField, Select, Checkbox, FormError
+  navigation:
+    - "" # Navbar, Sidebar, Breadcrumbs, Tabs
+  overlays:
+    - "" # Modal, Drawer, Popover, Tooltip, Toast
+  data_display:
+    - "" # Table, DataGrid, Chart, Badge, Avatar
+
+tokens_in_use:
+  colors: false
+  typography: false
+  spacing: false
+  radius: false
+  elevation: false
+  motion: false

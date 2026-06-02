@@ -1,0 +1,35 @@
+{
+  "schema_version": "2",
+  "dataset": {
+    "id": "trigger",
+    "description": "Runtime trigger tests that verify skill activation.",
+    "default_runtime_targets": [
+      "claude"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "trigger-positive",
+      "description": "Confirms the skill trigger can be recognized from a matching request.",
+      "prompt": "You are evaluating whether the skill named 'lets-render-rich-response' should activate. For this synthetic matching request, reply with exactly: TRIGGER_YES",
+      "format": "single",
+      "split": "eval",
+      "type": "trigger",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "TRIGGER_YES"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 30
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    }
+  ]
+}

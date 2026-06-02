@@ -1,0 +1,30 @@
+React.createElement('div', {
+  style: {
+    padding: '16px 20px',
+    background: 'var(--ux-surface-rail, #1c1c1c)',
+    border: '1px solid var(--ux-border-subtle, #2a2a2a)',
+    borderRadius: 8,
+    fontFamily: 'var(--ux-font-sans, system-ui)',
+    color: 'var(--ux-text-primary, #fff)',
+  }
+},
+  React.createElement('div', {
+    style: { fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ux-text-secondary, #a0a0a0)', marginBottom: 12 }
+  }, '{{cardTitle}}'),
+  React.createElement('div', {
+    style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
+  },
+    React.createElement('div', { style: { textAlign: 'center' } },
+      React.createElement('div', { style: { fontSize: 28, fontWeight: 600, color: 'var(--ux-accent-info, #60a5fa)' } }, '{{metric1Value}}'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--ux-text-secondary, #a0a0a0)', marginTop: 4 } }, '{{metric1Label}}')
+    ),
+    React.createElement('div', { style: { textAlign: 'center' } },
+      React.createElement('div', { style: { fontSize: 28, fontWeight: 600, color: 'var(--ux-accent-success, #4ade80)' } }, '{{metric2Value}}'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--ux-text-secondary, #a0a0a0)', marginTop: 4 } }, '{{metric2Label}}')
+    ),
+    React.createElement('div', { style: { textAlign: 'center' } },
+      React.createElement('div', { style: { fontSize: 28, fontWeight: 600, color: 'var(--ux-text-primary, #fff)' } }, '{{metric3Value}}'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--ux-text-secondary, #a0a0a0)', marginTop: 4 } }, '{{metric3Label}}')
+    )
+  )
+)

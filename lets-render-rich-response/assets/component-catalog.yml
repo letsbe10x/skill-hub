@@ -1,0 +1,97 @@
+# Track 2 component catalog — mirrors ux-engine registerCanonical + Track2DemoPanel fixtures.
+# Branch: ux-engine cogsmith-ai/track-2-patterns (merge to main when Track 2 ships).
+# Agent rule: pick the first row whose "when" matches; only use generated when no row fits.
+
+version: "1.0.0"
+canonical_registration: registerCanonical
+host_router: RailMessageRenderer
+
+render_paths:
+  - id: diff-view
+    kind: structured
+    schema_id: diff-view
+    schema_version: "1.0.0"
+    renderer: DiffViewRenderer
+    host_surface: inline
+    sandbox: false
+    when:
+      - before/after text comparison (config, code, tokens, prose)
+      - two blobs that diff line-by-line
+    not_when:
+      - more than two columns or interactive charts
+      - need form input
+    payload_shape:
+      left: string
+      right: string
+      mode: line | char
+      title: string
+    template: assets/templates/structured-diff-view.message.json
+    schema: assets/schemas/diff-view-payload.schema.json
+    showcase_fixture: Track2DemoPanel.makeDiffMessage
+
+  - id: simple-form
+    kind: structured
+    schema_id: simple-form
+    schema_version: "1.0.0"
+    renderer: SimpleFormRenderer
+    host_surface: inline
+    sandbox: false
+    when:
+      - collect operator input (≤8 fields)
+      - confirm/approve step with named fields
+    not_when:
+      - free-form chat reply sufficient
+      - custom layout not expressible as fields[]
+    payload_shape:
+      fields: FormField[]
+      submitActionId: string
+      submitLabel: string
+      title: string
+    field_types: [text, select, date, multiselect]
+    template: assets/templates/structured-simple-form.message.json
+    schema: assets/schemas/simple-form-payload.schema.json
+    showcase_fixture: Track2DemoPanel.makeFormMessage
+
+  - id: generated-tile
+    kind: generated
+    schema_id: null
+    renderer: GeneratedTile
+    host_surface: iframe_srcdoc
+    sandbox: allow-scripts
+    when:
+      - metrics/status card with custom layout
+      - visual not covered by registry renderers
+    not_when:
+      - diff or form suffices
+      - needs host DOM or same-origin
+    spec_shape:
+      tileId: string
+      jsx: string
+      label: string
+      declaredActions: WidgetActionSpec[]
+      allowlist: { fetchUrls: [], navigateRoutes: [] }
+    template: assets/templates/generated-tile.message.json
+    jsx_template: assets/templates/generated-metrics-card.jsx.txt
+    showcase_fixture: Track2DemoPanel.makeGeneratedTileMessage
+
+  - id: text-fallback
+    kind: text
+    when:
+      - classification ambiguous
+      - validation failed
+      - operator only needs prose
+    template: null
+
+host_wiring:
+  registry: StructuredRendererRegistry
+  init: registerCanonical(registry)
+  per_message:
+    component: RailMessageRenderer
+    props:
+      - message
+      - registry
+      - auditAdapter
+      - hostPolicy
+      - onActionDispatch
+      - onNavigate
+      - onAskForProse

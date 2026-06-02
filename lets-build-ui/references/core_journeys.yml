@@ -1,0 +1,17 @@
+# Core Journeys (acceptance contract)
+#
+# Purpose: define the critical paths that must remain working after the rebuild.
+
+journeys:
+  - id: ""
+    name: "" # e.g. “New user onboarding”
+    actor_role: "" # e.g. Member
+    start_state: "" # e.g. logged out
+    success_condition: "" # e.g. reaches dashboard with first project created
+    steps:
+      - ""
+    evidence_required:
+      - "" # screenshots, Webwright final_runs/, crafted final_script.py, playwright test, etc.
+
+regression_checks:
+  - "" # e.g. “Search results render and filters work on mobile width”

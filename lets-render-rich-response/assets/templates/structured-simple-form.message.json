@@ -1,0 +1,17 @@
+{
+  "kind": "structured",
+  "messageId": "{{messageId}}",
+  "runId": "{{runId}}",
+  "episodeId": "{{episodeId}}",
+  "emittedAt": "{{emittedAt}}",
+  "schemaId": "simple-form",
+  "schemaVersion": "1.0.0",
+  "label": "{{label}}",
+  "summary": "{{summary}}",
+  "payload": {
+    "title": "{{title}}",
+    "submitActionId": "{{submitActionId}}",
+    "submitLabel": "{{submitLabel}}",
+    "fields": []
+  }
+}

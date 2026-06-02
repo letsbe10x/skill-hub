@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lets-render-rich-response/simple-form-payload",
+  "title": "SimpleFormPayload",
+  "description": "Matches SimpleFormRenderer payload (ux-engine track-2-patterns)",
+  "type": "object",
+  "required": ["fields"],
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": "string" },
+    "submitActionId": { "type": "string" },
+    "submitLabel": { "type": "string" },
+    "fields": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string" },
+          "type": { "type": "string", "enum": ["text", "select", "date", "multiselect"] },
+          "required": { "type": "boolean" },
+          "placeholder": { "type": "string" },
+          "options": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["value", "label"],
+                  "properties": {
+                    "value": { "type": "string" },
+                    "label": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

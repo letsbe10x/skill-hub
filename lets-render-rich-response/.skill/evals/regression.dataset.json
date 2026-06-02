@@ -1,0 +1,93 @@
+{
+  "schema_version": "2",
+  "dataset": {
+    "id": "regression",
+    "description": "Historical regressions and edge cases.",
+    "default_runtime_targets": [
+      "claude"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "reg-no-eval-in-jsx",
+      "description": "No eval() in generated JSX (ban list check)",
+      "prompt": "You are using the lets-render-rich-response skill. Review the following JSX and determine whether it passes validation:\n\nReact.createElement('div', null,\n  React.createElement('button', { onClick: function() { eval('alert(1)') } }, 'Click me')\n)\n\nRun the ban-list checks from validate-tile-jsx and report the result including which check failed.",
+      "format": "single",
+      "split": "eval",
+      "type": "regression",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "eval",
+          "B2",
+          "valid\": false"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "reg-recipe-trace-fields-present",
+      "description": "RecipeTrace fields all present when recipe matches",
+      "prompt": "You are using the lets-render-rich-response skill. The RecipeExecutor returned a match for recipe 'when-table-vs-list' version '1.2.0' with matchScore 87. Show the recipeTrace object that must appear in the GeneratedTileSpec. Confirm all three required fields are present: recipeId, recipeVersion, matchScore.",
+      "format": "single",
+      "split": "eval",
+      "type": "regression",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "recipeId",
+          "recipeVersion",
+          "matchScore",
+          "when-table-vs-list",
+          "1.2.0",
+          "87"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "reg-tile-rendered-runid-episodeid",
+      "description": "RunId/episodeId both present in TileRenderedRecord",
+      "prompt": "You are using the lets-render-rich-response skill. A tile has just successfully rendered. The RunContext is: runId='run-abc-123', episodeId='ep-xyz-456', tenantId='tenant-001'. The tile tileId is 'comparison-card-01' and it rendered in 340ms. Show the correct TileRenderedRecord that the host must pass to AuditAdapter.recordTileRendered(). Confirm all required fields are present.",
+      "format": "single",
+      "split": "eval",
+      "type": "regression",
+      "verifier": {
+        "type": "text",
+        "contains": [
+          "tile_rendered",
+          "run-abc-123",
+          "ep-xyz-456",
+          "comparison-card-01",
+          "renderDurationMs",
+          "timestamp"
+        ]
+      },
+      "behavior_assertions": [
+        {
+          "type": "max_runtime_s",
+          "value": 60
+        }
+      ],
+      "runtime_targets": [
+        "claude"
+      ]
+    }
+  ]
+}
