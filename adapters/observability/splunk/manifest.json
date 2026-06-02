@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "splunk",
+  "version": "0.1.0",
+  "description": "Splunk Enterprise — search via management REST API, ingest via HEC.",
+  "vertical": "observability",
+  "categories": ["logging", "monitoring"],
+  "supported_ops": ["search", "ingest", "server-info"],
+  "env_vars": {
+    "required": ["SPLUNK_MGMT_URL", "SPLUNK_USER", "SPLUNK_PASSWORD"],
+    "optional": ["SPLUNK_HEC_URL", "SPLUNK_HEC_TOKEN", "SPLUNK_INDEX", "SPLUNK_INSECURE"]
+  },
+  "cli_command": "lets-splunk",
+  "package": "lets-splunk",
+  "shim_status": "follow-up"
+}

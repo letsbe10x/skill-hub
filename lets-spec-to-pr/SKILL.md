@@ -2,7 +2,7 @@
 name: lets-spec-to-pr
 description: "Use when you have an approved spec and want to implement it end-to-end from governance classification through PR creation. Combines change-code, verify-change, and review-change goals."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.0.0"
   tags: [spec, implementation, delivery]
 lifecycle: published

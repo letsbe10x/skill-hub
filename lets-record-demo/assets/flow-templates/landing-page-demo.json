@@ -1,0 +1,27 @@
+{
+  "$schema": "../../references/flow-spec.md",
+  "_description": "Template: marketing / docs site — hero scroll + section browse + CTA click. Rewrite url + selectors for your app.",
+  "url": "https://example.com",
+  "viewport": { "width": 1440, "height": 900 },
+  "deviceScaleFactor": 2,
+  "colorScheme": "no-preference",
+  "waitUntil": "networkidle",
+  "trailingPauseMs": 600,
+  "steps": [
+    { "action": "wait", "ms": 1500 },
+    { "action": "moveMouse", "x": 720, "y": 450, "steps": 25 },
+    { "action": "wait", "ms": 600 },
+    { "action": "scroll", "y": 600, "durationMs": 1200 },
+    { "action": "wait", "ms": 1000 },
+    { "action": "scroll", "y": 1400, "durationMs": 1500 },
+    { "action": "wait", "ms": 1000 },
+    { "action": "scroll", "y": 2200, "durationMs": 1500 },
+    { "action": "wait", "ms": 1000 },
+    { "action": "scroll", "y": 0, "durationMs": 1000, "_note": "Return to hero." },
+    { "action": "wait", "ms": 600 },
+    { "action": "hover", "role": "link", "role_options": { "name": "Get started" } },
+    { "action": "wait", "ms": 400 },
+    { "action": "click", "role": "link", "role_options": { "name": "Get started" } },
+    { "action": "wait", "ms": 1500 }
+  ]
+}

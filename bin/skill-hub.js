@@ -28,6 +28,15 @@ const bundles = {
     "lets-assess-ai-readiness",
     "lets-generate-cli",
     "lets-create-readme-gifs",
+    "lets-record-demo",
+    "lets-graphify-code",
+    "lets-search-logs",
+    "lets-inspect-metrics",
+    "lets-manage-alerts",
+    "lets-watch-service",
+    "lets-deploy-check",
+    "lets-triage-incident",
+    "lets-diagnose-k8s",
     "lets-resolve-merge-conflicts",
     "lets-render-rich-response",
     "lets-build-ui",
@@ -48,6 +57,7 @@ const bundles = {
     "lets-create-plan",
     "lets-brainstorm",
     "lets-onboard-repo",
+    "lets-record-demo",
     "lets-resolve-merge-conflicts",
   ],
   sdlc: [
@@ -79,6 +89,7 @@ const bundles = {
   design: [
     "lets-research-ux-walkthrough",
     "lets-research-content-evaluate",
+    "lets-record-demo",
   ],
   "repo-readiness": [
     "lets-onboard-repo",
@@ -96,6 +107,15 @@ const bundles = {
     "lets-onboard-repo",
     "lets-bootstrap-repo",
     "lets-bootstrap-agents-md",
+  ],
+  observability: [
+    "lets-search-logs",
+    "lets-inspect-metrics",
+    "lets-manage-alerts",
+    "lets-watch-service",
+    "lets-deploy-check",
+    "lets-triage-incident",
+    "lets-diagnose-k8s",
   ],
 };
 

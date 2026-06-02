@@ -1,0 +1,26 @@
+services:
+  splunk:
+    image: splunk/splunk:latest
+    # splunk/splunk only ships linux/amd64. On Apple Silicon, Docker Desktop's
+    # Rosetta 2 emulation handles it transparently — slower (~20% on boot,
+    # negligible at runtime) but functionally correct.
+    platform: linux/amd64
+    container_name: lets-sandbox-splunk
+    hostname: splunk
+    environment:
+      # Both flags are required on recent splunk/splunk images (since ~2026).
+      # See https://www.splunk.com/en_us/legal/splunk-general-terms.html
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_GENERAL_TERMS: "--accept-sgt-current-at-splunk-com"
+      SPLUNK_PASSWORD: "${SPLUNK_PASSWORD:-Changeme123!}"
+      SPLUNK_HEC_TOKEN: "${SPLUNK_HEC_TOKEN:-00000000-0000-0000-0000-000000000000}"
+    ports:
+      - "8000:8000"
+      - "8088:8088"
+      - "8089:8089"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsk -u admin:${SPLUNK_PASSWORD:-Changeme123!} https://localhost:8089/services/server/info > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s

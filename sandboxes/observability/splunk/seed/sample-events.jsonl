@@ -1,0 +1,10 @@
+{"event": "192.168.1.10 - alice [25/May/2026:10:00:01 +0000] \"GET /api/health HTTP/1.1\" 200 12", "sourcetype": "access_combined", "host": "web-01"}
+{"event": "192.168.1.11 - bob   [25/May/2026:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 200 89", "sourcetype": "access_combined", "host": "web-01"}
+{"event": "192.168.1.12 - carol [25/May/2026:10:00:05 +0000] \"GET /api/orders/42 HTTP/1.1\" 404 23", "sourcetype": "access_combined", "host": "web-02"}
+{"event": "192.168.1.13 - dave  [25/May/2026:10:00:07 +0000] \"PUT /api/orders/42 HTTP/1.1\" 500 67", "sourcetype": "access_combined", "host": "web-02"}
+{"event": "192.168.1.14 - eve   [25/May/2026:10:00:09 +0000] \"DELETE /api/orders/41 HTTP/1.1\" 204 0", "sourcetype": "access_combined", "host": "web-01"}
+{"event": "192.168.1.15 - frank [25/May/2026:10:00:12 +0000] \"GET /api/products HTTP/1.1\" 200 1456", "sourcetype": "access_combined", "host": "web-03"}
+{"event": "192.168.1.16 - grace [25/May/2026:10:00:14 +0000] \"POST /api/cart HTTP/1.1\" 201 234", "sourcetype": "access_combined", "host": "web-03"}
+{"event": "192.168.1.17 - henry [25/May/2026:10:00:17 +0000] \"GET /api/cart HTTP/1.1\" 200 567", "sourcetype": "access_combined", "host": "web-01"}
+{"event": "192.168.1.18 - iris  [25/May/2026:10:00:19 +0000] \"POST /api/checkout HTTP/1.1\" 200 89", "sourcetype": "access_combined", "host": "web-02"}
+{"event": "192.168.1.19 - jack  [25/May/2026:10:00:22 +0000] \"GET /api/orders/43 HTTP/1.1\" 200 145", "sourcetype": "access_combined", "host": "web-03"}

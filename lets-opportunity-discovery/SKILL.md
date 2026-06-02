@@ -2,7 +2,7 @@
 name: lets-opportunity-discovery
 description: "Use when discovering and ranking product opportunities from a solution, hypothesis, or research corpus. Produces a scored opportunity map. Not for validating already-decided features."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.1.0"
   tags: [research, product, opportunity, solution, hypothesis, prd]
 lifecycle: draft

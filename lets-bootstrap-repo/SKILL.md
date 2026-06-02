@@ -2,7 +2,7 @@
 name: lets-bootstrap-repo
 description: "Bootstrap a repository for AI readiness by capturing maintainer-confirmed service truth, detecting staleness, running discovery, and reporting readiness. Conversational intake with choice menus, optional enrichment via AGENTS.md generation and coding standards extraction."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "2.0.0"
   tags: [onboarding, bootstrap, context, readiness]
 lifecycle: published

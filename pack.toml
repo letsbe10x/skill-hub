@@ -6,8 +6,8 @@ version = "0.1.0"
 license = "MIT"
 
 [author]
-name = "cogsmith-ai"
-url = "https://github.com/cogsmith-ai/letsbe10x"
+name = "letsbe10x"
+url = "https://github.com/letsbe10x"
 
 [[components.skills]]
 path = "lets-start-here"
@@ -68,6 +68,35 @@ path = "lets-generate-cli"
 
 [[components.skills]]
 path = "lets-create-readme-gifs"
+
+# observability / SRE — pair with adapters/observability/* (PRD-178 Phase 3)
+
+[[components.skills]]
+path = "lets-search-logs"
+
+[[components.skills]]
+path = "lets-inspect-metrics"
+
+[[components.skills]]
+path = "lets-manage-alerts"
+
+[[components.skills]]
+path = "lets-watch-service"
+
+[[components.skills]]
+path = "lets-deploy-check"
+
+[[components.skills]]
+path = "lets-triage-incident"
+
+[[components.skills]]
+path = "lets-diagnose-k8s"
+
+[[components.skills]]
+path = "lets-record-demo"
+
+[[components.skills]]
+path = "lets-graphify-code"
 
 # imported from letsbe10x/skills (PRD-178 Phase 3 follow-through)
 

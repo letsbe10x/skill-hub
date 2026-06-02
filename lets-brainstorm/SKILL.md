@@ -2,7 +2,7 @@
 name: lets-brainstorm
 description: "Use BEFORE any creative work — creating features, building components, adding functionality, modifying behavior, or resolving any open design question. Turns an unresolved question into a validated spec artifact and routes to the correct downstream skill."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "0.4.0"
   tags: [exploration, design, spec, architecture, decisions, ideation, creative-work]
 lifecycle: draft

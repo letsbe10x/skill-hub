@@ -1,0 +1,47 @@
+services:
+  confluence:
+    image: atlassian/confluence:latest
+    # Atlassian publishes amd64-only manifests. Docker Desktop's Rosetta
+    # handles emulation on Apple Silicon.
+    platform: linux/amd64
+    container_name: lets-sandbox-confluence
+    hostname: confluence
+    environment:
+      JVM_MINIMUM_MEMORY: "512m"
+      JVM_MAXIMUM_MEMORY: "1536m"
+      ATL_PROXY_NAME: "localhost"
+      ATL_PROXY_PORT: "8090"
+      # Points at the shared postgres sandbox via the lets-sandbox-data
+      # network. The Confluence-specific database + user are created by
+      # the postgres sandbox's init script on first boot.
+      ATL_DB_TYPE: "postgresql"
+      ATL_JDBC_URL: "jdbc:postgresql://lets-sandbox-postgres:5432/confluencedb"
+      ATL_JDBC_USER: "confluence"
+      ATL_JDBC_PASSWORD: "confluence"
+      ATL_DB_DRIVER: "org.postgresql.Driver"
+    ports:
+      - "8090:8090"
+      - "8091:8091"
+    volumes:
+      - confluence_data:/var/atlassian/application-data/confluence
+    networks:
+      - default
+      - lets-sandbox-data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:8090/status | grep -q 'RUNNING\\|FIRST_RUN' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 120s
+
+volumes:
+  confluence_data:
+
+# This sandbox depends on the shared postgres sandbox. Bring up postgres
+# FIRST: `cd ~/lets/skill-hub/sandboxes/databases/postgres && ./smoke.sh`
+# (with KEEP_RUNNING=1 if you want it to persist for jira/confluence to use).
+networks:
+  default:
+  lets-sandbox-data:
+    external: true
+    name: lets-sandbox-data

@@ -2,7 +2,7 @@
 name: lets-bootstrap-agents-md
 description: "Generate evidence-backed AGENTS.md files for a repo module hierarchy. Runs bottom-up discovery, tiers modules, generates per-module docs with verified commands and evidence citations, then synthesizes the root last. Includes correctness/completeness/actionability verification gates."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "2.0.0"
   tags: [agents, documentation, context, bootstrap]
 lifecycle: published

@@ -2,7 +2,7 @@
 name: lets-develop-feature
 description: "Full-lifecycle feature development with intake discovery, compositional delegation, staged execution, service-context binding, spec-alignment checking, architecture gates, and evidence-gated completion. Graduated rigor from trivial fixes to multi-slice features."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "5.2.0"
   tags: [implementation, change-management, delivery, governance, architecture, intake, discovery]
 lifecycle: published

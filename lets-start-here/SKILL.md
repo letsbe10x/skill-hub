@@ -2,7 +2,7 @@
 name: lets-start-here
 description: "INVOKE FIRST before any letsbe10x task — classifies intent, establishes governance context, and routes to the correct skill. Do not bypass this when a trigger word matches. Use this before all code changes, investigations, reviews, onboarding, and planning."
 metadata:
-  author: cogsmith-ai
+  author: letsbe10x
   version: "1.0.0"
   tags: [routing, sdlc, entry-point, classification]
 lifecycle: published

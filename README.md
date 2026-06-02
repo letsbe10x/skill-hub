@@ -118,6 +118,7 @@ npx github:letsbe10x/skill-hub install engineering --agent cursor
 | "Evaluate copy or messaging" | `lets-research-content-evaluate` |
 | "Walk through a UX flow and log friction" | `lets-research-ux-walkthrough` |
 | "Generate a CLI for Splunk / NewRelic / any tool" | `lets-generate-cli` |
+| "Record a browser-flow demo video for a PR" | `lets-record-demo` |
 
 ## Suggested Skill Sets
 
@@ -135,6 +136,7 @@ For code delivery from plan through review:
 | `lets-review-code` | Run multi-lens code review with verified findings |
 | `lets-review-pr` | Review pull requests with diff context, spec alignment, and verdicts |
 | `lets-spec-to-pr` | Implement an approved spec through PR creation |
+| `lets-record-demo` | Record a browser-flow demo video (.mov / .mp4 / .gif) for a PR |
 
 ### Repo Readiness
 
@@ -183,6 +185,7 @@ For product strategy, PRDs, UX, and messaging:
 | `lets-research-content-evaluate` | Draft | Content evaluation |
 | `lets-research-ux-walkthrough` | Draft | UX walkthrough |
 | `lets-generate-cli` | Published | Generate an agent-native CLI for any tool (REST, GraphQL, stateful, process, GUI) |
+| `lets-record-demo` | Published | Record a browser-flow demo video (.mov / .mp4 / .gif) for a PR via a declarative JSON flow |
 
 ## Contributing
 
